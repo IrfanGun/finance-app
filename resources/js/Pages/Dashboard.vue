@@ -1,12 +1,13 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChartPie, ChevronRight, Flag, Plus } from 'lucide-vue-next';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Camera, ChartPie, ChevronRight, Flag, Plus } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import FormInput from '@/Components/FormInput.vue';
 import SelectInput from '@/Components/SelectInput.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { index as categoriesIndex } from '@/routes/categories';
+import { scan as receiptScan } from '@/routes/receipt';
 import { store as transactionStore } from '@/actions/App/Http/Controllers/TransactionController';
 
 const page = usePage();
@@ -64,7 +65,7 @@ onUnmounted(() => {
 
 const shortcuts = [
     { icon: Plus, label: 'Add' },
-    { icon: ArrowUpRight, label: 'Transfer' },
+    { icon: Camera, label: 'Scan', href: receiptScan.url() },
     { icon: ChartPie, label: 'Budget' },
     { icon: Flag, label: 'Plan' },
 ];
@@ -88,7 +89,7 @@ const shortcuts = [
             <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border-[80px] border-white/10"></div>
             <div class="relative mt-5 flex items-center justify-between"><div><p class="text-sm text-blue-100">Good morning,</p><h1 class="text-2xl font-semibold">{{ userName }}</h1></div><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA]">{{ userName.slice(0, 2).toUpperCase() }}</div></div>
             <div class="relative mt-7"><p class="text-sm text-blue-100">Total balance</p><p class="mt-1 text-[32px] font-semibold">Rp {{ formatCurrency(summary.balance) }}</p></div>
-            <div class="relative mt-7 grid grid-cols-4 gap-3 text-center text-xs"><div v-for="item in shortcuts" :key="item.label"><span class="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#2457DA]"><component :is="item.icon" :size="19" /></span><span class="mt-1 block">{{ item.label }}</span></div></div>
+            <div class="relative mt-7 grid grid-cols-4 gap-3 text-center text-xs"><div v-for="item in shortcuts" :key="item.label"><Link v-if="item.href" :href="item.href" class="block"><span class="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#2457DA]"><component :is="item.icon" :size="19" /></span><span class="mt-1 block">{{ item.label }}</span></Link><template v-else><span class="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#2457DA]"><component :is="item.icon" :size="19" /></span><span class="mt-1 block">{{ item.label }}</span></template></div></div>
         </header>
 
         <main class="space-y-7 px-6 pt-6">
