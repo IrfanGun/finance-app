@@ -17,7 +17,7 @@ import {
     ScanLine,
 } from 'lucide-vue-next';
 
-import { PaddleOCR } from '@paddleocr/paddleocr-js';
+import type { PaddleOCR as PaddleOCRClass } from '@paddleocr/paddleocr-js';
 import * as ort from 'onnxruntime-web/wasm';
 
 import { dashboard } from '@/routes';
@@ -59,9 +59,9 @@ const requiredStableFrames = 3;
 /**
  * Interval detection.
  *
- * 250ms = sekitar 4 inference / detik.
+ * 500ms = sekitar 2 inference / detik, lebih ringan untuk perangkat mobile.
  */
-const detectionInterval = 250;
+const detectionInterval = 500;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,7 +167,7 @@ const detection = ref<Detection | null>(null);
 */
 
 let paddleOcr:
-    Awaited<ReturnType<typeof PaddleOCR.create>> | null = null;
+    Awaited<ReturnType<typeof PaddleOCRClass.create>> | null = null;
 
 let cameraStream: MediaStream | null = null;
 
@@ -242,6 +242,9 @@ async function getDetectionSession() {
 
 async function getPaddleOcr() {
     if (!paddleOcr) {
+        const { PaddleOCR } =
+            await import('@paddleocr/paddleocr-js');
+
         paddleOcr =
             await PaddleOCR.create({
                 lang: 'en',
@@ -343,40 +346,6 @@ function extractReceiptAmounts(
     }
 }
 
-function extractReceiptTotal(
-    items: Array<{
-        text: string;
-    }>,
-) {
-    const lines =
-        items
-            .map((item) => item.text.trim())
-            .filter(Boolean);
-
-    const total =
-        extractAmount(
-            lines,
-            /\b(t[o0]ta[l1]|jumlah|j[uy]mlah|bayar|bayer)\b/i,
-        );
-
-    return total;
-}
-
-function formatAmount(
-    amount: number | null,
-) {
-    if (amount === null) {
-        return 'Tidak ditemukan';
-    }
-
-    return new Intl.NumberFormat(
-        'id-ID',
-        {
-            maximumFractionDigits: 0,
-        },
-    ).format(amount);
-}
-
 /*
 |--------------------------------------------------------------------------
 | File Picker
@@ -420,16 +389,14 @@ async function openCamera() {
                         ideal: 'environment',
                     },
 
-                    aspectRatio: {
-                        ideal: 9 / 16,
-                    },
-
                     width: {
-                        ideal: 1080,
+                        ideal: 720,
+                        max: 1280,
                     },
 
                     height: {
-                        ideal: 1920,
+                        ideal: 1280,
+                        max: 1280,
                     },
                 },
             });
@@ -1138,37 +1105,6 @@ function cropImage(
 |--------------------------------------------------------------------------
 */
 
-function getPortraitCrop(
-    width: number,
-    height: number,
-) {
-    const portraitRatio =
-        2 / 3;
-
-    let cropWidth =
-        width;
-
-    let cropHeight =
-        width /
-        portraitRatio;
-
-    if (cropHeight > height) {
-        cropHeight =
-            height;
-
-        cropWidth =
-            height *
-            portraitRatio;
-    }
-
-    return {
-        x: (width - cropWidth) / 2,
-        y: (height - cropHeight) / 2,
-        width: cropWidth,
-        height: cropHeight,
-    };
-}
-
 function videoFrameToImage():
     Promise<HTMLImageElement | null> {
     return new Promise(
@@ -1189,17 +1125,11 @@ function videoFrameToImage():
                     'canvas',
                 );
 
-            const crop =
-                getPortraitCrop(
-                    video.value.videoWidth,
-                    video.value.videoHeight,
-                );
-
             canvas.width =
-                Math.round(crop.width);
+                video.value.videoWidth;
 
             canvas.height =
-                Math.round(crop.height);
+                video.value.videoHeight;
 
             const context =
                 canvas.getContext(
@@ -1214,11 +1144,10 @@ function videoFrameToImage():
 
             context.drawImage(
                 video.value,
-
-                crop.x,
-                crop.y,
-                crop.width,
-                crop.height,
+                0,
+                0,
+                canvas.width,
+                canvas.height,
                 0,
                 0,
                 canvas.width,
@@ -1545,47 +1474,8 @@ async function detectCameraFrame() {
             stableDetectionCount >=
             requiredStableFrames
         ) {
-            const candidateCrop =
-                cropImage(
-                    image,
-                    detected,
-                );
-
-            const [candidateOcr] =
-                await (
-                    await getPaddleOcr()
-                ).predict(
-                    candidateCrop,
-                );
-
-            const candidateTotal =
-                candidateOcr
-                    ? extractReceiptTotal(
-                        candidateOcr.items,
-                    )
-                    : null;
-
-            if (
-                candidateTotal === null
-            ) {
-                stableDetectionCount =
-                    0;
-
-                statusMessage.value =
-                    'Struk belum tervalidasi. Pastikan teks Total atau Jumlah dan nominalnya terlihat jelas.';
-
-                scheduleNextDetection();
-
-                return;
-            }
-
-            totalAmount.value =
-                candidateTotal;
-
             statusMessage.value =
-                `TOTAL ${formatAmount(
-                    candidateTotal,
-                )} terbaca. Menyiapkan foto…`;
+                'Struk stabil. Menyiapkan foto...';
 
             autoCaptured =
                 true;
@@ -1593,9 +1483,7 @@ async function detectCameraFrame() {
             statusMessage.value =
                 'Struk stabil. Mengambil foto…';
 
-            await autoCaptureReceipt(
-                candidateTotal,
-            );
+            await autoCaptureReceipt();
 
             return;
         }
@@ -1643,17 +1531,11 @@ async function autoCaptureReceipt(
             'canvas',
         );
 
-    const crop =
-        getPortraitCrop(
-            video.value.videoWidth,
-            video.value.videoHeight,
-        );
-
     canvas.width =
-        Math.round(crop.width);
+        video.value.videoWidth;
 
     canvas.height =
-        Math.round(crop.height);
+        video.value.videoHeight;
 
     const context =
         canvas.getContext('2d');
@@ -1667,11 +1549,10 @@ async function autoCaptureReceipt(
 
     context.drawImage(
         video.value,
-
-        crop.x,
-        crop.y,
-        crop.width,
-        crop.height,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
         0,
         0,
         canvas.width,
@@ -2024,13 +1905,13 @@ onUnmounted(
                     @change="handleFile" />
 
                 <!-- LIVE CAMERA -->
-                <div v-if="cameraActive" class="relative overflow-hidden rounded-xl bg-black">
+                <div v-if="cameraActive" class="relative overflow-hidden rounded-xl">
                     <video ref="video" muted playsinline autoplay
-                        class="aspect-[9/16] max-h-[70vh] w-full object-contain" />
+                        class="block h-auto max-h-[70vh] w-full" />
 
                     <!-- Receipt positioning guide -->
                     <div class="pointer-events-none absolute inset-0 flex items-center justify-center px-8 py-12">
-                        <div class="relative h-[72%] w-[78%] rounded-xl border-2 border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.28)]">
+                        <div class="relative h-[72%] w-[78%] rounded-xl border-2 border-white/90">
                             <span class="absolute -left-0.5 -top-0.5 h-8 w-8 rounded-tl-lg border-l-4 border-t-4 border-blue-400" />
                             <span class="absolute -right-0.5 -top-0.5 h-8 w-8 rounded-tr-lg border-r-4 border-t-4 border-blue-400" />
                             <span class="absolute -bottom-0.5 -left-0.5 h-8 w-8 rounded-bl-lg border-b-4 border-l-4 border-blue-400" />
