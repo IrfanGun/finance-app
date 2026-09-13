@@ -21,7 +21,6 @@ import { PaddleOCR } from '@paddleocr/paddleocr-js';
 import * as ort from 'onnxruntime-web/wasm';
 
 import { dashboard } from '@/routes';
-import { model as receiptModel } from '@/routes/receipt';
 import { store as transactionStore } from '@/actions/App/Http/Controllers/TransactionController';
 import {
     useTransactionForm,
@@ -229,7 +228,9 @@ async function getDetectionSession() {
         statusMessage.value = 'Memuat model YOLO…';
 
         detectionSession = await ort.InferenceSession.create(
-            receiptModel.url(),
+            getRuntimeAssetUrl(
+                '/models/YOLOv8_receipt.onnx',
+            ),
             {
                 executionProviders: ['wasm'],
             },
