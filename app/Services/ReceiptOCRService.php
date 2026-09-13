@@ -8,7 +8,7 @@ class ReceiptOCRService
 {
     public function modelPath(): string
     {
-        return storage_path('app/models/YOLOv8_receipt.onnx');
+        return public_path('models/YOLOv8_receipt.onnx');
     }
 
     public function modelExists(): bool
@@ -20,7 +20,7 @@ class ReceiptOCRService
     {
         if (! $this->modelExists()) {
             throw new RuntimeException(
-                'YOLOv8_receipt.onnx tidak ditemukan di storage/app/models.',
+                'YOLOv8_receipt.onnx tidak ditemukan di public/models.',
             );
         }
     }
