@@ -5,7 +5,10 @@ ENV PYTHONUNBUFFERED=1
 ENV PADDLE_HOME=/models/paddle
 
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y libgomp1 \
+    && apt-get install --no-install-recommends -y \
+        libgomp1 \
+        libgl1 \
+        libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

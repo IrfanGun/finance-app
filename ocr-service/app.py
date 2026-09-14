@@ -4,12 +4,17 @@ import json
 import os
 import re
 from io import BytesIO
-from threading import Lock
 from typing import Any
 
 import numpy as np
+
 from fastapi import FastAPI, File, Header, HTTPException, UploadFile
 from PIL import Image, ImageEnhance, ImageFilter
+from paddleocr import PaddleOCR
+
+
+MAX_FILE_SIZE = 8 * 1024 * 1024
+OCR_PIPELINE: PaddleOCR | None = None
 
 
 app = FastAPI(
@@ -17,28 +22,19 @@ app = FastAPI(
     version="1.0.0",
 )
 
-MAX_FILE_SIZE = 8 * 1024 * 1024
-OCR_LOCK = Lock()
-OCR_PIPELINE: Any = None
 
-
-def get_ocr_pipeline() -> Any:
+@app.on_event("startup")
+def startup_event() -> None:
     global OCR_PIPELINE
 
-    if OCR_PIPELINE is None:
-        with OCR_LOCK:
-            if OCR_PIPELINE is None:
-                from paddleocr import PaddleOCR
+    OCR_PIPELINE = PaddleOCR(
+        lang="en",
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,
+        use_textline_orientation=False,
+    )
 
-                OCR_PIPELINE = PaddleOCR(
-                    lang="en",
-                    use_doc_orientation_classify=False,
-                    use_doc_unwarping=False,
-                    use_textline_orientation=False,
-                    engine="paddle",
-                )
-
-    return OCR_PIPELINE
+    print("PaddleOCR initialized")
 
 
 def prepare_image(data: bytes) -> np.ndarray:
@@ -78,7 +74,10 @@ def result_payload(result: Any) -> dict[str, Any]:
 
 
 def run_ocr(image: np.ndarray) -> tuple[str, float]:
-    results = get_ocr_pipeline().predict(image)
+    if OCR_PIPELINE is None:
+        raise RuntimeError("OCR pipeline belum terinisialisasi")
+
+    results = OCR_PIPELINE.predict(image)
     lines: list[tuple[float, str, float]] = []
 
     for result in results:
