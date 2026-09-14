@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinancialAccountController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\TransactionController;
@@ -15,6 +16,7 @@ Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verif
 
 Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::resource('assets', FinancialAccountController::class)->parameters(['assets' => 'account'])->only(['index', 'store', 'update', 'destroy']);
     Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('receipt/scan', [ReceiptController::class, 'scan'])->name('receipt.scan');
     Route::post('receipt/ocr', [ReceiptController::class, 'ocr'])
