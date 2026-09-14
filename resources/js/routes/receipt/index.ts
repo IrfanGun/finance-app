@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\ReceiptController::scan
- * @see app/Http/Controllers/ReceiptController.php:13
+ * @see app/Http/Controllers/ReceiptController.php:15
  * @route '/receipt/scan'
  */
 export const scan = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ scan.definition = {
 
 /**
 * @see \App\Http\Controllers\ReceiptController::scan
- * @see app/Http/Controllers/ReceiptController.php:13
+ * @see app/Http/Controllers/ReceiptController.php:15
  * @route '/receipt/scan'
  */
 scan.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ scan.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ReceiptController::scan
- * @see app/Http/Controllers/ReceiptController.php:13
+ * @see app/Http/Controllers/ReceiptController.php:15
  * @route '/receipt/scan'
  */
 scan.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ scan.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\ReceiptController::scan
- * @see app/Http/Controllers/ReceiptController.php:13
+ * @see app/Http/Controllers/ReceiptController.php:15
  * @route '/receipt/scan'
  */
 scan.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -43,50 +43,41 @@ scan.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see \App\Http\Controllers\ReceiptController::model
- * @see app/Http/Controllers/ReceiptController.php:29
- * @route '/receipt/model'
+* @see \App\Http\Controllers\ReceiptController::ocr
+ * @see app/Http/Controllers/ReceiptController.php:34
+ * @route '/receipt/ocr'
  */
-export const model = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: model.url(options),
-    method: 'get',
+export const ocr = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: ocr.url(options),
+    method: 'post',
 })
 
-model.definition = {
-    methods: ["get","head"],
-    url: '/receipt/model',
-} satisfies RouteDefinition<["get","head"]>
+ocr.definition = {
+    methods: ["post"],
+    url: '/receipt/ocr',
+} satisfies RouteDefinition<["post"]>
 
 /**
-* @see \App\Http\Controllers\ReceiptController::model
- * @see app/Http/Controllers/ReceiptController.php:29
- * @route '/receipt/model'
+* @see \App\Http\Controllers\ReceiptController::ocr
+ * @see app/Http/Controllers/ReceiptController.php:34
+ * @route '/receipt/ocr'
  */
-model.url = (options?: RouteQueryOptions) => {
-    return model.definition.url + queryParams(options)
+ocr.url = (options?: RouteQueryOptions) => {
+    return ocr.definition.url + queryParams(options)
 }
 
 /**
-* @see \App\Http\Controllers\ReceiptController::model
- * @see app/Http/Controllers/ReceiptController.php:29
- * @route '/receipt/model'
+* @see \App\Http\Controllers\ReceiptController::ocr
+ * @see app/Http/Controllers/ReceiptController.php:34
+ * @route '/receipt/ocr'
  */
-model.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: model.url(options),
-    method: 'get',
-})
-/**
-* @see \App\Http\Controllers\ReceiptController::model
- * @see app/Http/Controllers/ReceiptController.php:29
- * @route '/receipt/model'
- */
-model.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: model.url(options),
-    method: 'head',
+ocr.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: ocr.url(options),
+    method: 'post',
 })
 const receipt = {
     scan: Object.assign(scan, scan),
-model: Object.assign(model, model),
+ocr: Object.assign(ocr, ocr),
 }
 
 export default receipt

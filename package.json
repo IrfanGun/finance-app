@@ -27,8 +27,6 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
-        "@paddleocr/paddleocr-js": "^0.4.2",
-        "lucide-vue-next": "^1.0.0",
-        "onnxruntime-web": "^1.29.0"
+        "lucide-vue-next": "^1.0.0"
     }
 }

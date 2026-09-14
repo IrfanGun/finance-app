@@ -28,6 +28,7 @@ Thumbs.db
 *.tar
 *.tar.gz
 *.tgz
-
-!public/paddleocr/
-!public/paddleocr/*.tar
+ocr-service/__pycache__/
+ocr-service/*.pyc
+ocr-service/*.venv-ocr
+*.venv-ocr 

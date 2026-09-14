@@ -17,7 +17,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('receipt/scan', [ReceiptController::class, 'scan'])->name('receipt.scan');
-    Route::get('receipt/model', [ReceiptController::class, 'model'])->name('receipt.model');
+    Route::post('receipt/ocr', [ReceiptController::class, 'ocr'])
+        ->middleware('throttle:10,1')
+        ->name('receipt.ocr');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
