@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::store
- * @see app/Http/Controllers/TransactionController.php:42
+ * @see app/Http/Controllers/TransactionController.php:44
  * @route '/transactions'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::store
- * @see app/Http/Controllers/TransactionController.php:42
+ * @see app/Http/Controllers/TransactionController.php:44
  * @route '/transactions'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionController::store
- * @see app/Http/Controllers/TransactionController.php:42
+ * @see app/Http/Controllers/TransactionController.php:44
  * @route '/transactions'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

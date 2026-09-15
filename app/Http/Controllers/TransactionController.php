@@ -16,8 +16,10 @@ class TransactionController extends Controller
         $request->validate([
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
-            'asset_id' => ['nullable', 'integer', 'exists:financial_accounts,id'],
-            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'asset_id' => ['nullable', 'array'],
+            'asset_id.*' => ['integer', 'exists:financial_accounts,id'],
+            'category_id' => ['nullable', 'array'],
+            'category_id.*' => ['integer', 'exists:categories,id'],
         ]);
 
         $transactions = $request->user()
@@ -25,8 +27,8 @@ class TransactionController extends Controller
             ->with(['category', 'account'])
             ->when($request->filled('from'), fn ($query) => $query->whereDate('date', '>=', $request->string('from')))
             ->when($request->filled('to'), fn ($query) => $query->whereDate('date', '<=', $request->string('to')))
-            ->when($request->filled('asset_id'), fn ($query) => $query->where('account_id', $request->integer('asset_id')))
-            ->when($request->filled('category_id'), fn ($query) => $query->where('category_id', $request->integer('category_id')))
+            ->when($request->filled('asset_id'), fn ($query) => $query->whereIn('account_id', $request->input('asset_id')))
+            ->when($request->filled('category_id'), fn ($query) => $query->whereIn('category_id', $request->input('category_id')))
             ->latest('date')
             ->latest('id')
             ->get();
