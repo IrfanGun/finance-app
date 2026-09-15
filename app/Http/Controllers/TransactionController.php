@@ -2,17 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use App\Models\Transaction;
-use App\Services\TransactionService;
 use App\Http\Requests\TransactionRequest;
+use App\Services\TransactionService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TransactionController extends Controller
 {
+    public function index(Request $request): Response
+    {
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+            'asset_id' => ['nullable', 'integer', 'exists:financial_accounts,id'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+        ]);
+
+        $transactions = $request->user()
+            ->transactions()
+            ->with(['category', 'account'])
+            ->when($request->filled('from'), fn ($query) => $query->whereDate('date', '>=', $request->string('from')))
+            ->when($request->filled('to'), fn ($query) => $query->whereDate('date', '<=', $request->string('to')))
+            ->when($request->filled('asset_id'), fn ($query) => $query->where('account_id', $request->integer('asset_id')))
+            ->when($request->filled('category_id'), fn ($query) => $query->where('category_id', $request->integer('category_id')))
+            ->latest('date')
+            ->latest('id')
+            ->get();
+
+        return Inertia::render('Transactions/Index', [
+            'transactions' => $transactions,
+            'filters' => $request->only(['from', 'to', 'asset_id', 'category_id']),
+            'assets' => $request->user()->financialAccounts()->orderBy('name')->get(['id', 'name']),
+            'categories' => $request->user()->categories()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
     public function store(TransactionRequest $request, TransactionService $transactions): RedirectResponse
     {
         $transactions->create($request->user(), $request->validated());
+
         return back();
     }
 }
