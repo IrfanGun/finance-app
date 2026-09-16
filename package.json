@@ -27,6 +27,7 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
+        "countries-list": "^3.4.1",
         "lucide-vue-next": "^1.0.0"
     }
 }

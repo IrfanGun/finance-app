@@ -4,6 +4,8 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { update as profileUpdate } from '@/routes/profile';
+import { send as verificationSend } from '@/routes/verification';
 
 defineProps({
     mustVerifyEmail: {
@@ -24,28 +26,22 @@ const form = useForm({
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Profile Information
-            </h2>
-
-            <p class="mt-1 text-sm text-gray-600">
-                Update your account's profile information and email address.
-            </p>
-        </header>
-
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
+            class="space-y-5"
+            @submit.prevent="form.patch(profileUpdate.url(), { preserveScroll: true })"
         >
-            <div>
-                <InputLabel for="name" value="Name" />
+            <div class="relative">
+                <InputLabel
+                    for="name"
+                    value="Full name"
+                    class="pointer-events-none absolute left-4 top-2 z-10 text-sm font-medium !text-app-muted"
+                />
 
                 <TextInput
                     id="name"
-                    type="text"
-                    class="mt-1 block w-full"
                     v-model="form.name"
+                    type="text"
+                    class="block h-14 w-full !rounded-xl !border-app-divider px-4 pb-1 pt-5 text-lg shadow-none focus:!border-app-primary focus:!ring-app-primary/10"
                     required
                     autofocus
                     autocomplete="name"
@@ -54,14 +50,18 @@ const form = useForm({
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
-            <div>
-                <InputLabel for="email" value="Email" />
+            <div class="relative">
+                <InputLabel
+                    for="email"
+                    value="Email address"
+                    class="pointer-events-none absolute left-4 top-2 z-10 text-sm font-medium !text-app-muted"
+                />
 
                 <TextInput
                     id="email"
-                    type="email"
-                    class="mt-1 block w-full"
                     v-model="form.email"
+                    type="email"
+                    class="block h-14 w-full !rounded-xl !border-app-divider px-4 pb-1 pt-5 text-lg shadow-none focus:!border-app-primary focus:!ring-app-primary/10"
                     required
                     autocomplete="username"
                 />
@@ -70,15 +70,15 @@ const form = useForm({
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="mt-2 text-sm text-gray-800">
+                <p class="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
                     Your email address is unverified.
                     <Link
-                        :href="route('verification.send')"
+                        :href="verificationSend.url()"
                         method="post"
                         as="button"
-                        class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        class="font-semibold underline hover:text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                     >
-                        Click here to re-send the verification email.
+                        Resend verification email
                     </Link>
                 </p>
 
@@ -90,8 +90,13 @@ const form = useForm({
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+            <div class="flex flex-col items-stretch gap-2">
+                <PrimaryButton
+                    class="!bg-app-primary w-full justify-center rounded-xl py-3 text-lg normal-case tracking-normal hover:!bg-app-bright focus:!ring-app-primary/30"
+                    :disabled="form.processing"
+                >
+                    {{ form.processing ? 'Saving...' : 'Save changes' }}
+                </PrimaryButton>
 
                 <Transition
                     enter-active-class="transition ease-in-out"
@@ -101,7 +106,7 @@ const form = useForm({
                 >
                     <p
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
+                        class="text-sm text-green-600"
                     >
                         Saved.
                     </p>

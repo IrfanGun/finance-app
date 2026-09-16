@@ -7,6 +7,7 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
 import { nextTick, ref } from 'vue';
+import { destroy as profileDestroy } from '@/routes/profile';
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref(null);
@@ -22,7 +23,7 @@ const confirmUserDeletion = () => {
 };
 
 const deleteUser = () => {
-    form.delete(route('profile.destroy'), {
+    form.delete(profileDestroy.url(), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
         onError: () => passwordInput.value.focus(),
@@ -39,33 +40,33 @@ const closeModal = () => {
 </script>
 
 <template>
-    <section class="space-y-6">
+    <section class="space-y-5">
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Delete Account
+            <h2 class="text-base font-semibold text-red-700">
+                Delete account
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
-                Once your account is deleted, all of its resources and data will
-                be permanently deleted. Before deleting your account, please
-                download any data or information that you wish to retain.
+            <p class="mt-1 text-sm leading-6 text-red-700/70">
+                This permanently removes your account and all associated data.
             </p>
         </header>
 
-        <DangerButton @click="confirmUserDeletion">Delete Account</DangerButton>
+        <DangerButton
+            class="rounded-xl px-4 py-3 normal-case tracking-normal"
+            @click="confirmUserDeletion"
+        >
+            Delete account
+        </DangerButton>
 
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
-                <h2
-                    class="text-lg font-medium text-gray-900"
-                >
-                    Are you sure you want to delete your account?
+                <h2 class="text-lg font-semibold text-gray-900">
+                    Delete your account?
                 </h2>
 
-                <p class="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Please enter your password to
-                    confirm you would like to permanently delete your account.
+                <p class="mt-1 text-sm leading-6 text-gray-600">
+                    This permanently deletes your account and all related data.
+                    Enter your password to continue.
                 </p>
 
                 <div class="mt-6">
@@ -80,7 +81,7 @@ const closeModal = () => {
                         ref="passwordInput"
                         v-model="form.password"
                         type="password"
-                        class="mt-1 block w-3/4"
+                        class="mt-2 block h-12 w-3/4 !rounded-xl !border-app-divider px-4 text-base shadow-none focus:!border-app-primary focus:!ring-app-primary/10"
                         placeholder="Password"
                         @keyup.enter="deleteUser"
                     />
@@ -89,17 +90,20 @@ const closeModal = () => {
                 </div>
 
                 <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeModal">
+                    <SecondaryButton
+                        class="rounded-xl normal-case tracking-normal"
+                        @click="closeModal"
+                    >
                         Cancel
                     </SecondaryButton>
 
                     <DangerButton
-                        class="ms-3"
+                        class="ms-3 rounded-xl normal-case tracking-normal"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
                         @click="deleteUser"
                     >
-                        Delete Account
+                        Delete account
                     </DangerButton>
                 </div>
             </div>
