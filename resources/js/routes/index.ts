@@ -43,6 +43,49 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
+* @see \App\Http\Controllers\ChatController::__invoke
+ * @see app/Http/Controllers/ChatController.php:10
+ * @route '/chat'
+ */
+export const chat = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: chat.url(options),
+    method: 'get',
+})
+
+chat.definition = {
+    methods: ["get","head"],
+    url: '/chat',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\ChatController::__invoke
+ * @see app/Http/Controllers/ChatController.php:10
+ * @route '/chat'
+ */
+chat.url = (options?: RouteQueryOptions) => {
+    return chat.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\ChatController::__invoke
+ * @see app/Http/Controllers/ChatController.php:10
+ * @route '/chat'
+ */
+chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: chat.url(options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\ChatController::__invoke
+ * @see app/Http/Controllers/ChatController.php:10
+ * @route '/chat'
+ */
+chat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: chat.url(options),
+    method: 'head',
+})
+
+/**
 * @see \App\Http\Controllers\Auth\RegisteredUserController::register
  * @see app/Http/Controllers/Auth/RegisteredUserController.php:22
  * @route '/register'

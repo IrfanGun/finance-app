@@ -1,145 +1,230 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
-import re
 from io import BytesIO
+from math import isfinite
 from typing import Any
 
-import numpy as np
-
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, Header, HTTPException, UploadFile
-from PIL import Image, ImageEnhance, ImageFilter
-from paddleocr import PaddleOCR
+from groq import Groq
+from PIL import Image, ImageOps
+
+
+load_dotenv()
 
 
 MAX_FILE_SIZE = 8 * 1024 * 1024
-OCR_PIPELINE: PaddleOCR | None = None
-
+MAX_IMAGE_DIMENSION = 2400
+DEFAULT_VISION_MODEL = "qwen/qwen3.8-27b"
+GROQ_CLIENT: Groq | None = None
 
 app = FastAPI(
-    title="Receipt OCR Service",
-    version="1.0.0",
+    title="Receipt LLM Service",
+    version="2.0.0",
 )
 
 
 @app.on_event("startup")
 def startup_event() -> None:
-    global OCR_PIPELINE
+    global GROQ_CLIENT
 
-    OCR_PIPELINE = PaddleOCR(
-        lang="en",
-        use_doc_orientation_classify=False,
-        use_doc_unwarping=False,
-        use_textline_orientation=False,
-    )
+    api_key = os.getenv("GROQ_API_KEY")
 
-    print("PaddleOCR initialized")
+    if not api_key:
+        print("GROQ_API_KEY belum dikonfigurasi")
+
+        return
+
+    GROQ_CLIENT = Groq(api_key=api_key)
+    print("Groq vision client initialized")
 
 
-def prepare_image(data: bytes) -> np.ndarray:
-    image = Image.open(BytesIO(data)).convert("RGB")
+def prepare_image(data: bytes) -> tuple[bytes, str]:
+    """Validate the upload and normalize it for the vision model."""
+    with Image.open(BytesIO(data)) as source_image:
+        image = ImageOps.exif_transpose(source_image).convert("RGB")
+
     width, height = image.size
-    scale = min(1.5, 1800 / max(width, height))
+    largest_dimension = max(width, height)
 
-    if scale > 1:
+    if largest_dimension > MAX_IMAGE_DIMENSION:
+        scale = MAX_IMAGE_DIMENSION / largest_dimension
         image = image.resize(
             (round(width * scale), round(height * scale)),
             Image.Resampling.LANCZOS,
         )
 
-    image = ImageEnhance.Contrast(image).enhance(1.15)
-    image = image.filter(ImageFilter.SHARPEN)
-
-    return np.asarray(image)
-
-
-def result_payload(result: Any) -> dict[str, Any]:
-    if isinstance(result, dict):
-        payload = result
-    else:
-        value = getattr(result, "json", None)
-
-        if callable(value):
-            value = value()
-
-        if isinstance(value, str):
-            value = json.loads(value)
-
-        payload = value if isinstance(value, dict) else {}
-
-    nested = payload.get("res")
-
-    return nested if isinstance(nested, dict) else payload
-
-
-def run_ocr(image: np.ndarray) -> tuple[str, float]:
-    if OCR_PIPELINE is None:
-        raise RuntimeError("OCR pipeline belum terinisialisasi")
-
-    results = OCR_PIPELINE.predict(image)
-    lines: list[tuple[float, str, float]] = []
-
-    for result in results:
-        payload = result_payload(result)
-        texts = payload.get("rec_texts", [])
-        scores = payload.get("rec_scores", [])
-        boxes = payload.get("rec_boxes", payload.get("rec_polys", []))
-
-        if isinstance(texts, str):
-            texts = [texts]
-
-        for index, text in enumerate(texts):
-            text_value = str(text).strip()
-
-            if not text_value:
-                continue
-
-            score = float(scores[index]) if index < len(scores) else 0.0
-            box = boxes[index] if index < len(boxes) else []
-            y_position = float(box[1]) if len(box) >= 2 else float(index)
-            lines.append((y_position, text_value, score))
-
-    lines.sort(key=lambda line: line[0])
-    text = "\n".join(line[1] for line in lines)
-    confidence = (
-        sum(line[2] for line in lines) / len(lines)
-        if lines
-        else 0.0
+    output = BytesIO()
+    image.save(
+        output,
+        format="JPEG",
+        quality=92,
+        optimize=True,
     )
 
-    return text, confidence
+    return output.getvalue(), "image/jpeg"
 
 
-def extract_amount(text: str) -> int | None:
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    label_pattern = re.compile(
-        r"\b(t[o0]ta[l1]|jumlah|j[uy]mlah|bayar|bayer|dibayar|tunai|cash)\b",
-        re.IGNORECASE,
+def image_data_url(image: bytes, mime_type: str) -> str:
+    encoded_image = base64.b64encode(image).decode("ascii")
+
+    return f"data:{mime_type};base64,{encoded_image}"
+
+
+def as_integer(value: Any) -> int | None:
+    """Accept only numeric values produced by the structured LLM response."""
+    if isinstance(value, bool):
+        return None
+
+    if isinstance(value, int):
+        return value
+
+    if isinstance(value, float) and isfinite(value) and value.is_integer():
+        return int(value)
+
+    if isinstance(value, str):
+        try:
+            return int(value.strip())
+        except ValueError:
+            return None
+
+    return None
+
+
+def normalize_items(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+
+    items: list[dict[str, Any]] = []
+
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+
+        name = item.get("name")
+
+        if not isinstance(name, str) or not name.strip():
+            continue
+
+        quantity = as_integer(item.get("quantity"))
+        unit_price = as_integer(item.get("unit_price"))
+        total = as_integer(item.get("total"))
+
+        items.append(
+            {
+                "name": name.strip(),
+                "quantity": quantity if quantity is not None else 1,
+                "unit_price": unit_price,
+                "total": total,
+            },
+        )
+
+    return items
+
+
+def normalize_receipt(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return {
+            "merchant_name": None,
+            "date": None,
+            "currency": None,
+            "items": [],
+            "total": None,
+            "raw_text": "",
+        }
+
+    merchant_name = value.get("merchant_name")
+    date = value.get("date")
+    currency = value.get("currency")
+    raw_text = value.get("raw_text")
+
+    return {
+        "merchant_name": merchant_name.strip()
+        if isinstance(merchant_name, str) and merchant_name.strip()
+        else None,
+        "date": date.strip()
+        if isinstance(date, str) and date.strip()
+        else None,
+        "currency": currency.strip()
+        if isinstance(currency, str) and currency.strip()
+        else None,
+        "items": normalize_items(value.get("items")),
+        "total": as_integer(value.get("total")),
+        "raw_text": raw_text.strip()
+        if isinstance(raw_text, str)
+        else "",
+    }
+
+
+def parse_receipt(image: bytes, mime_type: str) -> dict[str, Any]:
+    if GROQ_CLIENT is None:
+        raise RuntimeError("Groq vision client belum terinisialisasi")
+
+    response = GROQ_CLIENT.chat.completions.create(
+        model=os.getenv("GROQ_VISION_MODEL", DEFAULT_VISION_MODEL),
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert receipt understanding model. "
+                    "Read the receipt directly from the image, including "
+                    "Indonesian and English receipts. Return only one valid "
+                    "JSON object, without markdown or code fences. "
+                    "Do not invent information that is not visible. "
+                    "The total must be the final transaction amount, not "
+                    "subtotal, tax, discount, cash paid, or change. "
+                    "All monetary values must be integer Indonesian Rupiah "
+                    "without currency symbols or separators. "
+                    "Include every readable purchased item and use null for "
+                    "an unreadable numeric value. "
+                    "Use an empty items array when no item is readable. "
+                    "The date must use YYYY-MM-DD only when unambiguous. "
+                    "Copy all legible receipt text into raw_text in reading "
+                    "order. Use this exact JSON shape: "
+                    '{"merchant_name":"string or null",'
+                    '"date":"YYYY-MM-DD or null",'
+                    '"currency":"IDR or null",'
+                    '"items":[{"name":"string","quantity":1,'
+                    '"unit_price":20000,"total":20000}],'
+                    '"total":20000,"raw_text":"string"}.'
+                ),
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Extract all available details from this receipt "
+                            "image and return the requested JSON object."
+                        ),
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_data_url(image, mime_type),
+                        },
+                    },
+                ],
+            },
+        ],
+        temperature=0,
+        max_completion_tokens=2048,
+        response_format={"type": "json_object"},
     )
-    number_pattern = re.compile(
-        r"(?:rp\.?\s*)?\d{1,3}(?:[.,]\d{3})+|"
-        r"(?:rp\.?\s*)?\d{3,}",
-        re.IGNORECASE,
-    )
 
-    def numbers(value: str) -> list[int]:
-        return [
-            int(re.sub(r"\D", "", match))
-            for match in number_pattern.findall(value)
-            if len(re.sub(r"\D", "", match)) >= 3
-        ]
+    content = response.choices[0].message.content
 
-    for index, line in enumerate(lines):
-        if label_pattern.search(line):
-            amounts = numbers(" ".join(lines[max(0, index - 1):index + 4]))
+    if not content:
+        raise RuntimeError("Groq tidak menghasilkan response")
 
-            if amounts:
-                return max(amounts, key=lambda amount: len(str(amount)))
-
-    all_amounts = numbers(" ".join(lines))
-
-    return max(all_amounts, key=lambda amount: len(str(amount))) if all_amounts else None
+    try:
+        return normalize_receipt(json.loads(content))
+    except json.JSONDecodeError as exception:
+        raise RuntimeError("Groq menghasilkan JSON yang tidak valid") from exception
 
 
 def validate_token(token: str | None) -> None:
@@ -170,30 +255,44 @@ def process_receipt(
         raise HTTPException(status_code=413, detail="Ukuran gambar maksimal 8 MB")
 
     try:
-        image = prepare_image(data)
-        text, confidence = run_ocr(image)
-        amount = extract_amount(text)
+        image, mime_type = prepare_image(data)
 
-        if amount is None:
+        try:
+            receipt = parse_receipt(image, mime_type)
+        except Exception as exception:
+            print(f"Receipt LLM error: {exception}")
+            raise HTTPException(
+                status_code=502,
+                detail="LLM gagal membaca detail struk",
+            ) from exception
+
+        amount = receipt.get("total")
+
+        if (
+            not isinstance(amount, int)
+            or isinstance(amount, bool)
+            or amount <= 0
+            or amount > 100_000_000
+        ):
             raise HTTPException(
                 status_code=422,
-                detail=(
-                    "Total struk tidak terlihat. Pastikan bagian total "
-                    "terlihat jelas dan foto tidak terlalu jauh."
-                ),
+                detail="Total transaksi tidak berhasil ditemukan",
             )
 
         return {
-            "text": text,
+            "text": receipt["raw_text"],
+            "receipt": receipt,
+            "items": receipt["items"],
             "amount": amount,
-            "confidence": confidence,
+            "confidence": None,
             "detection": None,
         }
+
     except HTTPException:
         raise
     except Exception as exception:
-        print(f"OCR processing error: {exception}")
+        print(f"Receipt processing error: {exception}")
         raise HTTPException(
-            status_code=500,
-            detail="Gambar gagal diproses oleh OCR",
+            status_code=422,
+            detail="Gambar tidak dapat diproses sebagai struk",
         ) from exception

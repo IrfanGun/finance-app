@@ -1,6 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { Activity, CircleUserRound, Home, LayoutDashboard, Plus } from 'lucide-vue-next';
+import { Activity, CircleUserRound, Home, MessageCircle, Plus } from 'lucide-vue-next';
+import { chat as chatIndex } from '@/routes';
 import { edit as profileEdit } from '@/routes/profile';
 const emit = defineEmits(['add']);
 
@@ -13,7 +14,7 @@ const isActive = (path) => page.url === path;
         <Link href="/dashboard" class="nav-item" :class="{ 'nav-active': isActive('/dashboard') }"><Home class="nav-icon" :size="21" /><span>Home</span></Link>
         <button class="nav-item"><Activity class="nav-icon" :size="21" /><span>Activity</span></button>
         <button @click="emit('add')" class="group -mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-[#2457DA] text-white shadow-lg shadow-blue-600/30 transition duration-300 hover:scale-105 active:scale-90 focus:outline-none focus:ring-4 focus:ring-blue-200" aria-label="Add transaction"><Plus class="transition duration-300 group-hover:rotate-90" :size="28" /></button>
-        <button class="nav-item"><LayoutDashboard class="nav-icon" :size="21" /><span>Budget</span></button>
+        <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }"><MessageCircle class="nav-icon" :size="21" /><span>Chat</span></Link>
         <Link :href="profileEdit.url()" class="nav-item" :class="{ 'nav-active': isActive(profileEdit.url()) }"><CircleUserRound class="nav-icon" :size="21" /><span>Profile</span></Link>
     </nav>
 </template>

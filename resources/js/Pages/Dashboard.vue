@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Camera, ChartPie, ChevronRight, Flag, Plus } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Camera, ChevronRight, Flag, MessageCircle, Plus } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import FormInput from '@/Components/FormInput.vue';
 import SelectInput from '@/Components/SelectInput.vue';
@@ -10,6 +10,7 @@ import { index as categoriesIndex } from '@/routes/categories';
 import { scan as receiptScan } from '@/routes/receipt';
 import { index as assetsIndex } from '@/routes/assets';
 import { index as transactionsIndex } from '@/routes/transactions';
+import { chat as chatIndex } from '@/routes';
 import { store as transactionStore } from '@/actions/App/Http/Controllers/TransactionController';
 
 const page = usePage();
@@ -68,7 +69,7 @@ onUnmounted(() => {
 const shortcuts = [
     { icon: Plus, label: 'Add' },
     { icon: Camera, label: 'Scan', href: receiptScan.url() },
-    { icon: ChartPie, label: 'Budget' },
+    { icon: MessageCircle, label: 'Chat', href: chatIndex.url() },
     { icon: Flag, label: 'Plan' },
 ];
 </script>

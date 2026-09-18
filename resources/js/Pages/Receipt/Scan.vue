@@ -37,6 +37,13 @@ type Detection = {
     height: number;
 };
 
+type ReceiptItem = {
+    name: string;
+    quantity: number | null;
+    unit_price: number | null;
+    total: number | null;
+};
+
 const fileInput = ref<HTMLInputElement | null>(null);
 const video = ref<HTMLVideoElement | null>(null);
 const cameraActive = ref(false);
@@ -44,6 +51,7 @@ const cameraStream = ref<MediaStream | null>(null);
 const selectedFile = ref<File | null>(null);
 const sourceUrl = ref('');
 const ocrText = ref('');
+const receiptItems = ref<ReceiptItem[]>([]);
 const totalAmount = ref<number | null>(null);
 const detection = ref<Detection | null>(null);
 const errorMessage = ref('');
@@ -101,10 +109,60 @@ function revokeUrl(url: string): void {
 
 function resetScanResult(): void {
     ocrText.value = '';
+    receiptItems.value = [];
     totalAmount.value = null;
     detection.value = null;
     errorMessage.value = '';
     showScanModal.value = false;
+}
+
+function formatCurrency(value: number | null): string {
+    if (value === null) {
+        return '-';
+    }
+
+    return new Intl.NumberFormat('id-ID').format(value);
+}
+
+function normalizeReceiptItems(value: unknown): ReceiptItem[] {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value.flatMap((item): ReceiptItem[] => {
+        if (typeof item !== 'object' || item === null) {
+            return [];
+        }
+
+        const record = item as Record<string, unknown>;
+        const name = [
+            record.name,
+            record.item_name,
+            record.product_name,
+            record.description,
+        ].find((candidate): candidate is string => (
+            typeof candidate === 'string' && candidate.trim().length > 0
+        ));
+
+        if (!name) {
+            return [];
+        }
+
+        const toNumber = (candidate: unknown): number | null => (
+            typeof candidate === 'number'
+                ? candidate
+                : null
+        );
+
+        return [
+            {
+                name: name.trim(),
+                quantity: toNumber(record.quantity) ?? 1,
+                unit_price: toNumber(record.unit_price),
+                total: toNumber(record.total),
+            },
+        ];
+    });
 }
 
 function openPicker(): void {
@@ -336,6 +394,7 @@ async function scanReceipt(
     showScanModal.value = true;
     errorMessage.value = '';
     ocrText.value = '';
+    receiptItems.value = [];
     totalAmount.value = null;
     detection.value = null;
     statusMessage.value = 'Server sedang mendeteksi dan membaca struk...';
@@ -370,11 +429,19 @@ async function scanReceipt(
             text?: unknown;
             amount?: unknown;
             detection?: unknown;
+            items?: unknown;
+            receipt?: {
+                items?: unknown;
+            };
         };
+
+        const receiptItemsPayload = result.receipt?.items ?? result.items;
+        const items = normalizeReceiptItems(receiptItemsPayload);
 
         ocrText.value = typeof result.text === 'string'
             ? result.text
             : '';
+        receiptItems.value = items;
         totalAmount.value = typeof result.amount === 'number'
             ? result.amount
             : null;
@@ -566,6 +633,35 @@ onUnmounted(() => {
                 <p class="mt-1 text-sm text-slate-500">
                     Periksa atau koreksi nominal sebelum melanjutkan.
                 </p>
+
+                <section class="mt-5">
+                    <h3 class="text-sm font-bold uppercase text-slate-700">
+                        Detail Transaksi
+                    </h3>
+
+                    <div v-if="receiptItems.length" class="mt-3 flex flex-col gap-2 text-sm text-slate-700">
+                        <div
+                            v-for="(item, index) in receiptItems"
+                            :key="`${item.name}-${index}`"
+                            class="flex items-baseline justify-between gap-4"
+                        >
+                            <span class="min-w-0 truncate">
+                                {{ item.name }}
+                            </span>
+                            <span class="shrink-0 text-right">
+                                {{ item.quantity ?? 1 }} ×
+                                {{ formatCurrency(item.unit_price) }} =
+                                <strong class="font-semibold text-slate-900">
+                                    {{ formatCurrency(item.total) }}
+                                </strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <p v-else class="mt-3 text-sm text-slate-500">
+                        Detail item tidak berhasil dibaca dari struk.
+                    </p>
+                </section>
 
                 <label class="mt-5 block rounded-xl border border-blue-200 bg-blue-50 p-4">
                     <span class="block text-sm font-bold uppercase text-blue-800">TOTAL</span>

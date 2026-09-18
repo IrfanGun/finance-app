@@ -32,3 +32,9 @@ ocr-service/__pycache__/
 ocr-service/*.pyc
 ocr-service/*.venv-ocr
 *.venv-ocr 
+
+# Python virtual environments
+.venv/
+.venv-*/
+ocr-service/.venv/
+ocr-service/.venv-*/

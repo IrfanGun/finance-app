@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinancialAccountController;
 use App\Http\Controllers\ProfileController;
@@ -15,6 +16,9 @@ Route::get('/', function () {
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('chat', ChatController::class)
+        ->middleware('verified')
+        ->name('chat');
     Route::resource('categories', CategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::resource('assets', FinancialAccountController::class)->parameters(['assets' => 'account'])->only(['index', 'store', 'update', 'destroy']);
     Route::resource('transactions', TransactionController::class)
