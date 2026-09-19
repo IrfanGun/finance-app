@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AiChatController;
+use App\Http\Controllers\AiChatTransactionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -16,6 +18,14 @@ Route::get('/', function () {
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::post('ai/chat', AiChatController::class)
+        ->middleware('verified')
+        ->middleware('throttle:20,1')
+        ->name('ai.chat');
+    Route::post('ai/chat/transactions/confirm', [AiChatTransactionController::class, 'confirm'])
+        ->middleware('verified')
+        ->middleware('throttle:20,1')
+        ->name('ai.chat.transactions.confirm');
     Route::get('chat', ChatController::class)
         ->middleware('verified')
         ->name('chat');

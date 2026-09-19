@@ -10,6 +10,9 @@ COPY requirements.txt ./requirements.txt
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
 COPY app.py ./app.py
+COPY finance_agents.py ./finance_agents.py
+COPY services ./services
+COPY tools ./tools
 
 EXPOSE 8001
 

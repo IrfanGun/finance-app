@@ -40,4 +40,11 @@ return [
         'token' => env('OCR_SERVICE_TOKEN'),
     ],
 
+    'ai' => [
+        'url' => env('AI_SERVICE_URL', 'http://127.0.0.1:8001'),
+        'token' => env('AI_SERVICE_TOKEN'),
+        'connect_timeout' => env('AI_SERVICE_CONNECT_TIMEOUT', 3),
+        'timeout' => env('AI_SERVICE_TIMEOUT', 90),
+    ],
+
 ];

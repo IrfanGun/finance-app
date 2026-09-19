@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import base64
+import hmac
 import json
+import logging
 import os
 from io import BytesIO
 from math import isfinite
@@ -9,27 +11,53 @@ from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Header, HTTPException, UploadFile
-from groq import Groq
+from fastapi.middleware.cors import CORSMiddleware
+from groq import APIError, Groq, RateLimitError
 from PIL import Image, ImageOps
+from pydantic import BaseModel, Field
+
+from finance_agents import FinanceAgent
 
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 MAX_FILE_SIZE = 8 * 1024 * 1024
 MAX_IMAGE_DIMENSION = 2400
 DEFAULT_VISION_MODEL = "qwen/qwen3.8-27b"
 GROQ_CLIENT: Groq | None = None
+finance_agent: FinanceAgent | None = None
+AI_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("AI_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+if not AI_ALLOWED_ORIGINS:
+    raise RuntimeError(
+        "AI_ALLOWED_ORIGINS belum dikonfigurasi. "
+        "Isi dengan daftar origin yang dipisahkan koma."
+    )
 
 app = FastAPI(
     title="Receipt LLM Service",
     version="2.0.0",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=AI_ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["POST", "GET"],
+    allow_headers=["Content-Type", "X-OCR-Token"],
+)
+
 
 @app.on_event("startup")
 def startup_event() -> None:
-    global GROQ_CLIENT
+    global GROQ_CLIENT, finance_agent
 
     api_key = os.getenv("GROQ_API_KEY")
 
@@ -39,7 +67,19 @@ def startup_event() -> None:
         return
 
     GROQ_CLIENT = Groq(api_key=api_key)
-    print("Groq vision client initialized")
+    chat_client = Groq(
+        api_key=api_key,
+        timeout=float(os.getenv("GROQ_CHAT_TIMEOUT_SECONDS", "45")),
+        max_retries=0,
+    )
+    finance_agent = FinanceAgent(
+        client=chat_client,
+        model=os.getenv(
+            "GROQ_CHAT_MODEL",
+            "qwen/qwen3.8-27b",
+        ),
+    )
+    print("Groq vision and chat clients initialized")
 
 
 def prepare_image(data: bytes) -> tuple[bytes, str]:
@@ -212,7 +252,9 @@ def parse_receipt(image: bytes, mime_type: str) -> dict[str, Any]:
             },
         ],
         temperature=0,
-        max_completion_tokens=2048,
+        max_completion_tokens=int(
+            os.getenv("GROQ_VISION_MAX_COMPLETION_TOKENS", "700")
+        ),
         response_format={"type": "json_object"},
     )
 
@@ -232,6 +274,25 @@ def validate_token(token: str | None) -> None:
 
     if expected_token and token != expected_token:
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+
+def validate_ai_service_context(
+    service_token: str | None,
+    user_id: str | None,
+) -> int:
+    expected_token = os.getenv("AI_SERVICE_TOKEN", "")
+
+    if (
+        not expected_token
+        or not service_token
+        or not hmac.compare_digest(expected_token, service_token)
+    ):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    if user_id is None or not user_id.isdigit() or int(user_id) < 1:
+        raise HTTPException(status_code=401, detail="Invalid user context")
+
+    return int(user_id)
 
 
 @app.get("/health")
@@ -259,6 +320,14 @@ def process_receipt(
 
         try:
             receipt = parse_receipt(image, mime_type)
+        except RateLimitError as exception:
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    "Layanan AI sedang mencapai batas penggunaan. "
+                    "Silakan coba lagi dalam beberapa saat."
+                ),
+            ) from exception
         except Exception as exception:
             print(f"Receipt LLM error: {exception}")
             raise HTTPException(
@@ -290,9 +359,101 @@ def process_receipt(
 
     except HTTPException:
         raise
+    except RateLimitError as exception:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                "Layanan AI sedang mencapai batas penggunaan. "
+                "Silakan coba lagi dalam beberapa saat."
+            ),
+        ) from exception
     except Exception as exception:
         print(f"Receipt processing error: {exception}")
         raise HTTPException(
             status_code=422,
             detail="Gambar tidak dapat diproses sebagai struk",
         ) from exception
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4000)
+
+
+class ChatResponse(BaseModel):
+    response: str
+    pending_transaction: dict[str, Any] | None = None
+    account_selection_required: bool = False
+    account_options: list[dict[str, Any]] = Field(default_factory=list)
+    missing_resources: list[dict[str, str]] = Field(default_factory=list)
+
+
+@app.post("/ai/chat", response_model=ChatResponse)
+def chat(
+    request: ChatRequest,
+    x_ai_service_token: str | None = Header(
+        default=None,
+        alias="X-AI-Service-Token",
+    ),
+    x_ai_user_id: str | None = Header(
+        default=None,
+        alias="X-AI-User-ID",
+    ),
+) -> ChatResponse:
+    user_id = validate_ai_service_context(
+        x_ai_service_token,
+        x_ai_user_id,
+    )
+
+    if finance_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI service belum dikonfigurasi",
+        )
+
+    messages = [
+        {
+            "role": "system",
+            "content": """
+You are a personal finance assistant.
+
+Keep user-facing answers concise, usually under 100 words.
+
+Use available tools whenever the user
+wants to create, update, delete or retrieve
+financial data.
+
+Never guess or select a financial account
+that the user did not explicitly name.
+When creating a transaction without an
+explicit account, call create_transaction
+without the account so the user can choose
+from their own assets.
+
+Never claim a transaction was created
+unless the tool successfully created it.
+""",
+        },
+        {
+            "role": "user",
+            "content": request.message,
+        },
+    ]
+
+    try:
+        return finance_agent.chat(messages, user_id=user_id)
+    except APIError as exception:
+        logger.warning(
+            "Groq chat request failed.",
+            extra={
+                "exception_type": exception.__class__.__name__,
+                "status_code": getattr(exception, "status_code", None),
+            },
+        )
+
+        return ChatResponse(
+            response=(
+                "AI belum dapat memproses pesan ini. "
+                "Tidak ada transaksi yang dikonfirmasi; silakan coba lagi "
+                "beberapa saat kemudian."
+            ),
+        )
