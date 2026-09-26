@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AiTransactionController::index
- * @see app/Http/Controllers/AiTransactionController.php:13
+ * @see app/Http/Controllers/AiTransactionController.php:14
  * @route '/api/ai/transactions'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::index
- * @see app/Http/Controllers/AiTransactionController.php:13
+ * @see app/Http/Controllers/AiTransactionController.php:14
  * @route '/api/ai/transactions'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::index
- * @see app/Http/Controllers/AiTransactionController.php:13
+ * @see app/Http/Controllers/AiTransactionController.php:14
  * @route '/api/ai/transactions'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\AiTransactionController::index
- * @see app/Http/Controllers/AiTransactionController.php:13
+ * @see app/Http/Controllers/AiTransactionController.php:14
  * @route '/api/ai/transactions'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::store
- * @see app/Http/Controllers/AiTransactionController.php:27
+ * @see app/Http/Controllers/AiTransactionController.php:28
  * @route '/api/ai/transactions'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::store
- * @see app/Http/Controllers/AiTransactionController.php:27
+ * @see app/Http/Controllers/AiTransactionController.php:28
  * @route '/api/ai/transactions'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::store
- * @see app/Http/Controllers/AiTransactionController.php:27
+ * @see app/Http/Controllers/AiTransactionController.php:28
  * @route '/api/ai/transactions'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -77,8 +77,42 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 })
 
 /**
+* @see \App\Http\Controllers\AiTransactionController::storeBatch
+ * @see app/Http/Controllers/AiTransactionController.php:67
+ * @route '/api/ai/transactions/batch'
+ */
+export const storeBatch = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: storeBatch.url(options),
+    method: 'post',
+})
+
+storeBatch.definition = {
+    methods: ["post"],
+    url: '/api/ai/transactions/batch',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\AiTransactionController::storeBatch
+ * @see app/Http/Controllers/AiTransactionController.php:67
+ * @route '/api/ai/transactions/batch'
+ */
+storeBatch.url = (options?: RouteQueryOptions) => {
+    return storeBatch.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\AiTransactionController::storeBatch
+ * @see app/Http/Controllers/AiTransactionController.php:67
+ * @route '/api/ai/transactions/batch'
+ */
+storeBatch.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: storeBatch.url(options),
+    method: 'post',
+})
+
+/**
 * @see \App\Http\Controllers\AiTransactionController::update
- * @see app/Http/Controllers/AiTransactionController.php:66
+ * @see app/Http/Controllers/AiTransactionController.php:106
  * @route '/api/ai/transactions/{transaction}'
  */
 export const update = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -93,7 +127,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::update
- * @see app/Http/Controllers/AiTransactionController.php:66
+ * @see app/Http/Controllers/AiTransactionController.php:106
  * @route '/api/ai/transactions/{transaction}'
  */
 update.url = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -121,7 +155,7 @@ update.url = (args: { transaction: string | number } | [transaction: string | nu
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::update
- * @see app/Http/Controllers/AiTransactionController.php:66
+ * @see app/Http/Controllers/AiTransactionController.php:106
  * @route '/api/ai/transactions/{transaction}'
  */
 update.patch = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -131,7 +165,7 @@ update.patch = (args: { transaction: string | number } | [transaction: string | 
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::destroy
- * @see app/Http/Controllers/AiTransactionController.php:80
+ * @see app/Http/Controllers/AiTransactionController.php:120
  * @route '/api/ai/transactions/{transaction}'
  */
 export const destroy = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -146,7 +180,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::destroy
- * @see app/Http/Controllers/AiTransactionController.php:80
+ * @see app/Http/Controllers/AiTransactionController.php:120
  * @route '/api/ai/transactions/{transaction}'
  */
 destroy.url = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -174,13 +208,13 @@ destroy.url = (args: { transaction: string | number } | [transaction: string | n
 
 /**
 * @see \App\Http\Controllers\AiTransactionController::destroy
- * @see app/Http/Controllers/AiTransactionController.php:80
+ * @see app/Http/Controllers/AiTransactionController.php:120
  * @route '/api/ai/transactions/{transaction}'
  */
 destroy.delete = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
-const AiTransactionController = { index, store, update, destroy }
+const AiTransactionController = { index, store, storeBatch, update, destroy }
 
 export default AiTransactionController

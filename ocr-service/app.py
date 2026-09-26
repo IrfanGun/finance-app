@@ -382,6 +382,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     response: str
     pending_transaction: dict[str, Any] | None = None
+    pending_transactions: list[dict[str, Any]] | None = None
     account_selection_required: bool = False
     account_options: list[dict[str, Any]] = Field(default_factory=list)
     missing_resources: list[dict[str, str]] = Field(default_factory=list)
@@ -421,6 +422,12 @@ Keep user-facing answers concise, usually under 100 words.
 Use available tools whenever the user
 wants to create, update, delete or retrieve
 financial data.
+
+When the user mentions two or more separate
+transactions in one message, use the
+create_transactions tool and keep every
+transaction separate. Do not combine amounts
+or silently discard any transaction.
 
 Never guess or select a financial account
 that the user did not explicitly name.

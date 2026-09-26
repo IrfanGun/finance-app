@@ -9,6 +9,7 @@ Route::prefix('ai')
     ->group(function (): void {
         Route::get('transactions', [AiTransactionController::class, 'index']);
         Route::post('transactions', [AiTransactionController::class, 'store']);
+        Route::post('transactions/batch', [AiTransactionController::class, 'storeBatch']);
         Route::patch('transactions/{transaction}', [AiTransactionController::class, 'update']);
         Route::delete('transactions/{transaction}', [AiTransactionController::class, 'destroy']);
     });

@@ -29,6 +29,27 @@ def create_transaction(
     )
 
 
+def create_transactions(
+    transactions: list[dict],
+    user_id: int | None = None,
+):
+    result = laravel.post(
+        "/api/ai/transactions/batch",
+        {
+            "transactions": transactions,
+        },
+        user_id=user_id,
+    )
+
+    if isinstance(result, dict) and result.get("code") in {
+        "account_selection_required",
+        "missing_resources",
+    }:
+        result["pending_transactions"] = transactions
+
+    return result
+
+
 def get_transactions(
     limit: int = 20,
     user_id: int | None = None,

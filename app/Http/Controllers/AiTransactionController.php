@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAiTransactionRequest;
+use App\Http\Requests\StoreAiTransactionsRequest;
 use App\Http\Requests\UpdateAiTransactionRequest;
 use App\Services\AiTransactionService;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,45 @@ class AiTransactionController extends Controller
 
         return response()->json([
             'transaction' => $transactions->create(
+                $request->user(),
+                $data,
+            ),
+        ], 201);
+    }
+
+    public function storeBatch(
+        StoreAiTransactionsRequest $request,
+        AiTransactionService $transactions,
+    ): JsonResponse {
+        $data = $request->validated()['transactions'];
+        $requiresAccountSelection = collect($data)->contains(
+            fn (array $transaction): bool => ! is_string($transaction['account'] ?? null)
+                || trim($transaction['account']) === '',
+        );
+        $missingResources = $transactions->missingResourcesForBatch(
+            $request->user(),
+            $data,
+        );
+
+        if ($requiresAccountSelection) {
+            return response()->json([
+                'code' => 'account_selection_required',
+                'account_options' => $transactions->accountOptions(
+                    $request->user(),
+                ),
+                'missing_resources' => $missingResources,
+            ], 409);
+        }
+
+        if ($missingResources !== []) {
+            return response()->json([
+                'code' => 'missing_resources',
+                'missing_resources' => $missingResources,
+            ], 409);
+        }
+
+        return response()->json([
+            'transactions' => $transactions->createBatch(
                 $request->user(),
                 $data,
             ),

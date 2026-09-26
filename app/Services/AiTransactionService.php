@@ -68,6 +68,23 @@ class AiTransactionService
     }
 
     /**
+     * @param  array<int, array<string, mixed>>  $transactions
+     * @return array<int, Transaction>
+     */
+    public function createBatch(User $user, array $transactions): array
+    {
+        return DB::transaction(function () use ($user, $transactions): array {
+            $createdTransactions = [];
+
+            foreach ($transactions as $transaction) {
+                $createdTransactions[] = $this->create($user, $transaction);
+            }
+
+            return $createdTransactions;
+        });
+    }
+
+    /**
      * @param  array<string, mixed>  $transaction
      * @param  array<int, array<string, mixed>>  $resources
      */
@@ -76,43 +93,33 @@ class AiTransactionService
         array $transaction,
         array $resources,
     ): Transaction {
-        return DB::transaction(function () use ($user, $transaction, $resources): Transaction {
-            foreach ($resources as $resource) {
-                if ($resource['type'] === 'account') {
-                    $account = $user->financialAccounts()
-                        ->whereRaw('LOWER(name) = ?', [Str::lower($resource['name'])])
-                        ->first();
+        return $this->completeChatTransactions(
+            $user,
+            [$transaction],
+            $resources,
+        )[0];
+    }
 
-                    if ($account === null) {
-                        $user->financialAccounts()->create([
-                            'name' => $resource['name'],
-                            'type' => $resource['account_type'],
-                            'opening_balance' => $resource['opening_balance'],
-                        ]);
-                    }
+    /**
+     * @param  array<int, array<string, mixed>>  $transactions
+     * @param  array<int, array<string, mixed>>  $resources
+     * @return array<int, Transaction>
+     */
+    public function completeChatTransactions(
+        User $user,
+        array $transactions,
+        array $resources,
+    ): array {
+        return DB::transaction(function () use ($user, $transactions, $resources): array {
+            $this->createChatResources($user, $resources);
 
-                    continue;
-                }
+            $createdTransactions = [];
 
-                $category = $user->categories()
-                    ->where('type', $resource['category_type'])
-                    ->whereRaw('LOWER(name) = ?', [Str::lower($resource['name'])])
-                    ->first();
-
-                if ($category === null) {
-                    $user->categories()->create([
-                        'name' => $resource['name'],
-                        'type' => $resource['category_type'],
-                        'icon' => $resource['icon'],
-                        'color' => $resource['color'],
-                        'is_active' => true,
-                    ]);
-                } elseif (! $category->is_active) {
-                    $category->update(['is_active' => true]);
-                }
+            foreach ($transactions as $transaction) {
+                $createdTransactions[] = $this->create($user, $transaction);
             }
 
-            return $this->create($user, $transaction);
+            return $createdTransactions;
         });
     }
 
@@ -157,6 +164,25 @@ class AiTransactionService
         }
 
         return $missing;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $transactions
+     * @return array<int, array{type: string, name: string}>
+     */
+    public function missingResourcesForBatch(User $user, array $transactions): array
+    {
+        $missing = [];
+
+        foreach ($transactions as $transaction) {
+            foreach ($this->missingResources($user, $transaction) as $resource) {
+                $resourceKey = $resource['type'].'|'.Str::lower($resource['name']);
+
+                $missing[$resourceKey] = $resource;
+            }
+        }
+
+        return array_values($missing);
     }
 
     public function update(User $user, int $transactionId, array $data): Transaction
@@ -214,6 +240,47 @@ class AiTransactionService
         }
 
         return $account;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $resources
+     */
+    private function createChatResources(User $user, array $resources): void
+    {
+        foreach ($resources as $resource) {
+            if ($resource['type'] === 'account') {
+                $account = $user->financialAccounts()
+                    ->whereRaw('LOWER(name) = ?', [Str::lower($resource['name'])])
+                    ->first();
+
+                if ($account === null) {
+                    $user->financialAccounts()->create([
+                        'name' => $resource['name'],
+                        'type' => $resource['account_type'],
+                        'opening_balance' => $resource['opening_balance'],
+                    ]);
+                }
+
+                continue;
+            }
+
+            $category = $user->categories()
+                ->where('type', $resource['category_type'])
+                ->whereRaw('LOWER(name) = ?', [Str::lower($resource['name'])])
+                ->first();
+
+            if ($category === null) {
+                $user->categories()->create([
+                    'name' => $resource['name'],
+                    'type' => $resource['category_type'],
+                    'icon' => $resource['icon'],
+                    'color' => $resource['color'],
+                    'is_active' => true,
+                ]);
+            } elseif (! $category->is_active) {
+                $category->update(['is_active' => true]);
+            }
+        }
     }
 
     private function findCategory(

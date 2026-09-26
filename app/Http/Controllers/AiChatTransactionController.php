@@ -13,14 +13,23 @@ class AiChatTransactionController extends Controller
         AiTransactionService $transactions,
     ): JsonResponse {
         $validated = $request->validated();
-        $transaction = $transactions->completeChatTransaction(
-            $request->user(),
+        $transactionData = $validated['transactions'] ?? [
             $validated['transaction'],
+        ];
+        $createdTransactions = $transactions->completeChatTransactions(
+            $request->user(),
+            $transactionData,
             $validated['resources'] ?? [],
         );
 
-        return response()->json([
-            'transaction' => $transaction,
-        ], 201);
+        $response = [
+            'transaction' => $createdTransactions[0],
+        ];
+
+        if (count($createdTransactions) > 1) {
+            $response['transactions'] = $createdTransactions;
+        }
+
+        return response()->json($response, 201);
     }
 }

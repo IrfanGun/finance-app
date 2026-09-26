@@ -11,6 +11,7 @@ from groq import APIError
 
 from tools.transactions import (
     create_transaction,
+    create_transactions,
     get_transactions,
     update_transaction,
     delete_transaction,
@@ -60,6 +61,59 @@ TOOLS = [
                     "transaction_type",
                     "amount",
                 ],
+            },
+        },
+    },
+
+    {
+        "type": "function",
+        "function": {
+            "name": "create_transactions",
+            "description": (
+                "Create multiple income or expense transactions from one "
+                "user message. Use this when the user mentions two or more "
+                "separate transactions. Keep each transaction separate and "
+                "do not combine their amounts."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "transactions": {
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 20,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "transaction_type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "income",
+                                        "expense",
+                                    ],
+                                },
+                                "amount": {
+                                    "type": "number",
+                                },
+                                "account": {
+                                    "type": "string",
+                                },
+                                "category": {
+                                    "type": "string",
+                                },
+                                "description": {
+                                    "type": "string",
+                                },
+                            },
+                            "required": [
+                                "transaction_type",
+                                "amount",
+                                "description",
+                            ],
+                        },
+                    },
+                },
+                "required": ["transactions"],
             },
         },
     },
@@ -154,6 +208,7 @@ class FinanceAgent:
         )
         self.tool_handlers: dict[str, Callable[..., Any]] = {
             "create_transaction": create_transaction,
+            "create_transactions": create_transactions,
             "get_transactions": get_transactions,
             "update_transaction": update_transaction,
             "delete_transaction": delete_transaction,
@@ -227,15 +282,17 @@ class FinanceAgent:
                     try:
                         arguments = json.loads(tool_call.function.arguments or "{}")
 
-                        if (
-                            tool_name == "create_transaction"
-                            and isinstance(arguments.get("account"), str)
-                            and not self._account_was_named_by_user(
-                                arguments["account"],
+                        if tool_name == "create_transaction":
+                            self._remove_guessed_account(
+                                arguments,
                                 messages,
                             )
-                        ):
-                            arguments.pop("account")
+
+                        if tool_name == "create_transactions":
+                            arguments = self._normalize_batch_arguments(
+                                arguments,
+                                messages,
+                            )
 
                         tool_result = tool_handler(
                             user_id=user_id,
@@ -243,16 +300,32 @@ class FinanceAgent:
                         )
 
                         if (
-                            tool_name == "create_transaction"
+                            tool_name in {
+                                "create_transaction",
+                                "create_transactions",
+                            }
                             and isinstance(tool_result, dict)
                             and tool_result.get("code") == "account_selection_required"
                         ):
+                            pending_transactions = tool_result.get(
+                                "pending_transactions",
+                            )
+
+                            if not isinstance(pending_transactions, list):
+                                pending_transactions = [arguments]
+
                             return {
                                 "response": (
                                     "Transaksi belum dicatat. Silakan pilih "
-                                    "asset atau akun sumber dana."
+                                    "asset atau akun sumber dana untuk semua "
+                                    "transaksi."
                                 ),
-                                "pending_transaction": arguments,
+                                "pending_transaction": (
+                                    pending_transactions[0]
+                                    if len(pending_transactions) == 1
+                                    else None
+                                ),
+                                "pending_transactions": pending_transactions,
                                 "account_selection_required": True,
                                 "account_options": tool_result.get(
                                     "account_options",
@@ -265,7 +338,10 @@ class FinanceAgent:
                             }
 
                         if (
-                            tool_name == "create_transaction"
+                            tool_name in {
+                                "create_transaction",
+                                "create_transactions",
+                            }
                             and isinstance(tool_result, dict)
                             and tool_result.get("code") == "missing_resources"
                         ):
@@ -283,12 +359,22 @@ class FinanceAgent:
                                     "belum tersedia. Silakan konfirmasi pembuatan "
                                     "akun atau kategori terlebih dahulu."
                                 ),
-                                "pending_transaction": arguments,
+                                "pending_transaction": (
+                                    arguments
+                                    if tool_name == "create_transaction"
+                                    else None
+                                ),
+                                "pending_transactions": (
+                                    [arguments]
+                                    if tool_name == "create_transaction"
+                                    else arguments.get("transactions", [])
+                                ),
                                 "missing_resources": missing_resources,
                             }
                     except (requests.Timeout, requests.ConnectionError) as exception:
                         logger.warning(
-                            "AI tool request to Laravel failed.",
+                            "AI tool request to Laravel failed: %s",
+                            exception,
                             extra={
                                 "tool_name": tool_name,
                                 "user_id": user_id,
@@ -331,6 +417,15 @@ class FinanceAgent:
                                 f"sebesar Rp {transaction.get('amount', '')} "
                                 "berhasil dicatat."
                             )
+                    elif tool_name == "create_transactions":
+                        transactions = tool_result.get("transactions")
+
+                        if isinstance(transactions, list):
+                            completed_writes.extend(
+                                self._transaction_success_message(transaction)
+                                for transaction in transactions
+                                if isinstance(transaction, dict)
+                            )
                     elif tool_name == "update_transaction":
                         completed_writes.append(
                             "Perubahan transaksi berhasil disimpan."
@@ -359,6 +454,56 @@ class FinanceAgent:
         return {
             "response": "Maaf, proses permintaan memerlukan terlalu banyak langkah. Silakan coba lagi.",
         }
+
+    @staticmethod
+    def _remove_guessed_account(
+        arguments: dict[str, Any],
+        messages: list[dict[str, Any]],
+    ) -> None:
+        if (
+            isinstance(arguments.get("account"), str)
+            and not FinanceAgent._account_was_named_by_user(
+                arguments["account"],
+                messages,
+            )
+        ):
+            arguments.pop("account")
+
+    @staticmethod
+    def _normalize_batch_arguments(
+        arguments: dict[str, Any],
+        messages: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        transactions = arguments.get("transactions")
+
+        if not isinstance(transactions, list):
+            return arguments
+
+        normalized_transactions = []
+
+        for transaction in transactions:
+            if not isinstance(transaction, dict):
+                continue
+
+            normalized_transaction = dict(transaction)
+            FinanceAgent._remove_guessed_account(
+                normalized_transaction,
+                messages,
+            )
+            normalized_transactions.append(normalized_transaction)
+
+        return {
+            "transactions": normalized_transactions,
+        }
+
+    @staticmethod
+    def _transaction_success_message(transaction: dict[str, Any]) -> str:
+        return (
+            "Transaksi "
+            f"{transaction.get('title', '')} "
+            f"sebesar Rp {transaction.get('amount', '')} "
+            "berhasil dicatat."
+        )
 
     @staticmethod
     def _account_was_named_by_user(
