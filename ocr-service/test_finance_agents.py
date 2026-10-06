@@ -172,6 +172,71 @@ class FinanceAgentSetupFlowTest(unittest.TestCase):
         )
         self.assertNotIn("account", create_tool["parameters"]["required"])
 
+    def test_multiple_transactions_are_preserved_for_account_selection(self):
+        transactions = [
+            {
+                "transaction_type": "expense",
+                "amount": 20000,
+                "category": "Makan",
+                "description": "Makan",
+            },
+            {
+                "transaction_type": "expense",
+                "amount": 40000,
+                "category": "Bensin",
+                "description": "Isi bensin",
+            },
+        ]
+        tool_call = SimpleNamespace(
+            id="call-multiple-transactions",
+            function=SimpleNamespace(
+                name="create_transactions",
+                arguments=json.dumps({"transactions": transactions}),
+            ),
+        )
+        assistant_message = SimpleNamespace(
+            content=None,
+            tool_calls=[tool_call],
+        )
+        client = SimpleNamespace(
+            chat=SimpleNamespace(
+                completions=SimpleNamespace(
+                    create=Mock(
+                        return_value=SimpleNamespace(
+                            choices=[SimpleNamespace(message=assistant_message)],
+                        ),
+                    ),
+                ),
+            ),
+        )
+        agent = FinanceAgent(
+            client=client,
+            model="test-model",
+            max_completion_tokens=350,
+        )
+        agent.tool_handlers["create_transactions"] = lambda **_: {
+            "code": "account_selection_required",
+            "account_options": [
+                {"id": 8, "name": "Cash", "type": "cash"},
+            ],
+            "missing_resources": [
+                {"type": "category", "name": "Makan"},
+                {"type": "category", "name": "Bensin"},
+            ],
+            "pending_transactions": transactions,
+        }
+
+        result = agent.chat([
+            {
+                "role": "user",
+                "content": "saya makan 20rb dan isi bensin 40rb",
+            },
+        ], user_id=10)
+
+        self.assertTrue(result["account_selection_required"])
+        self.assertEqual(result["pending_transactions"], transactions)
+        self.assertEqual(len(result["missing_resources"]), 2)
+
     def test_create_tool_sends_an_omitted_account_to_laravel(self):
         with patch(
             "tools.transactions.laravel.post",

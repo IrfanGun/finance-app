@@ -4,6 +4,7 @@ import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpRight, Heart, Pencil, Receipt } f
 import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import { categoryIcons } from '@/Components/Categories/categoryIcons';
 
 defineProps({ category: Object, transactions: Array });
 const categoryEdit = categoriesIndex;
@@ -28,7 +29,7 @@ const categoryEdit = categoriesIndex;
             <section class="rounded-2xl bg-white p-6 text-center shadow-sm"><span
                     class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl"
                     :style="{ backgroundColor: category.color + '18', color: category.color }">
-                    <Heart :size="30" />
+                    <component :is="categoryIcons[category.icon] || Heart" :size="30" />
                 </span>
                 <h2 class="mt-4 text-2xl font-semibold">{{ category.name }}</h2>
                 <p class="mt-1 text-sm capitalize text-[#637083]">{{ category.type }} category</p>

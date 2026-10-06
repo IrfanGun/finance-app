@@ -4,10 +4,14 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService
 {
-    public function listFor(User $user)
+    /**
+     * @return Collection<int, Category>
+     */
+    public function listFor(User $user): Collection
     {
         return $user->categories()->latest()->get();
     }

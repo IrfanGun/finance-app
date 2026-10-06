@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\CategoryController::store
- * @see app/Http/Controllers/CategoryController.php:24
+ * @see app/Http/Controllers/CategoryController.php:32
  * @route '/categories'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::store
- * @see app/Http/Controllers/CategoryController.php:24
+ * @see app/Http/Controllers/CategoryController.php:32
  * @route '/categories'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\CategoryController::store
- * @see app/Http/Controllers/CategoryController.php:24
+ * @see app/Http/Controllers/CategoryController.php:32
  * @route '/categories'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -78,7 +78,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
- * @see app/Http/Controllers/CategoryController.php:19
+ * @see app/Http/Controllers/CategoryController.php:22
  * @route '/categories/{category}'
  */
 export const show = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -93,7 +93,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
- * @see app/Http/Controllers/CategoryController.php:19
+ * @see app/Http/Controllers/CategoryController.php:22
  * @route '/categories/{category}'
  */
 show.url = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -126,7 +126,7 @@ show.url = (args: { category: number | { id: number } } | [category: number | { 
 
 /**
 * @see \App\Http\Controllers\CategoryController::show
- * @see app/Http/Controllers/CategoryController.php:19
+ * @see app/Http/Controllers/CategoryController.php:22
  * @route '/categories/{category}'
  */
 show.get = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -135,7 +135,7 @@ show.get = (args: { category: number | { id: number } } | [category: number | { 
 })
 /**
 * @see \App\Http\Controllers\CategoryController::show
- * @see app/Http/Controllers/CategoryController.php:19
+ * @see app/Http/Controllers/CategoryController.php:22
  * @route '/categories/{category}'
  */
 show.head = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -145,7 +145,7 @@ show.head = (args: { category: number | { id: number } } | [category: number | {
 
 /**
 * @see \App\Http\Controllers\CategoryController::update
- * @see app/Http/Controllers/CategoryController.php:29
+ * @see app/Http/Controllers/CategoryController.php:39
  * @route '/categories/{category}'
  */
 export const update = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -160,7 +160,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::update
- * @see app/Http/Controllers/CategoryController.php:29
+ * @see app/Http/Controllers/CategoryController.php:39
  * @route '/categories/{category}'
  */
 update.url = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -193,7 +193,7 @@ update.url = (args: { category: number | { id: number } } | [category: number | 
 
 /**
 * @see \App\Http\Controllers\CategoryController::update
- * @see app/Http/Controllers/CategoryController.php:29
+ * @see app/Http/Controllers/CategoryController.php:39
  * @route '/categories/{category}'
  */
 update.put = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -202,7 +202,7 @@ update.put = (args: { category: number | { id: number } } | [category: number | 
 })
 /**
 * @see \App\Http\Controllers\CategoryController::update
- * @see app/Http/Controllers/CategoryController.php:29
+ * @see app/Http/Controllers/CategoryController.php:39
  * @route '/categories/{category}'
  */
 update.patch = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -212,7 +212,7 @@ update.patch = (args: { category: number | { id: number } } | [category: number 
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
- * @see app/Http/Controllers/CategoryController.php:35
+ * @see app/Http/Controllers/CategoryController.php:47
  * @route '/categories/{category}'
  */
 export const destroy = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -227,7 +227,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
- * @see app/Http/Controllers/CategoryController.php:35
+ * @see app/Http/Controllers/CategoryController.php:47
  * @route '/categories/{category}'
  */
 destroy.url = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -260,7 +260,7 @@ destroy.url = (args: { category: number | { id: number } } | [category: number |
 
 /**
 * @see \App\Http\Controllers\CategoryController::destroy
- * @see app/Http/Controllers/CategoryController.php:35
+ * @see app/Http/Controllers/CategoryController.php:47
  * @route '/categories/{category}'
  */
 destroy.delete = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

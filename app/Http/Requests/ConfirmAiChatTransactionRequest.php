@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -108,8 +109,16 @@ class ConfirmAiChatTransactionRequest extends FormRequest
                     'required',
                     Rule::in(['income', 'expense']),
                 ];
-                $rules["resources.{$index}.icon"] = ['required', 'string', 'max:40'];
-                $rules["resources.{$index}.color"] = ['required', 'string', 'max:20'];
+                $rules["resources.{$index}.icon"] = [
+                    'required',
+                    'string',
+                    Rule::in(Category::ICONS),
+                ];
+                $rules["resources.{$index}.color"] = [
+                    'required',
+                    'string',
+                    Rule::in(Category::COLORS),
+                ];
             }
         }
 
