@@ -21,9 +21,10 @@ import {
     Utensils,
     Wifi,
     Zap,
+    icons as lucideIcons,
 } from 'lucide-vue-next';
 
-export const categoryIcons = {
+export const featuredCategoryIcons = {
     heart: Heart,
     home: House,
     arrow: ArrowUpRight,
@@ -46,6 +47,16 @@ export const categoryIcons = {
     clothing: Shirt,
     square: Square,
     more: MoreHorizontal,
+};
+
+export const categoryIconEntries = [
+    ...Object.entries(featuredCategoryIcons),
+    ...Object.entries(lucideIcons).filter(([name]) => !(name in featuredCategoryIcons)),
+];
+
+export const categoryIcons = {
+    ...lucideIcons,
+    ...featuredCategoryIcons,
 };
 
 export const categoryColors = ['#2457DA', '#16815B', '#B34735', '#A8750D', '#7A52B9', '#637083'];

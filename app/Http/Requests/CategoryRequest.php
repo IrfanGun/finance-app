@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CategoryRequest extends FormRequest
 {
@@ -21,12 +19,12 @@ class CategoryRequest extends FormRequest
             'icon' => [
                 'required',
                 'string',
-                Rule::in(Category::ICONS),
+                'regex:/^[A-Za-z][A-Za-z0-9]{0,63}$/',
             ],
             'color' => [
                 'required',
                 'string',
-                Rule::in(Category::COLORS),
+                'regex:/^#[0-9A-Fa-f]{6}$/',
             ],
             'is_active' => ['boolean'],
         ];

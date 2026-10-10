@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Transaction;
-#[Fillable(['user_id','name','type','opening_balance'])]
 
+#[Fillable(['user_id', 'name', 'type', 'currency', 'investment_unit', 'opening_balance'])]
 class FinancialAccount extends Model
 {
     public function transactions(): HasMany

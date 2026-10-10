@@ -5,11 +5,11 @@ import { Home, Plus } from 'lucide-vue-next';
 import { dashboard } from '@/routes';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import CategoryCard from '@/Components/Categories/CategoryCard.vue';
+import CategoryFilterTabs from '@/Components/Categories/CategoryFilterTabs.vue';
 import CategoryFormModal from '@/Components/Categories/CategoryFormModal.vue';
 import { useCategoryForm } from '@/Composables/useCategoryForm';
 
 const props = defineProps({ categories: { type: Array, default: () => [] } });
-const filters = ['all', 'expense', 'income'];
 const activeFilter = ref('all');
 const { open, form, create, edit, save, toggleActive, close } = useCategoryForm();
 const categoriesByType = (type) => props.categories.filter((category) => category.type === type && (activeFilter.value === 'all' || activeFilter.value === type));
@@ -24,7 +24,7 @@ const categoriesByType = (type) => props.categories.filter((category) => categor
             <button class="rounded-full bg-app-primary p-2 text-white" @click="create"><Plus :size="18" /></button>
         </header>
         <main class="space-y-5 px-6 pt-6">
-            <div class="flex gap-3"><button v-for="filter in filters" :key="filter" type="button" class="rounded-full px-5 py-2.5 text-sm font-semibold capitalize transition" :class="activeFilter === filter ? 'bg-app-primary text-white shadow-sm' : 'bg-app-primary/5 text-app-primary'" @click="activeFilter = filter">{{ filter }}</button></div>
+            <CategoryFilterTabs v-model="activeFilter" />
             <section v-for="type in ['expense', 'income']" :key="type" class="space-y-3"><CategoryCard v-for="category in categoriesByType(type)" :key="category.id" :category="category" @edit="edit" @toggle="toggleActive" /></section>
         </main>
         <CategoryFormModal :open="open" :form="form" @close="close" @save="save" />
