@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -11,9 +12,34 @@ class DashboardService
     {
         $income = $user->transactions()->where('type', 'income')->sum('amount');
         $expense = $user->transactions()->where('type', 'expense')->sum('amount');
+        $categories = $user->categories()
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get();
+        $categoryExpenses = $user->transactions()
+            ->where('type', 'expense')
+            ->whereNotNull('category_id')
+            ->select('category_id')
+            ->selectRaw('SUM(amount) as amount')
+            ->groupBy('category_id')
+            ->pluck('amount', 'category_id');
+        $spendingCategories = $categories
+            ->where('type', 'expense')
+            ->map(function (Category $category) use ($categoryExpenses): array {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'color' => $category->color,
+                    'amount' => (float) $categoryExpenses->get($category->id, 0),
+                ];
+            })
+            ->filter(fn (array $category): bool => $category['amount'] > 0)
+            ->sortByDesc('amount')
+            ->values();
 
         return [
-            'categories' => $user->categories()->where('is_active', true)->orderBy('type')->orderBy('name')->get(),
+            'categories' => $categories->where('is_active', true)->values(),
+            'spendingCategories' => $spendingCategories,
             'accounts' => $user->financialAccounts()
                 ->withSum([
                     'transactions as income_total' => fn (Builder $query) => $query->where('type', 'income'),

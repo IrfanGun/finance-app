@@ -27,7 +27,6 @@ const submit = () => form.post(register.url(), { onFinish: () => form.reset('pas
                 </form>
                 <p class="mt-7 text-center text-sm text-slate-500">Already have an account? <Link :href="login.url()" class="font-semibold text-blue-600 hover:text-blue-700">Log in</Link></p>
             </div>
-            <p class="pb-7 text-center text-xs text-slate-500">A little clarity. A lot more confidence.</p>
         </div>
     </main>
 </template>

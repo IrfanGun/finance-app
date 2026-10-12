@@ -8,12 +8,6 @@ import { Sparkles } from 'lucide-vue-next';
             <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
                 <Sparkles :size="20" />
             </span>
-            <div>
-                <p class="font-semibold">Your financial companion</p>
-                <p class="mt-1 text-sm leading-5 text-blue-100">
-                    Get simple guidance for your everyday money decisions.
-                </p>
-            </div>
         </div>
     </section>
 </template>

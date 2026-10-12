@@ -358,8 +358,6 @@ const sendMessage = async (suggestion = null) => {
         <ChatHeader :dashboard-url="dashboard.url()" />
 
         <main ref="messagesContainer" class="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-6 pb-[190px] pt-6">
-            <ChatIntroCard />
-
             <ChatMessageList :messages="messages" :is-typing="isTyping" />
         </main>
 

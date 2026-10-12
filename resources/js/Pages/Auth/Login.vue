@@ -19,7 +19,6 @@ const submit = () => form.post(login.url(), { onFinish: () => form.reset('passwo
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-2xl font-bold text-white">c</span>
                     <span class="text-[26px] font-semibold tracking-tight text-slate-800">clarity</span>
                 </Link>
-                <div class="mt-9 text-center"><h1 class="text-[30px] font-bold leading-tight tracking-tight">Welcome back</h1><p class="mt-1 text-base text-slate-500">Your money, in a clearer view.</p></div>
                 <div v-if="status" class="mt-6 text-sm font-medium text-green-600">{{ status }}</div>
                 <form class="mt-9 flex flex-col gap-6" @submit.prevent="submit">
                     <div class="flex flex-col gap-2"><label for="email" class="text-base text-slate-800">Email address</label><input id="email" v-model="form.email" type="email" name="email" placeholder="you@example.com" required autofocus autocomplete="username" class="h-[42px] rounded-lg border border-slate-300 px-4 text-base text-slate-900 outline-none transition placeholder:text-slate-700 focus:border-blue-600 focus:ring-2 focus:ring-blue-100" /><InputError :message="form.errors.email" /></div>
@@ -33,7 +32,6 @@ const submit = () => form.post(login.url(), { onFinish: () => form.reset('passwo
                 </form>
                 <p class="mt-7 text-center text-sm text-slate-500">New to Clarity? <Link :href="register.url()" class="font-semibold text-blue-600 hover:text-blue-700">Create account</Link></p>
             </div>
-            <p class="pb-7 text-center text-xs text-slate-500">A little clarity. A lot more confidence.</p>
         </div>
     </main>
 </template>
