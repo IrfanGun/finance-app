@@ -3,18 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Services\AiConversationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ChatController extends Controller
 {
-    public function __invoke(Request $request, AiConversationService $conversations): Response
-    {
+    public function __invoke(
+        Request $request,
+        AiConversationService $conversations,
+    ): Response|JsonResponse {
+        $validated = [];
+
+        if ($request->expectsJson()) {
+            $validated = $request->validate([
+                'conversation_id' => ['required', 'integer', 'min:1'],
+                'before_message_id' => ['required', 'integer', 'min:1'],
+            ]);
+        }
+
         $conversation = $conversations->findOwned(
             $request->user(),
             $request->integer('conversation_id') ?: null,
         );
+
+        $messagePage = $conversations->visibleMessagePage(
+            $conversation,
+            $request->expectsJson()
+                ? (int) $validated['before_message_id']
+                : null,
+        );
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'messages' => $messagePage['messages']
+                    ->map(fn ($message): array => $conversations->formatMessage($message))
+                    ->all(),
+                'has_more' => $messagePage['has_more'],
+            ]);
+        }
 
         $workflow = $conversation->workflows()
             ->whereIn('status', ['awaiting_input', 'ready'])
@@ -29,12 +57,11 @@ class ChatController extends Controller
 
         return Inertia::render('Chat', [
             'conversationId' => $conversation->id,
-            'messages' => $conversations->recentMessages($conversation)
-                ->filter(fn ($message): bool => $message->role !== 'tool'
-                    && ($message->metadata['kind'] ?? null) !== 'tool_calls')
+            'messages' => $messagePage['messages']
                 ->map(fn ($message): array => $conversations->formatMessage($message))
                 ->values()
                 ->all(),
+            'hasMoreMessages' => $messagePage['has_more'],
             'workflow' => $workflow === null ? null : [
                 'id' => $workflow->id,
                 'action' => $workflow->action,

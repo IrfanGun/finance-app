@@ -44,7 +44,7 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:12
+ * @see app/Http/Controllers/ChatController.php:13
  * @route '/chat'
  */
 export const chat = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ chat.definition = {
 
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:12
+ * @see app/Http/Controllers/ChatController.php:13
  * @route '/chat'
  */
 chat.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ chat.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:12
+ * @see app/Http/Controllers/ChatController.php:13
  * @route '/chat'
  */
 chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -77,7 +77,7 @@ chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:12
+ * @see app/Http/Controllers/ChatController.php:13
  * @route '/chat'
  */
 chat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

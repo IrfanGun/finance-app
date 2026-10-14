@@ -43,6 +43,38 @@ class AiConversationService
     }
 
     /**
+     * @return array{messages: Collection<int, AiMessage>, has_more: bool}
+     */
+    public function visibleMessagePage(
+        AiConversation $conversation,
+        ?int $beforeMessageId = null,
+        int $limit = 10,
+    ): array {
+        $messages = $conversation->messages()
+            ->where('role', '!=', 'tool')
+            ->where(function ($query): void {
+                $query->whereNull('metadata->kind')
+                    ->orWhere('metadata->kind', '!=', 'tool_calls');
+            })
+            ->when(
+                $beforeMessageId !== null,
+                fn ($query) => $query->where('id', '<', $beforeMessageId),
+            )
+            ->latest('id')
+            ->limit($limit + 1)
+            ->get();
+        $hasMore = $messages->count() > $limit;
+
+        return [
+            'messages' => $messages
+                ->take($limit)
+                ->sortBy('id')
+                ->values(),
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * @return Collection<int, AiMessage>
      */
     public function contextMessages(AiConversation $conversation, int $limit = 40): Collection

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AiFinanceController::summary
- * @see app/Http/Controllers/AiFinanceController.php:11
+ * @see app/Http/Controllers/AiFinanceController.php:15
  * @route '/api/ai/finance/summary'
  */
 export const summary = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ summary.definition = {
 
 /**
 * @see \App\Http\Controllers\AiFinanceController::summary
- * @see app/Http/Controllers/AiFinanceController.php:11
+ * @see app/Http/Controllers/AiFinanceController.php:15
  * @route '/api/ai/finance/summary'
  */
 summary.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ summary.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AiFinanceController::summary
- * @see app/Http/Controllers/AiFinanceController.php:11
+ * @see app/Http/Controllers/AiFinanceController.php:15
  * @route '/api/ai/finance/summary'
  */
 summary.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ summary.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\AiFinanceController::summary
- * @see app/Http/Controllers/AiFinanceController.php:11
+ * @see app/Http/Controllers/AiFinanceController.php:15
  * @route '/api/ai/finance/summary'
  */
 summary.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
