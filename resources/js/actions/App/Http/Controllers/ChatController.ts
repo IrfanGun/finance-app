@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:10
+ * @see app/Http/Controllers/ChatController.php:12
  * @route '/chat'
  */
 const ChatController = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ ChatController.definition = {
 
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:10
+ * @see app/Http/Controllers/ChatController.php:12
  * @route '/chat'
  */
 ChatController.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ ChatController.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:10
+ * @see app/Http/Controllers/ChatController.php:12
  * @route '/chat'
  */
 ChatController.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ ChatController.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\ChatController::__invoke
- * @see app/Http/Controllers/ChatController.php:10
+ * @see app/Http/Controllers/ChatController.php:12
  * @route '/chat'
  */
 ChatController.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

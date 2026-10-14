@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AiChatController::__invoke
- * @see app/Http/Controllers/AiChatController.php:13
+ * @see app/Http/Controllers/AiChatController.php:25
  * @route '/ai/chat'
  */
 const AiChatController = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ AiChatController.definition = {
 
 /**
 * @see \App\Http\Controllers\AiChatController::__invoke
- * @see app/Http/Controllers/AiChatController.php:13
+ * @see app/Http/Controllers/AiChatController.php:25
  * @route '/ai/chat'
  */
 AiChatController.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ AiChatController.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AiChatController::__invoke
- * @see app/Http/Controllers/AiChatController.php:13
+ * @see app/Http/Controllers/AiChatController.php:25
  * @route '/ai/chat'
  */
 AiChatController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

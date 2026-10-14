@@ -63,6 +63,26 @@ def get_transactions(
     )
 
 
+def get_finance_summary(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    user_id: int | None = None,
+):
+    params = {}
+
+    if from_date:
+        params["from"] = from_date
+
+    if to_date:
+        params["to"] = to_date
+
+    return laravel.get(
+        "/api/ai/finance/summary",
+        params=params,
+        user_id=user_id,
+    )
+
+
 def update_transaction(
     transaction_id: int,
     amount: Optional[float] = None,

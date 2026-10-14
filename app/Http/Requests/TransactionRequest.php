@@ -3,10 +3,14 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class TransactionRequest extends FormRequest
 {
-    public function authorize(): bool { return $this->user() !== null; }
+    public function authorize(): bool
+    {
+        return $this->user() !== null;
+    }
 
     public function rules(): array
     {
@@ -16,8 +20,16 @@ class TransactionRequest extends FormRequest
             'date' => ['required', 'date'],
             'title' => ['required', 'string', 'max:255'],
             'note' => ['nullable', 'string', 'max:1000'],
-            'account_id' => ['required', 'exists:financial_accounts,id'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'account_id' => [
+                'required',
+                Rule::exists('financial_accounts', 'id')
+                    ->where('user_id', $this->user()?->id),
+            ],
+            'category_id' => [
+                'nullable',
+                Rule::exists('categories', 'id')
+                    ->where('user_id', $this->user()?->id),
+            ],
         ];
     }
 }

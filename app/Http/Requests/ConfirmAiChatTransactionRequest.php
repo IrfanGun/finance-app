@@ -24,6 +24,9 @@ class ConfirmAiChatTransactionRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
+            'conversation_id' => ['nullable', 'integer', 'min:1'],
+            'workflow_id' => ['nullable', 'integer', 'min:1'],
+            'operation_id' => ['nullable', 'string', 'max:150', 'regex:/^[A-Za-z0-9._:-]+$/'],
             'transaction' => [
                 'required_without:transactions',
                 'array',
@@ -101,6 +104,15 @@ class ConfirmAiChatTransactionRequest extends FormRequest
                     'required',
                     'numeric',
                     'min:0',
+                ];
+                $rules["resources.{$index}.currency"] = [
+                    'nullable',
+                    'string',
+                    'regex:/^[A-Z]{3}$/',
+                ];
+                $rules["resources.{$index}.investment_unit"] = [
+                    'nullable',
+                    Rule::in(['gram', 'lot']),
                 ];
             }
 

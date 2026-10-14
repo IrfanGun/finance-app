@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../
 import chatB2e4da from './chat'
 /**
 * @see \App\Http\Controllers\AiChatController::__invoke
- * @see app/Http/Controllers/AiChatController.php:13
+ * @see app/Http/Controllers/AiChatController.php:25
  * @route '/ai/chat'
  */
 export const chat = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -17,7 +17,7 @@ chat.definition = {
 
 /**
 * @see \App\Http\Controllers\AiChatController::__invoke
- * @see app/Http/Controllers/AiChatController.php:13
+ * @see app/Http/Controllers/AiChatController.php:25
  * @route '/ai/chat'
  */
 chat.url = (options?: RouteQueryOptions) => {
@@ -26,7 +26,7 @@ chat.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AiChatController::__invoke
- * @see app/Http/Controllers/AiChatController.php:13
+ * @see app/Http/Controllers/AiChatController.php:25
  * @route '/ai/chat'
  */
 chat.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

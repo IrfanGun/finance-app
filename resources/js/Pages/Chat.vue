@@ -1,9 +1,10 @@
 <script setup>
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { chat as aiChat } from '@/routes/ai';
 import { dashboard } from '@/routes';
 import { confirm as confirmAiChatTransaction } from '@/actions/App/Http/Controllers/AiChatTransactionController';
+import { cancel as cancelAiWorkflow } from '@/actions/App/Http/Controllers/AiWorkflowController';
 import ChatComposer from '@/Components/Chat/ChatComposer.vue';
 import ChatHeader from '@/Components/Chat/ChatHeader.vue';
 import ChatIntroCard from '@/Components/Chat/ChatIntroCard.vue';
@@ -11,20 +12,27 @@ import ChatMessageList from '@/Components/Chat/ChatMessageList.vue';
 import ChatTransactionSetupModal from '@/Components/Chat/ChatTransactionSetupModal.vue';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 
+const props = defineProps({
+    conversationId: { type: Number, default: null },
+    messages: { type: Array, default: () => [] },
+    workflow: { type: Object, default: null },
+});
+
 const suggestions = [
     'How much did I spend this month?',
     'Help me plan my budget',
     'Give me a saving tip',
 ];
 
-const messages = ref([
+const fallbackMessages = [
     {
         id: 1,
         role: 'assistant',
         text: 'Hi! I’m your finance assistant. Ask me anything about your spending, budget, or saving goals.',
         time: 'Now',
     },
-]);
+];
+const messages = ref(props.messages.length > 0 ? props.messages : fallbackMessages);
 const draft = ref('');
 const isTyping = ref(false);
 const isSavingSetup = ref(false);
@@ -34,11 +42,18 @@ const setupResources = ref([]);
 const accountSelectionRequired = ref(false);
 const accountOptions = ref([]);
 const selectedAccountId = ref(null);
+const workflowReady = ref(false);
+const workflowModalVisible = ref(false);
+const confirmationOperationId = ref(null);
+const failedRequest = ref(null);
 const messagesContainer = ref(null);
 const chatEndpoint = aiChat.url();
 const confirmTransactionEndpoint = confirmAiChatTransaction.url();
-const isSetupOpen = computed(() => (
-    accountSelectionRequired.value || setupResources.value.length > 0
+const activeWorkflowId = ref(props.workflow?.id ?? null);
+const isSetupOpen = computed(() => workflowModalVisible.value && (
+    pendingTransactions.value.length > 0
+    ||
+    accountSelectionRequired.value || setupResources.value.length > 0 || workflowReady.value
 ));
 const canConfirmSetup = computed(() => {
     const mustSelectAccount = accountSelectionRequired.value
@@ -147,6 +162,10 @@ const setupMissingResources = (payload) => {
         ? payload.account_options
         : [];
     selectedAccountId.value = null;
+    workflowReady.value = payload.workflow_ready === true;
+    workflowModalVisible.value = true;
+    confirmationOperationId.value = confirmationOperationId.value
+        ?? `workflow:${payload.workflow_id ?? activeWorkflowId.value}`;
 
     if (
         accountSelectionRequired.value
@@ -159,6 +178,56 @@ const setupMissingResources = (payload) => {
         }, transactions[0].transaction_type));
     }
 };
+
+const clearWorkflowState = () => {
+    pendingTransaction.value = null;
+    pendingTransactions.value = [];
+    setupResources.value = [];
+    accountSelectionRequired.value = false;
+    accountOptions.value = [];
+    selectedAccountId.value = null;
+    workflowReady.value = false;
+    workflowModalVisible.value = false;
+    activeWorkflowId.value = null;
+    confirmationOperationId.value = null;
+};
+
+const hydrateWorkflow = (workflow) => {
+    if (!workflow) {
+        clearWorkflowState();
+
+        return;
+    }
+
+    activeWorkflowId.value = workflow.id ?? null;
+    setupMissingResources({
+        workflow_id: workflow.id,
+        pending_transactions: workflow.pending_transactions ?? workflow.draft?.transactions ?? [],
+        pending_transaction: workflow.pending_transaction,
+        missing_resources: workflow.missing_resources ?? workflow.draft?.missing_resources ?? [],
+        account_selection_required: workflow.account_selection_required
+            ?? workflow.draft?.account_selection_required
+            ?? false,
+        account_options: workflow.account_options ?? workflow.draft?.account_options ?? [],
+        workflow_ready: workflow.workflow_ready === true || workflow.status === 'ready',
+    });
+};
+
+watch(
+    () => props.messages,
+    (serverMessages) => {
+        messages.value = Array.isArray(serverMessages) && serverMessages.length > 0
+            ? serverMessages
+            : fallbackMessages;
+    },
+    { deep: true },
+);
+
+watch(
+    () => props.workflow,
+    (workflow) => hydrateWorkflow(workflow),
+    { deep: true },
+);
 
 const confirmMissingResources = async () => {
     if (!pendingTransaction.value || isSavingSetup.value) {
@@ -181,6 +250,12 @@ const confirmMissingResources = async () => {
                 type: resource.type,
                 name: resource.name.trim(),
                 account_type: resource.accountType,
+                currency: ['cash', 'bank'].includes(resource.accountType)
+                    ? 'IDR'
+                    : null,
+                investment_unit: resource.accountType === 'investment'
+                    ? 'lot'
+                    : null,
                 opening_balance: Number(resource.openingBalance || 0),
             }
                     : {
@@ -219,6 +294,13 @@ const confirmMissingResources = async () => {
                 transaction: transactionData[0],
                 resources,
             };
+        requestBody.conversation_id = props.conversationId;
+        if (activeWorkflowId.value) {
+            requestBody.workflow_id = activeWorkflowId.value;
+        }
+        confirmationOperationId.value = confirmationOperationId.value
+            ?? `workflow:${activeWorkflowId.value ?? Date.now()}`;
+        requestBody.operation_id = confirmationOperationId.value;
 
         const response = await fetch(confirmTransactionEndpoint, {
             method: 'POST',
@@ -246,11 +328,15 @@ const confirmMissingResources = async () => {
             time: 'Now',
         });
         pendingTransaction.value = null;
+        activeWorkflowId.value = null;
+        workflowReady.value = false;
         pendingTransactions.value = [];
         setupResources.value = [];
         accountSelectionRequired.value = false;
         accountOptions.value = [];
         selectedAccountId.value = null;
+        workflowModalVisible.value = false;
+        confirmationOperationId.value = null;
         await scrollToLatestMessage();
     } catch (error) {
         messages.value.push({
@@ -267,17 +353,50 @@ const confirmMissingResources = async () => {
     }
 };
 
-const cancelSetup = () => {
+const continueInChat = () => {
     if (isSavingSetup.value) {
         return;
     }
 
-    pendingTransaction.value = null;
-    pendingTransactions.value = [];
-    setupResources.value = [];
-    accountSelectionRequired.value = false;
-    accountOptions.value = [];
-    selectedAccountId.value = null;
+    workflowModalVisible.value = false;
+};
+
+const cancelWorkflow = async () => {
+    if (isSavingSetup.value || !activeWorkflowId.value) {
+        return;
+    }
+
+    try {
+        const response = await fetch(cancelAiWorkflow.url(activeWorkflowId.value), {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: requestHeaders(),
+        });
+
+        if (!response.ok) {
+            const payload = await response.json();
+            throw new Error(payload.message ?? 'Workflow gagal dibatalkan.');
+        }
+
+        pendingTransaction.value = null;
+        workflowModalVisible.value = false;
+        workflowReady.value = false;
+        pendingTransactions.value = [];
+        setupResources.value = [];
+        accountSelectionRequired.value = false;
+        accountOptions.value = [];
+        selectedAccountId.value = null;
+        activeWorkflowId.value = null;
+        confirmationOperationId.value = null;
+    } catch (error) {
+        messages.value.push({
+            id: Date.now() + 3,
+            role: 'assistant',
+            text: error instanceof Error ? error.message : 'Workflow gagal dibatalkan.',
+            time: 'Now',
+        });
+        await scrollToLatestMessage();
+    }
 };
 
 const startAccountCreation = () => {
@@ -300,12 +419,22 @@ const sendMessage = async (suggestion = null) => {
         return;
     }
 
-    messages.value.push({
-        id: Date.now(),
-        role: 'user',
-        text,
-        time: 'Now',
-    });
+    const retryingFailedRequest = failedRequest.value?.text === text;
+    const clientRequestId = retryingFailedRequest
+        ? failedRequest.value.id
+        : typeof globalThis.crypto?.randomUUID === 'function'
+            ? globalThis.crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    if (!retryingFailedRequest) {
+        messages.value.push({
+            id: clientRequestId,
+            role: 'user',
+            text,
+            time: 'Now',
+        });
+    }
+    failedRequest.value = null;
     draft.value = '';
     isTyping.value = true;
     await scrollToLatestMessage();
@@ -315,7 +444,11 @@ const sendMessage = async (suggestion = null) => {
             method: 'POST',
             credentials: 'same-origin',
             headers: requestHeaders(),
-            body: JSON.stringify({ message: text }),
+            body: JSON.stringify({
+                message: text,
+                conversation_id: props.conversationId,
+                client_request_id: clientRequestId,
+            }),
         });
         const payload = await response.json();
 
@@ -326,6 +459,8 @@ const sendMessage = async (suggestion = null) => {
         if (typeof payload.response !== 'string' || !payload.response.trim()) {
             throw new Error('AI service mengembalikan response yang tidak valid.');
         }
+
+        activeWorkflowId.value = payload.workflow_id ?? null;
 
         messages.value.push({
             id: Date.now() + 1,
@@ -344,11 +479,17 @@ const sendMessage = async (suggestion = null) => {
                 : 'Maaf, AI service tidak dapat dihubungi saat ini.',
             time: 'Now',
         });
+        failedRequest.value = {
+            id: clientRequestId,
+            text,
+        };
         await scrollToLatestMessage();
     } finally {
         isTyping.value = false;
     }
 };
+
+hydrateWorkflow(props.workflow);
 </script>
 
 <template>
@@ -380,7 +521,8 @@ const sendMessage = async (suggestion = null) => {
             :can-confirm-setup="canConfirmSetup"
             :is-saving-setup="isSavingSetup"
             :account-type-label="accountTypeLabel"
-            @cancel="cancelSetup"
+            @continue="continueInChat"
+            @cancel="cancelWorkflow"
             @confirm="confirmMissingResources"
             @start-account-creation="startAccountCreation"
             @update:selected-account-id="selectedAccountId = $event"

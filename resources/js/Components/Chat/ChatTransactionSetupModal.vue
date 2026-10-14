@@ -43,6 +43,7 @@ defineProps({
 });
 
 const emit = defineEmits([
+    'continue',
     'cancel',
     'confirm',
     'start-account-creation',
@@ -54,7 +55,7 @@ const emit = defineEmits([
     <div
         v-if="isOpen"
         class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-0 sm:items-center sm:px-4"
-        @click.self="emit('cancel')"
+        @click.self="emit('continue')"
     >
         <section
             role="dialog"
@@ -167,9 +168,17 @@ const emit = defineEmits([
                     type="button"
                     class="h-11 rounded-xl border border-[#DCE3ED] font-medium text-[#637083] disabled:opacity-60"
                     :disabled="isSavingSetup"
+                    @click="emit('continue')"
+                >
+                    Lanjutkan lewat chat
+                </button>
+                <button
+                    type="button"
+                    class="h-11 rounded-xl border border-red-200 font-medium text-red-600 disabled:opacity-60"
+                    :disabled="isSavingSetup"
                     @click="emit('cancel')"
                 >
-                    Batal
+                    Batalkan transaksi
                 </button>
             </div>
         </section>

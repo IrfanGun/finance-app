@@ -45,6 +45,10 @@ return [
         'token' => env('AI_SERVICE_TOKEN'),
         'connect_timeout' => env('AI_SERVICE_CONNECT_TIMEOUT', 3),
         'timeout' => env('AI_SERVICE_TIMEOUT', 90),
+        'workflow_ttl_hours' => env('AI_WORKFLOW_TTL_HOURS', 24),
+        'context_recent_messages' => env('AI_CONTEXT_RECENT_MESSAGES', 40),
+        'lease_seconds' => env('AI_CONVERSATION_LEASE_SECONDS', 120),
+        'context_input_budget_tokens' => env('AI_CONTEXT_INPUT_BUDGET_TOKENS', 8000),
     ],
 
 ];

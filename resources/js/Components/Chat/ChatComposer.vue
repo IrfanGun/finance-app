@@ -32,7 +32,7 @@ const updateDraft = (event) => {
 
 <template>
     <section class="fixed inset-x-0 bottom-[84px] z-20 mx-auto w-full max-w-lg space-y-3 border-t border-[#E9EDF3] bg-white px-6 py-4 shadow-[0_-4px_18px_rgba(21,35,56,0.05)]">
-        <div class="flex min-w-0 max-w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+        <!-- <div class="flex min-w-0 max-w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
             <button
                 v-for="suggestion in suggestions"
                 :key="suggestion"
@@ -43,7 +43,7 @@ const updateDraft = (event) => {
             >
                 {{ suggestion }}
             </button>
-        </div>
+        </div> -->
 
         <form
             class="flex min-w-0 items-center gap-2 rounded-2xl bg-[#F5F7FA] p-2"
@@ -66,9 +66,5 @@ const updateDraft = (event) => {
                 <Send :size="18" />
             </button>
         </form>
-
-        <p class="text-center text-[10px] text-[#94A0B2]">
-            Assistant suggestions are for general guidance only.
-        </p>
     </section>
 </template>

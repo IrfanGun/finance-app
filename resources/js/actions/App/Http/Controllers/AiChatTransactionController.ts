@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\AiChatTransactionController::confirm
- * @see app/Http/Controllers/AiChatTransactionController.php:11
+ * @see app/Http/Controllers/AiChatTransactionController.php:15
  * @route '/ai/chat/transactions/confirm'
  */
 export const confirm = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ confirm.definition = {
 
 /**
 * @see \App\Http\Controllers\AiChatTransactionController::confirm
- * @see app/Http/Controllers/AiChatTransactionController.php:11
+ * @see app/Http/Controllers/AiChatTransactionController.php:15
  * @route '/ai/chat/transactions/confirm'
  */
 confirm.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ confirm.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AiChatTransactionController::confirm
- * @see app/Http/Controllers/AiChatTransactionController.php:11
+ * @see app/Http/Controllers/AiChatTransactionController.php:15
  * @route '/ai/chat/transactions/confirm'
  */
 confirm.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

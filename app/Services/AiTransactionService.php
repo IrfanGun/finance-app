@@ -257,6 +257,12 @@ class AiTransactionService
                     $user->financialAccounts()->create([
                         'name' => $resource['name'],
                         'type' => $resource['account_type'],
+                        'currency' => in_array($resource['account_type'], ['cash', 'bank'], true)
+                            ? ($resource['currency'] ?? 'IDR')
+                            : null,
+                        'investment_unit' => $resource['account_type'] === 'investment'
+                            ? ($resource['investment_unit'] ?? 'lot')
+                            : null,
                         'opening_balance' => $resource['opening_balance'],
                     ]);
                 }

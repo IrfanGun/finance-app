@@ -11,6 +11,7 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 
 COPY app.py ./app.py
 COPY finance_agents.py ./finance_agents.py
+COPY finance_agent ./finance_agent
 COPY services ./services
 COPY tools ./tools
 
