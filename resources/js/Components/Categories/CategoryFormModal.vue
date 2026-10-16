@@ -9,9 +9,14 @@ import {
     getIconCategory,
     iconCategories,
 } from './iconCategoryLibrary';
+import CmsModal from '@/Components/CmsModal.vue';
 
 const props = defineProps({
     open: Boolean,
+    cms: {
+        type: Boolean,
+        default: false,
+    },
     form: {
         type: Object,
         required: true,
@@ -81,13 +86,17 @@ const selectIconCategory = (category) => {
 </script>
 
 <template>
-    <div
-        v-if="open"
-        class="fixed inset-0 z-30 flex items-end bg-black/30"
-        @click.self="emit('close')"
+    <CmsModal
+        :show="open"
+        :cms="cms"
+        :label="form.id ? 'Edit category' : 'New category'"
+        @close="emit('close')"
     >
         <form
-            class="mx-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-white px-6 pb-8 pt-3"
+            class="mx-auto w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-white px-6 pb-8 pt-3"
+            :class="cms
+                ? 'my-auto max-h-[calc(100dvh-2rem)] rounded-[28px] sm:max-h-[calc(100dvh-3rem)]'
+                : 'max-h-[90vh]'"
             @submit.prevent="emit('save')"
         >
             <div class="mx-auto mb-5 h-1 w-9 rounded-full bg-[#D5DBE5]"></div>
@@ -348,5 +357,5 @@ const selectIconCategory = (category) => {
                 </div>
             </section>
         </div>
-    </div>
+    </CmsModal>
 </template>

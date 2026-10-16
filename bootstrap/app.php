@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\KeepCmsNavigation;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,7 +21,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            KeepCmsNavigation::class,
         ]);
+
+        $middleware->redirectGuestsTo(
+            fn (Request $request): string => $request->is('cms/*')
+                ? route('cms.login')
+                : route('login'),
+        );
+        $middleware->redirectUsersTo(
+            fn (Request $request): string => $request->is('cms/*')
+                ? route('cms.dashboard')
+                : route('dashboard'),
+        );
 
         //
     })

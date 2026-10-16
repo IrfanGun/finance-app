@@ -14,7 +14,11 @@ class FinancialAccountController extends Controller
 {
     public function index(Request $request, FinancialAccountService $accounts): Response
     {
-        return Inertia::render('Accounts/Index', ['accounts' => $accounts->listFor($request->user())]);
+        $view = $request->is('cms/accounts')
+            ? 'Cms/AccountsCMS'
+            : 'Accounts/Index';
+
+        return Inertia::render($view, ['accounts' => $accounts->listFor($request->user())]);
     }
 
     public function store(FinancialAccountRequest $request, FinancialAccountService $accounts): RedirectResponse

@@ -33,11 +33,18 @@ class TransactionController extends Controller
             ->latest('id')
             ->get();
 
-        return Inertia::render('Transactions/Index', [
+        $view = $request->is('cms/transactions')
+            ? 'Cms/TransactionsCMS'
+            : 'Transactions/Index';
+
+        return Inertia::render($view, [
             'transactions' => $transactions,
             'filters' => $request->only(['from', 'to', 'asset_id', 'category_id']),
             'assets' => $request->user()->financialAccounts()->orderBy('name')->get(['id', 'name']),
-            'categories' => $request->user()->categories()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'categories' => $request->user()->categories()
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'type']),
         ]);
     }
 

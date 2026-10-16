@@ -13,6 +13,7 @@ import AssetDepreciationController from './AssetDepreciationController'
 import TransactionController from './TransactionController'
 import ReceiptController from './ReceiptController'
 import ProfileController from './ProfileController'
+import Cms from './Cms'
 import Auth from './Auth'
 const Controllers = {
     AiTransactionController: Object.assign(AiTransactionController, AiTransactionController),
@@ -30,6 +31,7 @@ AssetDepreciationController: Object.assign(AssetDepreciationController, AssetDep
 TransactionController: Object.assign(TransactionController, TransactionController),
 ReceiptController: Object.assign(ReceiptController, ReceiptController),
 ProfileController: Object.assign(ProfileController, ProfileController),
+Cms: Object.assign(Cms, Cms),
 Auth: Object.assign(Auth, Auth),
 }
 

@@ -11,6 +11,10 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request, DashboardService $dashboard): Response
     {
-        return Inertia::render('Dashboard', $dashboard->dataFor($request->user()));
+        $view = $request->is('cms/dashboard')
+            ? 'Cms/DashboardCMS'
+            : 'Dashboard';
+
+        return Inertia::render($view, $dashboard->dataFor($request->user()));
     }
 }

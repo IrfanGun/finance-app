@@ -55,7 +55,11 @@ class ChatController extends Controller
 
         $workflowDraft = $workflow?->draft ?? [];
 
-        return Inertia::render('Chat', [
+        $view = $request->is('cms/chat')
+            ? 'Cms/ChatCMS'
+            : 'Chat';
+
+        return Inertia::render($view, [
             'conversationId' => $conversation->id,
             'messages' => $messagePage['messages']
                 ->map(fn ($message): array => $conversations->formatMessage($message))

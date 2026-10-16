@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\AssetController::store
- * @see app/Http/Controllers/AssetController.php:28
+ * @see app/Http/Controllers/AssetController.php:32
  * @route '/assets'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\AssetController::store
- * @see app/Http/Controllers/AssetController.php:28
+ * @see app/Http/Controllers/AssetController.php:32
  * @route '/assets'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AssetController::store
- * @see app/Http/Controllers/AssetController.php:28
+ * @see app/Http/Controllers/AssetController.php:32
  * @route '/assets'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -78,7 +78,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\AssetController::show
- * @see app/Http/Controllers/AssetController.php:37
+ * @see app/Http/Controllers/AssetController.php:50
  * @route '/assets/{asset}'
  */
 export const show = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -93,7 +93,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\AssetController::show
- * @see app/Http/Controllers/AssetController.php:37
+ * @see app/Http/Controllers/AssetController.php:50
  * @route '/assets/{asset}'
  */
 show.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ show.url = (args: { asset: string | number } | [asset: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\AssetController::show
- * @see app/Http/Controllers/AssetController.php:37
+ * @see app/Http/Controllers/AssetController.php:50
  * @route '/assets/{asset}'
  */
 show.get = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -130,7 +130,7 @@ show.get = (args: { asset: string | number } | [asset: string | number ] | strin
 })
 /**
 * @see \App\Http\Controllers\AssetController::show
- * @see app/Http/Controllers/AssetController.php:37
+ * @see app/Http/Controllers/AssetController.php:50
  * @route '/assets/{asset}'
  */
 show.head = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -140,7 +140,7 @@ show.head = (args: { asset: string | number } | [asset: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\AssetController::edit
- * @see app/Http/Controllers/AssetController.php:48
+ * @see app/Http/Controllers/AssetController.php:61
  * @route '/assets/{asset}/edit'
  */
 export const edit = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -155,7 +155,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\AssetController::edit
- * @see app/Http/Controllers/AssetController.php:48
+ * @see app/Http/Controllers/AssetController.php:61
  * @route '/assets/{asset}/edit'
  */
 edit.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -183,7 +183,7 @@ edit.url = (args: { asset: string | number } | [asset: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\AssetController::edit
- * @see app/Http/Controllers/AssetController.php:48
+ * @see app/Http/Controllers/AssetController.php:61
  * @route '/assets/{asset}/edit'
  */
 edit.get = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -192,7 +192,7 @@ edit.get = (args: { asset: string | number } | [asset: string | number ] | strin
 })
 /**
 * @see \App\Http\Controllers\AssetController::edit
- * @see app/Http/Controllers/AssetController.php:48
+ * @see app/Http/Controllers/AssetController.php:61
  * @route '/assets/{asset}/edit'
  */
 edit.head = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -202,7 +202,7 @@ edit.head = (args: { asset: string | number } | [asset: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\AssetController::update
- * @see app/Http/Controllers/AssetController.php:62
+ * @see app/Http/Controllers/AssetController.php:75
  * @route '/assets/{asset}'
  */
 export const update = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -217,7 +217,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\AssetController::update
- * @see app/Http/Controllers/AssetController.php:62
+ * @see app/Http/Controllers/AssetController.php:75
  * @route '/assets/{asset}'
  */
 update.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -245,7 +245,7 @@ update.url = (args: { asset: string | number } | [asset: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\AssetController::update
- * @see app/Http/Controllers/AssetController.php:62
+ * @see app/Http/Controllers/AssetController.php:75
  * @route '/assets/{asset}'
  */
 update.put = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -254,7 +254,7 @@ update.put = (args: { asset: string | number } | [asset: string | number ] | str
 })
 /**
 * @see \App\Http\Controllers\AssetController::update
- * @see app/Http/Controllers/AssetController.php:62
+ * @see app/Http/Controllers/AssetController.php:75
  * @route '/assets/{asset}'
  */
 update.patch = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -264,7 +264,7 @@ update.patch = (args: { asset: string | number } | [asset: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\AssetController::destroy
- * @see app/Http/Controllers/AssetController.php:75
+ * @see app/Http/Controllers/AssetController.php:88
  * @route '/assets/{asset}'
  */
 export const destroy = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -279,7 +279,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\AssetController::destroy
- * @see app/Http/Controllers/AssetController.php:75
+ * @see app/Http/Controllers/AssetController.php:88
  * @route '/assets/{asset}'
  */
 destroy.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -307,7 +307,7 @@ destroy.url = (args: { asset: string | number } | [asset: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\AssetController::destroy
- * @see app/Http/Controllers/AssetController.php:75
+ * @see app/Http/Controllers/AssetController.php:88
  * @route '/assets/{asset}'
  */
 destroy.delete = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -317,7 +317,7 @@ destroy.delete = (args: { asset: string | number } | [asset: string | number ] |
 
 /**
 * @see \App\Http\Controllers\AssetController::dispose
- * @see app/Http/Controllers/AssetController.php:84
+ * @see app/Http/Controllers/AssetController.php:97
  * @route '/assets/{asset}/status'
  */
 export const dispose = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -332,7 +332,7 @@ dispose.definition = {
 
 /**
 * @see \App\Http\Controllers\AssetController::dispose
- * @see app/Http/Controllers/AssetController.php:84
+ * @see app/Http/Controllers/AssetController.php:97
  * @route '/assets/{asset}/status'
  */
 dispose.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -360,7 +360,7 @@ dispose.url = (args: { asset: string | number } | [asset: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\AssetController::dispose
- * @see app/Http/Controllers/AssetController.php:84
+ * @see app/Http/Controllers/AssetController.php:97
  * @route '/assets/{asset}/status'
  */
 dispose.patch = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({

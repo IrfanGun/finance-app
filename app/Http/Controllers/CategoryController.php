@@ -14,7 +14,11 @@ class CategoryController extends Controller
 {
     public function index(Request $request, CategoryService $categories): Response
     {
-        return Inertia::render('Categories/Index', [
+        $view = $request->is('cms/categories')
+            ? 'Cms/CategoriesCMS'
+            : 'Categories/Index';
+
+        return Inertia::render($view, [
             'categories' => $categories->listFor($request->user()),
         ]);
     }

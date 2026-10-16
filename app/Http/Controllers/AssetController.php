@@ -19,7 +19,11 @@ class AssetController extends Controller
     {
         Gate::authorize('viewAny', Asset::class);
 
-        return Inertia::render('Assets/Index', [
+        $view = $request->is('cms/assets')
+            ? 'Cms/AssetsCMS'
+            : 'Assets/Index';
+
+        return Inertia::render($view, [
             'assets' => $assets->listFor($request->user()),
             'currencyOptions' => $assets->currencyOptionsFor($request->user()),
         ]);
@@ -30,6 +34,15 @@ class AssetController extends Controller
         Gate::authorize('create', Asset::class);
 
         $asset = $assets->create($request->user(), $request->validated());
+
+        $refererPath = parse_url(
+            (string) $request->headers->get('referer'),
+            PHP_URL_PATH,
+        );
+
+        if ($refererPath === '/cms/assets') {
+            return to_route('cms.assets.index');
+        }
 
         return to_route('assets.show', $asset);
     }
