@@ -32,7 +32,7 @@ export default {
                 'app-header': 'linear-gradient(135deg, #11297A 0%, #1F4AC2 52%, #2969E6 100%)',
             },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
             },
         },
     },

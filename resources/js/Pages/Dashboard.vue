@@ -9,7 +9,9 @@ import SelectInput from '@/Components/SelectInput.vue';
 import DatePicker from '@/Components/DatePicker.vue';
 import { index as categoriesIndex } from '@/routes/categories';
 import { scan as receiptScan } from '@/routes/receipt';
+import { index as accountsIndex } from '@/routes/accounts';
 import { index as assetsIndex } from '@/routes/assets';
+import { show as assetShow } from '@/routes/assets';
 import { index as transactionsIndex } from '@/routes/transactions';
 import { chat as chatIndex } from '@/routes';
 import { store as transactionStore } from '@/actions/App/Http/Controllers/TransactionController';
@@ -19,6 +21,7 @@ const props = defineProps({
     categories: { type: Array, default: () => [] },
     spendingCategories: { type: Array, default: () => [] },
     accounts: { type: Array, default: () => [] },
+    assets: { type: Array, default: () => [] },
     transactions: { type: Array, default: () => [] },
     summary: { type: Object, default: () => ({ income: 0, expense: 0, balance: 0 }) },
 });
@@ -88,8 +91,11 @@ const shortcuts = [
                     {{ userName.slice(0, 2).toUpperCase() }}</div>
             </div>
             <div class="relative mt-7">
-                <p class="text-sm text-blue-100">Total balance</p>
+                <p class="text-sm text-blue-100">Net worth estimate</p>
                 <p class="mt-1 text-[32px] font-semibold">Rp {{ formatCurrency(summary.balance) }}</p>
+                <p class="mt-1 text-xs text-blue-100">
+                    Includes IDR {{ formatCurrency(summary.asset_value) }} in assets
+                </p>
             </div>
             <div class="relative mt-7 grid grid-cols-4 gap-3 text-center text-base">
                 <div v-for="item in shortcuts" :key="item.label">
@@ -160,8 +166,8 @@ const shortcuts = [
 
         <section class="mt-7 px-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Accounts &amp; assets</h2>
-                <Link :href="assetsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">See all
+                <h2 class="text-lg font-semibold">Accounts</h2>
+                <Link :href="accountsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">See all
                     <ChevronRight :size="16" />
                 </Link>
             </div>
@@ -180,6 +186,26 @@ const shortcuts = [
                 </article>
             </div>
             <p v-else class="mt-4 text-sm text-[#637083]">No accounts yet.</p>
+        </section>
+        <section class="mt-7 px-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Assets</h2>
+                <Link :href="assetsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">
+                    See all <ChevronRight :size="16" />
+                </Link>
+            </div>
+            <div v-if="assets.length" class="mt-4 space-y-3">
+                <Link
+                    v-for="asset in assets"
+                    :key="asset.id"
+                    :href="assetShow.url(asset.id)"
+                    class="flex items-center justify-between rounded-xl bg-[#F5F7FA] p-4"
+                >
+                    <span class="font-medium">{{ asset.name }}</span>
+                    <span class="text-sm font-semibold">{{ asset.currency }} {{ formatCurrency(asset.current_value) }}</span>
+                </Link>
+            </div>
+            <p v-else class="mt-4 text-sm text-[#637083]">No assets yet.</p>
         </section>
         <div v-if="showTransactionModal" class="fixed inset-0 z-30 flex items-end bg-black/30"
             @click.self="showTransactionModal = false">

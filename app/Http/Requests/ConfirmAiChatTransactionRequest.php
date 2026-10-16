@@ -98,7 +98,7 @@ class ConfirmAiChatTransactionRequest extends FormRequest
             if (($resource['type'] ?? null) === 'account') {
                 $rules["resources.{$index}.account_type"] = [
                     'required',
-                    Rule::in(['cash', 'bank', 'investment', 'other']),
+                    Rule::in(['cash', 'bank', 'other']),
                 ];
                 $rules["resources.{$index}.opening_balance"] = [
                     'required',
@@ -109,10 +109,6 @@ class ConfirmAiChatTransactionRequest extends FormRequest
                     'nullable',
                     'string',
                     'regex:/^[A-Z]{3}$/',
-                ];
-                $rules["resources.{$index}.investment_unit"] = [
-                    'nullable',
-                    Rule::in(['gram', 'lot']),
                 ];
             }
 

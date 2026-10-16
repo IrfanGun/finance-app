@@ -133,7 +133,6 @@ const emit = defineEmits([
                         <select v-model="resource.accountType" class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-3">
                             <option value="cash">Cash</option>
                             <option value="bank">Bank / e-wallet</option>
-                            <option value="investment">Investment</option>
                             <option value="other">Other</option>
                         </select>
                     </label>

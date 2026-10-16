@@ -25,17 +25,12 @@ class FinancialAccountRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'type' => ['required', Rule::in(['cash', 'bank', 'investment', 'other'])],
+            'type' => ['required', Rule::in(['cash', 'bank', 'other'])],
             'currency' => [
                 'nullable',
                 Rule::requiredIf(fn (): bool => in_array($this->input('type'), ['cash', 'bank'], true)),
                 'string',
                 'regex:/^[A-Z]{3}$/',
-            ],
-            'investment_unit' => [
-                'nullable',
-                Rule::requiredIf(fn (): bool => $this->input('type') === 'investment'),
-                Rule::in(['gram', 'lot']),
             ],
             'opening_balance' => ['required', 'numeric', 'min:0'],
         ];

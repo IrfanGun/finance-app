@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { createApp, h } from 'vue'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import type { DefineComponent } from 'vue'
+import ButtonPrimary from './Components/ButtonPrimary.vue'
 import { wayfinderRoute } from './wayfinder/route'
 
 createInertiaApp({
@@ -22,6 +23,7 @@ createInertiaApp({
         })
         vueApp.config.globalProperties.route = wayfinderRoute
         vueApp
+            .component('ButtonPrimary', ButtonPrimary)
             .use(plugin)
             .mount(el)
     },

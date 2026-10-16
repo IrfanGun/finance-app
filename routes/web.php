@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AiChatTransactionController;
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AssetDepreciationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -30,7 +32,19 @@ Route::middleware('auth')->group(function () {
         ->middleware('verified')
         ->name('chat');
     Route::resource('categories', CategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
-    Route::resource('assets', FinancialAccountController::class)->parameters(['assets' => 'account'])->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('accounts', FinancialAccountController::class)
+        ->parameters(['accounts' => 'account'])
+        ->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('assets', AssetController::class)
+        ->only(['index', 'store', 'show', 'edit', 'update', 'destroy']);
+    Route::patch('assets/{asset}/status', [AssetController::class, 'dispose'])
+        ->name('assets.status');
+    Route::put('assets/{asset}/depreciation', [AssetDepreciationController::class, 'update'])
+        ->name('assets.depreciation.update');
+    Route::patch('assets/{asset}/depreciation/status', [AssetDepreciationController::class, 'updateStatus'])
+        ->name('assets.depreciation.status');
+    Route::get('assets/{asset}/depreciation-logs', [AssetDepreciationController::class, 'logs'])
+        ->name('assets.depreciation.logs');
     Route::resource('transactions', TransactionController::class)
         ->only(['index', 'store']);
     Route::get('receipt/scan', [ReceiptController::class, 'scan'])->name('receipt.scan');

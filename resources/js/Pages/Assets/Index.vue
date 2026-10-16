@@ -1,420 +1,540 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { currencies } from 'countries-list/currencies';
-import {
-    ChevronDown,
-    Home,
-    Plus,
-    Pencil,
-    Search,
-    Trash2,
-    X,
-} from 'lucide-vue-next';
-import { dashboard } from '@/routes';
-import { store, update, destroy } from '@/routes/assets';
+import { ArrowLeft, ChevronRight, Plus, X } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import { dashboard } from '@/routes';
+import { show, store } from '@/routes/assets';
 
 const props = defineProps({
-    accounts: {
+    assets: {
+        type: Object,
+        default: () => ({ data: [], links: [] }),
+    },
+    currencyOptions: {
         type: Array,
-        default: () => [],
+        default: () => ['IDR'],
     },
 });
 
-const open = ref(false);
-const currencyPickerOpen = ref(false);
-const currencySearch = ref('');
-const deleting = ref(null);
+const creating = ref(false);
+const currentStep = ref(1);
+const createForm = ref(null);
+const businessToday = () => new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Jakarta',
+}).format(new Date());
 const form = useForm({
-    id: null,
     name: '',
-    type: 'cash',
-    currency: 'IDR',
-    investment_unit: null,
-    opening_balance: 0,
+    description: '',
+    currency: props.currencyOptions[0] ?? 'IDR',
+    purchase_price: '',
+    purchase_date: businessToday(),
+    depreciation: null,
 });
 
-const currencyOptions = computed(() => Object.entries(currencies)
-    .map(([code, currency]) => ({
-        code,
-        name: currency.name,
-    }))
-    .sort((first, second) => first.code.localeCompare(second.code)));
+const startCreate = () => {
+    form.reset();
+    form.currency = props.currencyOptions[0] ?? 'IDR';
+    form.purchase_date = businessToday();
+    currentStep.value = 1;
+    creating.value = true;
+};
 
-const filteredCurrencies = computed(() => {
-    const search = currencySearch.value.trim().toLocaleLowerCase();
+const closeCreate = () => {
+    creating.value = false;
+    currentStep.value = 1;
+};
 
-    if (!search) {
-        return currencyOptions.value;
-    }
-
-    return currencyOptions.value.filter((currency) => (
-        currency.code.toLocaleLowerCase().includes(search)
-        || currency.name.toLocaleLowerCase().includes(search)
-    ));
-});
-
-const selectedCurrency = computed(() => currencyOptions.value.find(
-    (currency) => currency.code === form.currency,
-));
-
-watch(() => form.type, (type) => {
-    if (type === 'cash' || type === 'bank') {
-        form.investment_unit = null;
+const backCreateStep = () => {
+    if (currentStep.value === 2) {
+        currentStep.value = 1;
 
         return;
     }
 
-    form.currency = null;
+    closeCreate();
+};
 
-    if (type !== 'investment') {
-        form.investment_unit = null;
+const toggleDepreciation = (enabled) => {
+    form.depreciation = enabled
+        ? {
+            depreciation_type: 'fixed',
+            value_direction: 'decrease',
+            depreciation_value: '',
+            is_tiered: 0,
+            depreciation_period: 'monthly',
+            rate_steps: [],
+            residual_value: '0.00',
+            depreciation_start_date: form.purchase_date,
+        }
+        : null;
+};
+
+const setDepreciationType = (depreciation, type) => {
+    depreciation.depreciation_type = type;
+};
+
+const setValueDirection = (depreciation, direction) => {
+    depreciation.value_direction = direction;
+
+    if (direction === 'increase') {
+        depreciation.depreciation_period = 'yearly';
+        depreciation.residual_value = '0.00';
+    } else if (depreciation.is_tiered) {
+        depreciation.depreciation_period = 'yearly';
     }
-});
-
-const edit = (account) => {
-    form.id = account.id;
-    form.name = account.name;
-    form.type = account.type;
-    form.currency = account.currency || 'IDR';
-    form.investment_unit = account.investment_unit;
-    form.opening_balance = account.opening_balance;
-    currencyPickerOpen.value = false;
-    currencySearch.value = '';
-    open.value = true;
 };
 
-const create = () => {
-    form.reset();
-    form.id = null;
-    form.type = 'cash';
-    form.currency = 'IDR';
-    form.investment_unit = null;
-    form.opening_balance = 0;
-    currencyPickerOpen.value = false;
-    currencySearch.value = '';
-    open.value = true;
+const setTieredDepreciation = (depreciation, isTiered) => {
+    depreciation.is_tiered = isTiered ? 1 : 0;
+
+    if (isTiered) {
+        depreciation.depreciation_period = 'yearly';
+        depreciation.rate_steps = depreciation.rate_steps?.length
+            ? depreciation.rate_steps
+            : [{ year_number: 1, depreciation_value: '' }];
+    }
 };
 
-const closeModal = () => {
-    open.value = false;
-    currencyPickerOpen.value = false;
+const addRateStep = (depreciation) => {
+    const lastYear = Math.max(
+        0,
+        ...depreciation.rate_steps.map((step) => Number(step.year_number) || 0),
+    );
+
+    depreciation.rate_steps.push({
+        year_number: lastYear + 1,
+        depreciation_value: '',
+    });
 };
 
-const selectCurrency = (code) => {
-    form.currency = code;
-    currencyPickerOpen.value = false;
-    currencySearch.value = '';
+const removeRateStep = (depreciation, index) => {
+    if (index > 0) {
+        depreciation.rate_steps.splice(index, 1);
+    }
 };
 
-const save = () => form[form.id ? 'put' : 'post'](
-    form.id ? update.url(form.id) : store.url(),
-    {
-        onSuccess: () => {
-            open.value = false;
-        },
-    },
-);
-
-const remove = (account) => {
-    deleting.value = account;
-};
-
-const confirmDelete = (deleteTransactions) => useForm({
-    delete_transactions: deleteTransactions,
-}).delete(
-    destroy.url(deleting.value.id),
-    {
-        onSuccess: () => {
-            deleting.value = null;
-        },
-    },
-);
-
-const formatAmount = (value, account) => {
-    const amount = Number(value ?? 0);
-
-    if (account.type === 'investment') {
-        return new Intl.NumberFormat('id-ID', {
-            maximumFractionDigits: 2,
-        }).format(amount);
+const continueToDepreciation = () => {
+    if (!createForm.value?.reportValidity()) {
+        return;
     }
 
-    const currency = account.currency || 'IDR';
-
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency,
-        maximumFractionDigits: 2,
-    }).format(amount);
+    currentStep.value = 2;
 };
 
-const openingBalanceLabel = computed(() => form.type === 'investment'
-    ? 'Opening quantity'
-    : 'Opening balance');
+const save = () => {
+    if (!createForm.value?.reportValidity()) {
+        return;
+    }
+
+    form.post(store.url(), {
+        onSuccess: () => {
+            closeCreate();
+            form.reset();
+        },
+        onError: (errors) => {
+            if (Object.keys(errors).some((key) => key.startsWith('depreciation'))) {
+                currentStep.value = 2;
+            }
+        },
+    });
+};
+
+const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 2,
+}).format(Number(amount ?? 0));
 </script>
 
 <template>
-    <Head title="Assets" />
+    <Head :title="creating ? 'Aset baru' : 'Assets'" />
 
     <div class="mx-auto min-h-screen w-full max-w-lg bg-white pb-28 text-app-heading">
-        <header class="flex items-center justify-between px-6 py-5">
-            <Link :href="dashboard.url()">
-                <Home :size="22" class="text-[#2457DA]" />
+        <header v-if="!creating" class="flex items-center justify-between px-6 py-5">
+            <Link :href="dashboard.url()" aria-label="Back to dashboard">
+                <ArrowLeft :size="22" class="text-[#2457DA]" />
             </Link>
-
             <h1 class="text-lg font-semibold">Assets</h1>
-
             <button
+                type="button"
                 class="rounded-full bg-app-primary p-2 text-white"
-                @click="create"
+                aria-label="Add asset"
+                @click="startCreate"
             >
                 <Plus :size="18" />
             </button>
         </header>
 
-        <main class="space-y-3 px-6 pt-5">
-            <p
-                v-if="!accounts.length"
-                class="py-10 text-center text-sm text-[#637083]"
-            >
-                No assets yet.
+        <main v-if="!creating" class="space-y-3 px-6 pt-5">
+            <p v-if="!assets.data.length" class="rounded-2xl bg-[#F5F7FA] px-5 py-10 text-center text-sm text-[#637083]">
+                Belum ada aset. Catat harga beli dan atur perubahan nilainya saat membuat aset.
             </p>
 
-            <article
-                v-for="account in accounts"
-                :key="account.id"
-                class="rounded-xl bg-[#F5F7FA] p-4"
+            <Link
+                v-for="asset in assets.data"
+                :key="asset.id"
+                :href="show.url(asset.id)"
+                class="block rounded-xl bg-[#F5F7FA] p-4 transition hover:bg-[#EEF3FF]"
             >
-                <div class="flex items-start justify-between">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                        <h2 class="truncate font-semibold">{{ asset.name }}</h2>
+                        <p class="mt-1 text-xs capitalize text-[#637083]">
+                            {{ asset.status }} · Dibeli {{ asset.purchase_date }}
+                        </p>
+                    </div>
+                    <ChevronRight :size="18" class="mt-1 shrink-0 text-[#2457DA]" />
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-3">
                     <div>
-                        <h2 class="font-semibold">{{ account.name }}</h2>
-                        <p class="text-xs capitalize text-[#637083]">
-                            {{ account.type }}
-                            <span v-if="account.type === 'investment' && account.investment_unit">
-                                · {{ account.investment_unit }}
-                            </span>
-                            <span v-else-if="account.type === 'cash' || account.type === 'bank'">
-                                · {{ account.currency || 'IDR' }}
-                            </span>
-                            · {{ account.transactions_count }} transactions
+                        <p class="text-xs text-[#637083]">Estimasi nilai sekarang</p>
+                        <p class="mt-1 font-semibold">{{ formatMoney(asset.current_value, asset.currency) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-[#637083]">Harga beli</p>
+                        <p class="mt-1 font-medium">{{ formatMoney(asset.purchase_price, asset.currency) }}</p>
+                    </div>
+                </div>
+                <p v-if="asset.depreciation" class="mt-3 text-xs capitalize text-[#637083]">
+                    Nilai {{ asset.depreciation.value_direction === 'increase' ? 'naik' : 'turun' }}
+                    · {{ asset.depreciation.depreciation_type === 'fixed' ? 'nominal tetap' : 'persentase harga beli' }}
+                    · {{ asset.depreciation.status }}
+                </p>
+            </Link>
+
+            <nav v-if="assets.links?.length > 3" class="flex flex-wrap justify-center gap-2 pt-3" aria-label="Asset pages">
+                <Link
+                    v-for="link in assets.links"
+                    :key="`${link.label}-${link.url}`"
+                    :href="link.url || '#'"
+                    :class="[
+                        'rounded-lg px-3 py-2 text-sm',
+                        link.active ? 'bg-[#2457DA] text-white' : 'bg-[#F5F7FA] text-[#314158]',
+                        !link.url ? 'pointer-events-none opacity-40' : '',
+                    ]"
+                    v-html="link.label"
+                />
+            </nav>
+        </main>
+
+        <section v-else class="px-6 pb-8 pt-3">
+            <header class="flex items-center gap-4">
+                <button
+                    type="button"
+                    class="rounded-full p-2 text-[#2457DA] hover:bg-[#F5F7FA]"
+                    :aria-label="currentStep === 2 ? 'Kembali ke detail aset' : 'Kembali ke daftar aset'"
+                    @click="backCreateStep"
+                >
+                    <ArrowLeft :size="22" />
+                </button>
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-medium text-[#637083]">Aset nonlikuid</p>
+                    <h1 class="text-xl font-semibold">
+                        {{ currentStep === 1 ? 'Aset baru' : 'Atur perubahan nilai' }}
+                    </h1>
+                </div>
+                <span class="shrink-0 text-sm font-medium text-[#637083]">
+                    Langkah {{ currentStep }} dari {{ form.depreciation ? 2 : 1 }}
+                </span>
+            </header>
+
+            <div class="mt-6 flex gap-2" aria-hidden="true">
+                <div class="h-1.5 flex-1 rounded-full" :class="currentStep >= 1 ? 'bg-[#2457DA]' : 'bg-slate-200'"></div>
+                <div
+                    v-if="form.depreciation"
+                    class="h-1.5 flex-1 rounded-full"
+                    :class="currentStep >= 2 ? 'bg-[#2457DA]' : 'bg-slate-200'"
+                ></div>
+            </div>
+
+            <form
+                ref="createForm"
+                class="mt-6 space-y-5"
+                novalidate
+                @submit.prevent="save"
+            >
+                <div v-if="currentStep === 1" class="space-y-4">
+                    <div>
+                        <h2 class="text-lg font-semibold">Detail aset</h2>
+                        <p class="mt-1 text-sm leading-5 text-[#637083]">
+                            Catat informasi dasar dan nilai saat aset dibeli.
                         </p>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button @click="edit(account)">
-                            <Pencil :size="17" class="text-[#2457DA]" />
-                        </button>
-                        <button @click="remove(account)">
-                            <Trash2 :size="17" class="text-red-500" />
-                        </button>
+                    <label class="block text-sm font-medium">
+                        Nama aset
+                        <input
+                            v-model="form.name"
+                            required
+                            maxlength="255"
+                            class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
+                            placeholder="Contoh: Mobil A"
+                        />
+                        <p v-if="form.errors.name" class="mt-1 text-xs text-red-600">
+                            {{ form.errors.name }}
+                        </p>
+                    </label>
+
+                    <label class="block text-sm font-medium">
+                        Deskripsi
+                        <textarea
+                            v-model="form.description"
+                            rows="2"
+                            class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3"
+                            placeholder="Opsional"
+                        />
+                        <p v-if="form.errors.description" class="mt-1 text-xs text-red-600">
+                            {{ form.errors.description }}
+                        </p>
+                    </label>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="block text-sm font-medium">
+                            Mata uang
+                            <select
+                                v-model="form.currency"
+                                required
+                                class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
+                            >
+                                <option v-for="currency in currencyOptions" :key="currency" :value="currency">
+                                    {{ currency }}
+                                </option>
+                            </select>
+                            <p v-if="form.errors.currency" class="mt-1 text-xs text-red-600">
+                                {{ form.errors.currency }}
+                            </p>
+                        </label>
+                        <label class="block text-sm font-medium">
+                            Harga beli
+                            <input
+                                v-model="form.purchase_price"
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                required
+                                class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
+                            />
+                            <p v-if="form.errors.purchase_price" class="mt-1 text-xs text-red-600">
+                                {{ form.errors.purchase_price }}
+                            </p>
+                        </label>
                     </div>
-                </div>
 
-                <p class="mt-3 text-xl font-semibold">
-                    <template v-if="account.type === 'investment'">
-                        {{ formatAmount(account.current_balance, account) }}
-                        {{ account.investment_unit === 'gram' ? 'g' : account.investment_unit }}
-                    </template>
-                    <template v-else>
-                        {{ formatAmount(account.current_balance, account) }}
-                    </template>
-                </p>
-                <p class="mt-1 text-xs text-[#637083]">Current balance</p>
-            </article>
-        </main>
+                    <label class="block text-sm font-medium">
+                        Tanggal beli
+                        <input
+                            v-model="form.purchase_date"
+                            type="date"
+                            :max="businessToday()"
+                            required
+                            class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
+                        />
+                        <p v-if="form.errors.purchase_date" class="mt-1 text-xs text-red-600">
+                            {{ form.errors.purchase_date }}
+                        </p>
+                    </label>
 
-        <div
-            v-if="open"
-            class="fixed inset-0 z-30 flex items-end bg-black/30"
-            @click.self="closeModal"
-            @keydown.esc="closeModal"
-        >
-            <form
-                class="mx-auto max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-[28px] bg-white px-6 pb-8 pt-3"
-                @submit.prevent="save"
-            >
-                <div class="flex items-center justify-between">
-                    <h2 class="text-[22px] font-semibold">
-                        {{ form.id ? 'Edit asset' : 'New asset' }}
-                    </h2>
-                    <button type="button" @click="closeModal">
-                        <X />
-                    </button>
-                </div>
-
-                <label class="block text-sm">
-                    Asset name
-                    <input
-                        v-model="form.name"
-                        required
-                        class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
-                        placeholder="e.g. BCA Savings"
-                    />
-                </label>
-
-                <label class="block text-sm">
-                    Type
-                    <select
-                        v-model="form.type"
-                        class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
-                    >
-                        <option value="cash">Cash</option>
-                        <option value="bank">Bank</option>
-                        <option value="investment">Investment</option>
-                        <option value="other">Other</option>
-                    </select>
-                </label>
-
-                <div
-                    v-if="form.type === 'cash' || form.type === 'bank'"
-                    class="relative block text-sm font-medium"
-                >
-                    <span>Currency</span>
-                    <button
-                        type="button"
-                        class="mt-2 flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 text-left font-normal outline-none transition hover:border-slate-300 focus:border-[#2457DA] focus:bg-white focus:ring-4 focus:ring-blue-100"
-                        :aria-expanded="currencyPickerOpen"
-                        aria-haspopup="listbox"
-                        @click="currencyPickerOpen = !currencyPickerOpen"
-                    >
-                        <span v-if="selectedCurrency" class="truncate">
-                            <span class="font-semibold">{{ selectedCurrency.code }}</span>
-                            <span class="ml-2 text-slate-500">{{ selectedCurrency.name }}</span>
+                    <label class="flex items-center gap-3 rounded-xl bg-[#F5F7FA] p-4 text-sm font-medium">
+                        <input type="checkbox" :checked="form.depreciation !== null" class="rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]" @change="toggleDepreciation($event.target.checked)" />
+                        <span>
+                            <span class="block">Aktifkan perubahan nilai otomatis</span>
+                            <span class="mt-1 block text-xs font-normal leading-5 text-[#637083]">
+                                Atur depresiasi atau apresiasi aset pada langkah berikutnya.
+                            </span>
                         </span>
-                        <span v-else class="text-slate-400">Choose a currency</span>
-                        <ChevronDown :size="18" class="shrink-0 text-slate-500" />
-                    </button>
+                    </label>
+                </div>
 
-                    <div
-                        v-if="currencyPickerOpen"
-                        class="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
-                    >
-                        <div class="border-b border-slate-100 p-3">
-                            <div class="flex h-10 items-center gap-2 rounded-lg bg-slate-100 px-3">
-                                <Search :size="17" class="shrink-0 text-slate-400" />
-                                <input
-                                    v-model="currencySearch"
-                                    autofocus
-                                    type="search"
-                                    class="h-full w-full border-0 bg-transparent p-0 text-sm outline-none placeholder:text-slate-400 focus:ring-0"
-                                    placeholder="Search code or currency"
-                                    aria-label="Search currencies"
-                                />
+                <div v-if="currentStep === 2 && form.depreciation" class="space-y-4">
+                    <div>
+                        <h2 class="text-lg font-semibold">Formulir depresiasi</h2>
+                      
+                    </div>
+
+                    <div class="space-y-4 rounded-xl border border-slate-200 p-4">
+                    <label class="block text-sm font-medium">
+                        Arah perubahan nilai
+                        <select
+                            v-model="form.depreciation.value_direction"
+                            class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
+                            @change="setValueDirection(form.depreciation, $event.target.value)"
+                        >
+                            <option value="decrease">Turun (depresiasi)</option>
+                            <option value="increase">Naik (apresiasi)</option>
+                        </select>
+                        <p v-if="form.errors['depreciation.value_direction']" class="mt-1 text-xs text-red-600">
+                            {{ form.errors['depreciation.value_direction'] }}
+                        </p>
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="block text-sm font-medium">
+                            Metode perubahan nilai
+                            <select
+                                v-model="form.depreciation.depreciation_type"
+                                class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
+                                @change="setDepreciationType(form.depreciation, $event.target.value)"
+                            >
+                                <option value="fixed">Nominal tetap</option>
+                                <option value="percentage">Persentase harga beli</option>
+                            </select>
+                        </label>
+                        <label v-if="!form.depreciation.is_tiered" class="block text-sm font-medium">
+                            {{ form.depreciation.depreciation_type === 'fixed' ? `Nominal (${form.currency})` : 'Persentase harga beli (%)' }}
+                            <input
+                                v-model="form.depreciation.depreciation_value"
+                                type="number"
+                                min="0.0001"
+                                :max="form.depreciation.depreciation_type === 'percentage' ? 100 : undefined"
+                                :step="form.depreciation.depreciation_type === 'fixed' ? 0.01 : 0.0001"
+                                required
+                                class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
+                            />
+                            <p v-if="form.errors['depreciation.depreciation_value']" class="mt-1 text-xs text-red-600">
+                                {{ form.errors['depreciation.depreciation_value'] }}
+                            </p>
+                        </label>
+                    </div>
+
+                    <label class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 text-sm font-medium">
+                        <input
+                            :checked="Boolean(form.depreciation.is_tiered)"
+                            type="checkbox"
+                            class="rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]"
+                            @change="setTieredDepreciation(form.depreciation, $event.target.checked)"
+                        />
+                        Bertingkat per tahun
+                    </label>
+
+                    <div v-if="form.depreciation.is_tiered" class="space-y-3">
+                        <div class="space-y-3">
+                            <div
+                                v-for="(step, index) in form.depreciation.rate_steps"
+                                :key="index"
+                                class="grid grid-cols-[1fr_1fr_auto] items-end gap-2"
+                            >
+                                <label class="block text-sm font-medium">
+                                    Mulai tahun ke-
+                                    <input
+                                        v-model.number="step.year_number"
+                                        type="number"
+                                        min="1"
+                                        max="1000"
+                                        :readonly="index === 0"
+                                        required
+                                        class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 read-only:bg-slate-100"
+                                    />
+                                    <p
+                                        v-if="form.errors[`depreciation.rate_steps.${index}.year_number`]"
+                                        class="mt-1 text-xs text-red-600"
+                                    >
+                                        {{ form.errors[`depreciation.rate_steps.${index}.year_number`] }}
+                                    </p>
+                                </label>
+                                <label class="block text-sm font-medium">
+                                    {{ form.depreciation.depreciation_type === 'fixed' ? `Nominal (${form.currency})` : 'Persentase harga beli (%)' }}
+                                    <input
+                                        v-model="step.depreciation_value"
+                                        type="number"
+                                        min="0.0001"
+                                        :max="form.depreciation.depreciation_type === 'percentage' ? 100 : undefined"
+                                        :step="form.depreciation.depreciation_type === 'fixed' ? 0.01 : 0.0001"
+                                        required
+                                        class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
+                                    />
+                                    <p
+                                        v-if="form.errors[`depreciation.rate_steps.${index}.depreciation_value`]"
+                                        class="mt-1 text-xs text-red-600"
+                                    >
+                                        {{ form.errors[`depreciation.rate_steps.${index}.depreciation_value`] }}
+                                    </p>
+                                </label>
+                                <button
+                                    v-if="index > 0"
+                                    type="button"
+                                    class="mb-1 rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                                    :aria-label="`Hapus tarif tahun ke-${step.year_number}`"
+                                    @click="removeRateStep(form.depreciation, index)"
+                                >
+                                    <X :size="18" />
+                                </button>
                             </div>
                         </div>
-
-                        <div
-                            class="max-h-60 overflow-y-auto p-1"
-                            role="listbox"
-                            aria-label="Currencies"
+                        <button
+                            type="button"
+                            class="text-sm font-medium text-[#2457DA]"
+                            @click="addRateStep(form.depreciation)"
                         >
-                            <button
-                                v-for="currency in filteredCurrencies"
-                                :key="currency.code"
-                                type="button"
-                                role="option"
-                                :aria-selected="form.currency === currency.code"
-                                class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition hover:bg-blue-50"
-                                :class="form.currency === currency.code ? 'bg-blue-50 text-[#2457DA]' : 'text-slate-700'"
-                                @click="selectCurrency(currency.code)"
-                            >
-                                <span class="min-w-0">
-                                    <span class="mr-2 font-semibold">{{ currency.code }}</span>
-                                    <span class="text-sm text-slate-500">{{ currency.name }}</span>
-                                </span>
-                                <span
-                                    v-if="form.currency === currency.code"
-                                    class="ml-2 shrink-0 text-sm font-semibold"
-                                >
-                                    Selected
-                                </span>
-                            </button>
-                            <p
-                                v-if="!filteredCurrencies.length"
-                                class="px-3 py-6 text-center text-sm text-slate-500"
-                            >
-                                No currencies found.
+                            + Tambah tingkat tarif
+                        </button>
+                        <p v-if="form.errors['depreciation.rate_steps']" class="text-xs text-red-600">
+                            {{ form.errors['depreciation.rate_steps'] }}
+                        </p>
+                        <p class="text-xs leading-5 text-[#637083]">
+                            Jadwal persentase dihitung dari harga beli. Jadwal nominal memakai jumlah tetap per tahun. Nilai terakhir terus berlaku sampai ada tingkat berikutnya.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div v-if="form.depreciation.is_tiered || form.depreciation.value_direction === 'increase'" class="text-sm font-medium">
+                            Periode
+                            <p class="mt-2 flex h-11 items-center rounded-lg border border-slate-300 bg-slate-50 px-3">
+                                Tahunan
                             </p>
                         </div>
+                        <label v-else class="block text-sm font-medium">
+                            Periode
+                            <select v-model="form.depreciation.depreciation_period" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3">
+                                <option value="monthly">Bulanan</option>
+                                <option value="yearly">Tahunan</option>
+                            </select>
+                        </label>
+                        <label v-if="form.depreciation.value_direction === 'decrease'" class="block text-sm font-medium">
+                            Nilai minimum
+                            <input v-model="form.depreciation.residual_value" type="number" min="0" step="0.01" required class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3" />
+                            <p v-if="form.errors['depreciation.residual_value']" class="mt-1 text-xs text-red-600">{{ form.errors['depreciation.residual_value'] }}</p>
+                        </label>
                     </div>
-                    <p v-if="form.errors.currency" class="mt-1 text-xs text-red-600">
-                        {{ form.errors.currency }}
+                    <label class="block text-sm font-medium">
+                        Mulai hitung dari
+                        <input v-model="form.depreciation.depreciation_start_date" type="date" :min="form.purchase_date" :max="businessToday()" required class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4" />
+                        <p v-if="form.errors['depreciation.depreciation_start_date']" class="mt-1 text-xs text-red-600">{{ form.errors['depreciation.depreciation_start_date'] }}</p>
+                    </label>
+                    <p class="text-xs leading-5 text-[#637083]">
+                        Periode pertama jatuh tempo satu periode penuh setelah tanggal acuan. Perubahan nilai berjalan otomatis setiap tahun dan tidak mengubah saldo akun kas atau bank.
                     </p>
+                    </div>
                 </div>
 
-                <label
-                    v-if="form.type === 'investment'"
-                    class="block text-sm"
-                >
-                    Investment unit
-                    <select
-                        v-model="form.investment_unit"
-                        required
-                        class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <ButtonPrimary
+                        v-if="currentStep === 2"
+                        type="button"
+                        variant="secondary"
+                        class="w-full"
+                        @click="currentStep = 1"
                     >
-                        <option :value="null" disabled>Select unit</option>
-                        <option value="gram">Gram</option>
-                        <option value="lot">Lot</option>
-                    </select>
-                    <p v-if="form.errors.investment_unit" class="mt-1 text-xs text-red-600">
-                        {{ form.errors.investment_unit }}
-                    </p>
-                </label>
-
-                <label class="block text-sm">
-                    {{ openingBalanceLabel }}
-                    <input
-                        v-model="form.opening_balance"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        required
-                        class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
-                    />
-                </label>
-
-                <button
-                    class="h-[53px] w-full rounded-xl bg-[#2457DA] text-white"
-                    :disabled="form.processing"
-                >
-                    {{ form.id ? 'Save changes' : 'Create asset' }}
-                </button>
+                        Kembali
+                    </ButtonPrimary>
+                    <ButtonPrimary
+                        v-if="currentStep === 1 && form.depreciation"
+                        type="button"
+                        class="col-span-2 w-full"
+                        @click="continueToDepreciation"
+                    >
+                        Lanjut ke depresiasi
+                    </ButtonPrimary>
+                    <ButtonPrimary
+                        v-else
+                        type="submit"
+                        :disabled="form.processing"
+                        :class="currentStep === 1 ? 'col-span-2 w-full' : 'w-full'"
+                    >
+                        {{ form.processing ? 'Menyimpan...' : 'Simpan aset' }}
+                    </ButtonPrimary>
+                </div>
             </form>
-        </div>
-
-        <div
-            v-if="deleting"
-            class="fixed inset-0 z-40 flex items-end bg-black/30"
-        >
-            <div class="mx-auto w-full max-w-lg rounded-t-[28px] bg-white px-6 pb-8 pt-6">
-                <h2 class="text-xl font-semibold">Delete {{ deleting.name }}?</h2>
-                <p class="mt-2 text-sm text-[#637083]">
-                    Choose what to do with its transactions.
-                </p>
-                <div class="mt-5 grid gap-3">
-                    <button
-                        class="rounded-xl bg-red-600 py-3 font-semibold text-white"
-                        @click="confirmDelete(true)"
-                    >
-                        Delete asset and transactions
-                    </button>
-                    <button
-                        class="rounded-xl border border-[#2457DA] py-3 font-semibold text-[#2457DA]"
-                        @click="confirmDelete(false)"
-                    >
-                        Delete asset only
-                    </button>
-                    <button
-                        class="py-2 text-sm text-[#637083]"
-                        @click="deleting = null"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
+        </section>
 
         <MobileBottomNav />
     </div>

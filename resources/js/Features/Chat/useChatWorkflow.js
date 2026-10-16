@@ -76,7 +76,6 @@ export function useChatWorkflow(props, appendAssistantMessage) {
     const accountTypeLabel = (type) => ({
         cash: 'Tunai',
         bank: 'Bank / e-wallet',
-        investment: 'Investasi',
         other: 'Lainnya',
     }[type] ?? type);
 
@@ -185,9 +184,6 @@ export function useChatWorkflow(props, appendAssistantMessage) {
                     account_type: resource.accountType,
                     currency: ['cash', 'bank'].includes(resource.accountType)
                         ? 'IDR'
-                        : null,
-                    investment_unit: resource.accountType === 'investment'
-                        ? 'lot'
                         : null,
                     opening_balance: Number(resource.openingBalance || 0),
                 }

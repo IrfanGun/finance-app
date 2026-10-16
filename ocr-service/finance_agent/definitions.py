@@ -6,7 +6,7 @@ TOOLS = [
             "description": (
                 "Get authoritative income, expense, balance, account balances, "
                 "and budget availability for a date range. Totals are grouped by "
-                "currency; never combine different currencies or investment units. "
+                "currency; never combine different currencies. "
                 "Use this for balance, spending, budget, or planning questions."
             ),
             "parameters": {

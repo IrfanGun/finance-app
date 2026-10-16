@@ -8,6 +8,8 @@ import AiChatTransactionController from './AiChatTransactionController'
 import ChatController from './ChatController'
 import CategoryController from './CategoryController'
 import FinancialAccountController from './FinancialAccountController'
+import AssetController from './AssetController'
+import AssetDepreciationController from './AssetDepreciationController'
 import TransactionController from './TransactionController'
 import ReceiptController from './ReceiptController'
 import ProfileController from './ProfileController'
@@ -23,6 +25,8 @@ AiChatTransactionController: Object.assign(AiChatTransactionController, AiChatTr
 ChatController: Object.assign(ChatController, ChatController),
 CategoryController: Object.assign(CategoryController, CategoryController),
 FinancialAccountController: Object.assign(FinancialAccountController, FinancialAccountController),
+AssetController: Object.assign(AssetController, AssetController),
+AssetDepreciationController: Object.assign(AssetDepreciationController, AssetDepreciationController),
 TransactionController: Object.assign(TransactionController, TransactionController),
 ReceiptController: Object.assign(ReceiptController, ReceiptController),
 ProfileController: Object.assign(ProfileController, ProfileController),

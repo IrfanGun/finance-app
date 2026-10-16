@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 /**
 * @see \App\Http\Controllers\FinancialAccountController::index
  * @see app/Http/Controllers/FinancialAccountController.php:15
- * @route '/assets'
+ * @route '/accounts'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: index.url(options),
@@ -11,13 +11,13 @@ export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 index.definition = {
     methods: ["get","head"],
-    url: '/assets',
+    url: '/accounts',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::index
  * @see app/Http/Controllers/FinancialAccountController.php:15
- * @route '/assets'
+ * @route '/accounts'
  */
 index.url = (options?: RouteQueryOptions) => {
     return index.definition.url + queryParams(options)
@@ -26,7 +26,7 @@ index.url = (options?: RouteQueryOptions) => {
 /**
 * @see \App\Http\Controllers\FinancialAccountController::index
  * @see app/Http/Controllers/FinancialAccountController.php:15
- * @route '/assets'
+ * @route '/accounts'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: index.url(options),
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 /**
 * @see \App\Http\Controllers\FinancialAccountController::index
  * @see app/Http/Controllers/FinancialAccountController.php:15
- * @route '/assets'
+ * @route '/accounts'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: index.url(options),
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 /**
 * @see \App\Http\Controllers\FinancialAccountController::store
  * @see app/Http/Controllers/FinancialAccountController.php:20
- * @route '/assets'
+ * @route '/accounts'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: store.url(options),
@@ -54,13 +54,13 @@ export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
 
 store.definition = {
     methods: ["post"],
-    url: '/assets',
+    url: '/accounts',
 } satisfies RouteDefinition<["post"]>
 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::store
  * @see app/Http/Controllers/FinancialAccountController.php:20
- * @route '/assets'
+ * @route '/accounts'
  */
 store.url = (options?: RouteQueryOptions) => {
     return store.definition.url + queryParams(options)
@@ -69,7 +69,7 @@ store.url = (options?: RouteQueryOptions) => {
 /**
 * @see \App\Http\Controllers\FinancialAccountController::store
  * @see app/Http/Controllers/FinancialAccountController.php:20
- * @route '/assets'
+ * @route '/accounts'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: store.url(options),
@@ -79,7 +79,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 /**
 * @see \App\Http\Controllers\FinancialAccountController::update
  * @see app/Http/Controllers/FinancialAccountController.php:27
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 export const update = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
@@ -88,13 +88,13 @@ export const update = (args: { account: number | { id: number } } | [account: nu
 
 update.definition = {
     methods: ["put","patch"],
-    url: '/assets/{account}',
+    url: '/accounts/{account}',
 } satisfies RouteDefinition<["put","patch"]>
 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::update
  * @see app/Http/Controllers/FinancialAccountController.php:27
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 update.url = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
@@ -127,7 +127,7 @@ update.url = (args: { account: number | { id: number } } | [account: number | { 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::update
  * @see app/Http/Controllers/FinancialAccountController.php:27
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 update.put = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
@@ -136,7 +136,7 @@ update.put = (args: { account: number | { id: number } } | [account: number | { 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::update
  * @see app/Http/Controllers/FinancialAccountController.php:27
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 update.patch = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
@@ -146,7 +146,7 @@ update.patch = (args: { account: number | { id: number } } | [account: number | 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::destroy
  * @see app/Http/Controllers/FinancialAccountController.php:35
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 export const destroy = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
@@ -155,13 +155,13 @@ export const destroy = (args: { account: number | { id: number } } | [account: n
 
 destroy.definition = {
     methods: ["delete"],
-    url: '/assets/{account}',
+    url: '/accounts/{account}',
 } satisfies RouteDefinition<["delete"]>
 
 /**
 * @see \App\Http\Controllers\FinancialAccountController::destroy
  * @see app/Http/Controllers/FinancialAccountController.php:35
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 destroy.url = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
@@ -194,7 +194,7 @@ destroy.url = (args: { account: number | { id: number } } | [account: number | {
 /**
 * @see \App\Http\Controllers\FinancialAccountController::destroy
  * @see app/Http/Controllers/FinancialAccountController.php:35
- * @route '/assets/{account}'
+ * @route '/accounts/{account}'
  */
 destroy.delete = (args: { account: number | { id: number } } | [account: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),

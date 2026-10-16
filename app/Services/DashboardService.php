@@ -12,6 +12,11 @@ class DashboardService
     {
         $income = $user->transactions()->where('type', 'income')->sum('amount');
         $expense = $user->transactions()->where('type', 'expense')->sum('amount');
+        $assetValue = $user->assets()
+            ->where('status', 'active')
+            ->where('currency', 'IDR')
+            ->sum('current_value');
+        $accountBalance = $user->financialAccounts()->sum('opening_balance') + $income - $expense;
         $categories = $user->categories()
             ->orderBy('type')
             ->orderBy('name')
@@ -51,11 +56,19 @@ class DashboardService
                         + ($account->income_total ?? 0)
                         - ($account->expense_total ?? 0);
                 }),
+            'assets' => $user->assets()
+                ->where('status', 'active')
+                ->orderByDesc('purchase_date')
+                ->orderByDesc('id')
+                ->take(3)
+                ->get(['id', 'name', 'currency', 'current_value']),
             'transactions' => $user->transactions()->with(['category', 'account'])->latest('date')->take(5)->get(),
             'summary' => [
                 'income' => $income,
                 'expense' => $expense,
-                'balance' => $user->financialAccounts()->sum('opening_balance') + $income - $expense,
+                'account_balance' => $accountBalance,
+                'asset_value' => $assetValue,
+                'balance' => $accountBalance + $assetValue,
             ],
         ];
     }
