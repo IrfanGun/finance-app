@@ -16,8 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name', 100);
             $table->string('type', 20);
-            $table->string('currency', 3)->nullable();
-            $table->string('investment_unit', 10)->nullable();
             $table->decimal('opening_balance', 19, 2)->default(0);
             $table->timestamps();
         });
