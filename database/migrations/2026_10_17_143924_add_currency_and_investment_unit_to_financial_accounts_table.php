@@ -27,7 +27,5 @@ return new class extends Migration
     /**
      * Preserve columns that may have existed before this migration ran.
      */
-    public function down(): void
-    {
-    }
+    public function down(): void {}
 };
