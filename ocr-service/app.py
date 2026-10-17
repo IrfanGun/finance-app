@@ -501,6 +501,45 @@ class SummaryResponse(BaseModel):
     summary: str
 
 
+def normalize_history_tool_call(tool_call: Any) -> dict[str, Any] | None:
+    if not isinstance(tool_call, dict):
+        return None
+
+    call_id = tool_call.get("id")
+    function = tool_call.get("function")
+
+    if not isinstance(call_id, str) or not isinstance(function, dict):
+        return None
+
+    name = function.get("name")
+    raw_arguments = function.get("arguments")
+
+    if not isinstance(name, str) or not name:
+        return None
+
+    if isinstance(raw_arguments, str):
+        try:
+            arguments = json.loads(raw_arguments)
+        except json.JSONDecodeError:
+            return None
+    elif isinstance(raw_arguments, dict):
+        arguments = raw_arguments
+    else:
+        return None
+
+    if not isinstance(arguments, dict):
+        return None
+
+    return {
+        "id": call_id,
+        "type": "function",
+        "function": {
+            "name": name,
+            "arguments": json.dumps(arguments, ensure_ascii=False),
+        },
+    }
+
+
 @app.post("/ai/chat", response_model=ChatResponse)
 def chat(
     request: ChatRequest,
@@ -555,6 +594,29 @@ combined with currency totals.
 The configured budgets are in IDR, so compare them
 only with IDR spending for the budget dates.
 
+When the user asks for meal or place recommendations, use search_meals.
+For a general request such as "saya lapar" or "rekomendasikan makanan yang
+bisa saya makan", search all saved meal records without an opening-hours
+filter. Hunger, present-tense wording, and a chat timestamp do not mean the
+user requires a place that is open now. Only set open_only=true when the user
+explicitly asks for a place that is open now or at a specified time. Pass a
+stated spending cap as max_price and trust the backend-filtered results; do
+not recommend a returned menu as within budget unless its price_max is within
+that cap. For a clear explicit date and time, pass it as ISO 8601 in at. If a
+relative time such as "nanti malam" matters and no hour can be resolved, ask
+which hour before filtering. Location searches match saved address text only;
+do not claim a place is nearby or the closest. If opening_status is unknown,
+say the saved opening hours are unknown and need checking. If no meal records
+match, say so and offer to adjust the filters. Never invent meal records,
+prices, addresses, opening hours, or impressions. The meal search response
+includes the active food budget when configured; otherwise say that no food
+category budget is set. Use get_finance_summary for questions about broader
+balance, spending, or cash flow, and do not treat total balance as freely
+available spending money. Recommending food never creates an expense. Do
+not create or edit meal records through chat. If a food budget exists but
+remaining_known is false, say that its remaining amount cannot be calculated
+from a food category in the saved transactions.
+
 When the user mentions two or more separate
 transactions in one message, use the
 create_transactions tool and keep every
@@ -607,15 +669,22 @@ request actually raises a connection error.
             ),
         })
 
-    history_tool_call_ids: set[str] = set()
+    normalized_history_tool_calls: dict[str, dict[str, Any]] = {}
     history_tool_result_ids: set[str] = set()
     failed_tool_call_ids: set[str] = set()
 
     for history_message in request.history:
         if history_message.get("role") == "assistant":
-            for tool_call in history_message.get("tool_calls", []):
-                if isinstance(tool_call, dict) and isinstance(tool_call.get("id"), str):
-                    history_tool_call_ids.add(tool_call["id"])
+            history_tool_calls = history_message.get("tool_calls", [])
+
+            if not isinstance(history_tool_calls, list):
+                continue
+
+            for tool_call in history_tool_calls:
+                normalized_tool_call = normalize_history_tool_call(tool_call)
+
+                if normalized_tool_call is not None:
+                    normalized_history_tool_calls[normalized_tool_call["id"]] = normalized_tool_call
         elif history_message.get("role") == "tool":
             tool_call_id = history_message.get("tool_call_id")
 
@@ -632,7 +701,7 @@ request actually raises a connection error.
                     failed_tool_call_ids.add(tool_call_id)
 
     complete_tool_call_ids = (
-        history_tool_call_ids
+        set(normalized_history_tool_calls)
         & history_tool_result_ids
         - failed_tool_call_ids
     )
@@ -643,10 +712,11 @@ request actually raises a connection error.
 
         if role == "assistant" and isinstance(history_message.get("tool_calls"), list):
             tool_calls = [
-                tool_call
+                normalized_history_tool_calls[tool_call["id"]]
                 for tool_call in history_message["tool_calls"]
                 if isinstance(tool_call, dict)
                 and tool_call.get("id") in complete_tool_call_ids
+                and tool_call["id"] in normalized_history_tool_calls
             ]
 
             if not tool_calls:

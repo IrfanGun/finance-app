@@ -15,6 +15,12 @@ class DashboardController extends Controller
             ? 'Cms/DashboardCMS'
             : 'Dashboard';
 
-        return Inertia::render($view, $dashboard->dataFor($request->user()));
+        $data = $dashboard->dataFor($request->user());
+        $mealRecordId = $request->integer('meal_record_id');
+        $data['selectedMealRecord'] = $mealRecordId > 0
+            ? $request->user()->mealRecords()->findOrFail($mealRecordId)
+            : null;
+
+        return Inertia::render($view, $data);
     }
 }

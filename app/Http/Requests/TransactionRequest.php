@@ -30,6 +30,11 @@ class TransactionRequest extends FormRequest
                 Rule::exists('categories', 'id')
                     ->where('user_id', $this->user()?->id),
             ],
+            'meal_record_id' => [
+                'nullable',
+                Rule::exists('meal_records', 'id')
+                    ->where('user_id', $this->user()?->id),
+            ],
         ];
     }
 }

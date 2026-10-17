@@ -24,18 +24,36 @@ const props = defineProps({
     assets: { type: Array, default: () => [] },
     transactions: { type: Array, default: () => [] },
     summary: { type: Object, default: () => ({ income: 0, expense: 0, balance: 0 }) },
+    selectedMealRecord: { type: Object, default: null },
 });
 
 const userName = page.props.auth?.user?.name ?? 'User';
 const showTransactionModal = ref(false);
 const transactionStep = ref(1);
 const transactionType = ref('expense');
-const transactionForm = useForm({ type: 'expense', amount: '', date: new Date().toISOString().slice(0, 10), title: '', note: '', account_id: props.accounts[0]?.id ?? '', category_id: '' });
+const transactionForm = useForm({
+    type: 'expense',
+    amount: '',
+    date: new Date().toISOString().slice(0, 10),
+    title: '',
+    note: '',
+    account_id: props.accounts[0]?.id ?? '',
+    category_id: '',
+    meal_record_id: props.selectedMealRecord?.id ?? null,
+});
 const isScrolled = ref(false);
 const formatCurrency = (amount) => new Intl.NumberFormat('id-ID').format(Number(amount ?? 0));
 const transactionCategory = (transaction) => transaction.category?.name ?? 'Uncategorized';
 const transactionAmount = (transaction) => `${transaction.type === 'income' ? '+' : '-'} Rp ${formatCurrency(transaction.amount)}`;
-const openTransactionModal = () => { transactionStep.value = 1; showTransactionModal.value = true; };
+const openTransactionModal = () => {
+    transactionForm.reset();
+    transactionForm.type = 'expense';
+    transactionForm.date = new Date().toISOString().slice(0, 10);
+    transactionForm.account_id = props.accounts[0]?.id ?? '';
+    transactionForm.meal_record_id = null;
+    transactionStep.value = 1;
+    showTransactionModal.value = true;
+};
 const submitTransaction = () => transactionForm.post(transactionStore.url(), { preserveScroll: true, onSuccess: () => { transactionForm.reset(); transactionForm.type = 'expense'; transactionForm.date = new Date().toISOString().slice(0, 10); transactionForm.account_id = props.accounts[0]?.id ?? ''; transactionStep.value = 1; showTransactionModal.value = false; } });
 
 const handleScroll = () => {
@@ -44,6 +62,13 @@ const handleScroll = () => {
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
+
+    if (props.selectedMealRecord) {
+        transactionForm.title = props.selectedMealRecord.name;
+        transactionForm.note = props.selectedMealRecord.place_name ?? '';
+        transactionForm.meal_record_id = props.selectedMealRecord.id;
+        showTransactionModal.value = true;
+    }
 });
 
 onUnmounted(() => {
@@ -215,7 +240,7 @@ const shortcuts = [
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-xs font-medium text-[#637083]">Step {{ transactionStep }} of 2</p>
-                        <h2 class="text-[22px] font-semibold">New transaction</h2>
+                        <h2 class="text-[22px] font-semibold">{{ transactionForm.meal_record_id ? 'Catat pengeluaran' : 'New transaction' }}</h2>
                     </div><button type="button" class="text-2xl text-[#637083]"
                         @click="showTransactionModal = false">×</button>
                 </div>
@@ -248,6 +273,7 @@ const shortcuts = [
                     <label class="mt-5 block">Title
                         <FormInput v-model="transactionForm.title" placeholder="What was this transaction for?"
                             required />
+                        <p v-if="transactionForm.meal_record_id" class="mt-1 text-xs text-[#637083]">Harga aktual dan akun pembayaran ditentukan di sini.</p>
                     </label>
                     <label class="mt-5 block">Category
                         <SelectInput v-model="transactionForm.category_id"

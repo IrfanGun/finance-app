@@ -7,7 +7,7 @@ import assets from './assets'
 import receipt from './receipt'
 import profile from './profile'
 /**
- * @see routes/web.php:70
+ * @see routes/web.php:74
  * @route '/cms'
  */
 export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -21,7 +21,7 @@ home.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:70
+ * @see routes/web.php:74
  * @route '/cms'
  */
 home.url = (options?: RouteQueryOptions) => {
@@ -29,7 +29,7 @@ home.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:70
+ * @see routes/web.php:74
  * @route '/cms'
  */
 home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -37,7 +37,7 @@ home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web.php:70
+ * @see routes/web.php:74
  * @route '/cms'
  */
 home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -123,7 +123,7 @@ login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web.php:79
+ * @see routes/web.php:83
  * @route '/cms/dashboard'
  */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -137,7 +137,7 @@ dashboard.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:79
+ * @see routes/web.php:83
  * @route '/cms/dashboard'
  */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -145,7 +145,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:79
+ * @see routes/web.php:83
  * @route '/cms/dashboard'
  */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -153,7 +153,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web.php:79
+ * @see routes/web.php:83
  * @route '/cms/dashboard'
  */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -162,7 +162,7 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web.php:141
+ * @see routes/web.php:145
  * @route '/cms/chat'
  */
 export const chat = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -176,7 +176,7 @@ chat.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:141
+ * @see routes/web.php:145
  * @route '/cms/chat'
  */
 chat.url = (options?: RouteQueryOptions) => {
@@ -184,7 +184,7 @@ chat.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:141
+ * @see routes/web.php:145
  * @route '/cms/chat'
  */
 chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -192,7 +192,7 @@ chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web.php:141
+ * @see routes/web.php:145
  * @route '/cms/chat'
  */
 chat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

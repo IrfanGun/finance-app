@@ -1,9 +1,10 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { CircleUserRound, Home, MessageCircle, Package, Plus } from 'lucide-vue-next';
+import { CircleUserRound, Home, MessageCircle, Package, Plus, Utensils } from 'lucide-vue-next';
 import { chat as chatIndex } from '@/routes';
 import { edit as profileEdit } from '@/routes/profile';
 import { index as assetsIndex } from '@/routes/assets';
+import { index as mealsIndex } from '@/routes/meals';
 const emit = defineEmits(['add']);
 
 const page = usePage();
@@ -20,6 +21,10 @@ const isActive = (path) => page.url === path;
         >
             <Package class="nav-icon" :size="21" />
             <span>Asset</span>
+        </Link>
+        <Link :href="mealsIndex.url()" class="nav-item" :class="{ 'nav-active': page.url.startsWith(mealsIndex.url()) }">
+            <Utensils class="nav-icon" :size="21" />
+            <span>Meals</span>
         </Link>
         <button @click="emit('add')" class="group -mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-[#2457DA] text-white shadow-lg shadow-blue-600/30 transition duration-300 hover:scale-105 active:scale-90 focus:outline-none focus:ring-4 focus:ring-blue-200" aria-label="Add transaction"><Plus class="transition duration-300 group-hover:rotate-90" :size="28" /></button>
         <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }"><MessageCircle class="nav-icon" :size="21" /><span>Chat</span></Link>

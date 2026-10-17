@@ -83,6 +83,37 @@ def get_finance_summary(
     )
 
 
+def search_meals(
+    keyword: Optional[str] = None,
+    location: Optional[str] = None,
+    type: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    at: Optional[str] = None,
+    open_only: Optional[bool] = None,
+    user_id: int | None = None,
+):
+    params = {
+        key: value
+        for key, value in {
+            "keyword": keyword,
+            "location": location,
+            "type": type,
+            "min_price": min_price,
+            "max_price": max_price,
+            "at": at,
+            "open_only": open_only,
+        }.items()
+        if value is not None
+    }
+
+    return laravel.get(
+        "/api/ai/meal-records",
+        params=params,
+        user_id=user_id,
+    )
+
+
 def update_transaction(
     transaction_id: int,
     amount: Optional[float] = None,

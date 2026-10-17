@@ -52,6 +52,10 @@ class TransactionController extends Controller
     {
         $transactions->create($request->user(), $request->validated());
 
+        if ($request->filled('meal_record_id')) {
+            return redirect()->route('dashboard');
+        }
+
         return back();
     }
 }

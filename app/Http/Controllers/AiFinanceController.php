@@ -4,14 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\Budget;
 use App\Models\User;
+use App\Services\MealRecordService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 
 class AiFinanceController extends Controller
 {
+    public function mealRecords(Request $request, MealRecordService $mealRecords): JsonResponse
+    {
+        $filters = $request->validate([
+            'keyword' => ['nullable', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', 'in:buy,homemade'],
+            'min_price' => ['nullable', 'numeric', 'min:0'],
+            'max_price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                Rule::when($request->filled('min_price'), ['gte:min_price']),
+            ],
+            'at' => ['nullable', 'date'],
+            'open_only' => [
+                'nullable',
+                Rule::in(['true', 'false', 'True', 'False', '1', '0']),
+            ],
+        ]);
+        $filters['open_only'] = $request->boolean('open_only');
+
+        return response()->json(
+            $mealRecords->recommendations($request->user(), $filters),
+        );
+    }
+
     public function summary(Request $request): JsonResponse
     {
         $validated = $request->validate([

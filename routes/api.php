@@ -16,6 +16,7 @@ Route::prefix('ai')
         Route::patch('transactions/{transaction}', [AiTransactionController::class, 'update']);
         Route::delete('transactions/{transaction}', [AiTransactionController::class, 'destroy']);
         Route::get('finance/summary', [AiFinanceController::class, 'summary']);
+        Route::get('meal-records', [AiFinanceController::class, 'mealRecords']);
     });
 
 Route::prefix('ai/memories')

@@ -9,6 +9,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Cms\AuthenticatedSessionController as CmsAuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinancialAccountController;
+use App\Http\Controllers\MealRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\TransactionController;
@@ -55,6 +56,9 @@ Route::middleware('auth')->group(function () {
         ->name('assets.depreciation.logs');
     Route::resource('transactions', TransactionController::class)
         ->only(['index', 'store']);
+    Route::resource('meals', MealRecordController::class)
+        ->parameters(['meals' => 'meal'])
+        ->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::get('receipt/scan', [ReceiptController::class, 'scan'])->name('receipt.scan');
     Route::post('receipt/ocr', [ReceiptController::class, 'ocr'])
         ->middleware('throttle:10,1')

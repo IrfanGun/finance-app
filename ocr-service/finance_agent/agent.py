@@ -11,6 +11,7 @@ from tools.transactions import (
     create_transactions,
     delete_transaction,
     get_finance_summary,
+    search_meals,
     get_transactions,
     update_transaction,
 )
@@ -51,6 +52,7 @@ class FinanceAgent:
             "update_transaction": update_transaction,
             "delete_transaction": delete_transaction,
             "get_finance_summary": get_finance_summary,
+            "search_meals": search_meals,
         }
 
     @staticmethod
@@ -152,6 +154,34 @@ class FinanceAgent:
                     "tool_trace": tool_trace,
                 }
 
+            valid_tool_calls = []
+            arguments_by_call_id = {}
+
+            for tool_call in tool_calls:
+                try:
+                    arguments = json.loads(tool_call.function.arguments or "{}")
+                except json.JSONDecodeError:
+                    arguments = None
+
+                if not isinstance(arguments, dict):
+                    logger.warning(
+                        "AI returned tool arguments that are not a JSON object.",
+                        extra={"tool_name": tool_call.function.name},
+                    )
+                    continue
+
+                valid_tool_calls.append(tool_call)
+                arguments_by_call_id[tool_call.id] = arguments
+
+            if not valid_tool_calls:
+                return {
+                    "response": (
+                        "Maaf, parameter pencarian belum terbaca dengan benar. "
+                        "Silakan coba ulangi permintaan Anda."
+                    ),
+                    "tool_trace": tool_trace,
+                }
+
             conversation.append(
                 {
                     "role": "assistant",
@@ -165,18 +195,15 @@ class FinanceAgent:
                                 "arguments": tool_call.function.arguments,
                             },
                         }
-                        for tool_call in tool_calls
+                        for tool_call in valid_tool_calls
                     ],
                 },
             )
 
-            for tool_call in tool_calls:
+            for tool_call in valid_tool_calls:
                 tool_name = tool_call.function.name
                 tool_handler = self.tool_handlers.get(tool_name)
-                try:
-                    trace_arguments = json.loads(tool_call.function.arguments or "{}")
-                except json.JSONDecodeError:
-                    trace_arguments = {}
+                trace_arguments = arguments_by_call_id[tool_call.id]
 
                 tool_trace.append({
                     "type": "tool_call",
@@ -191,7 +218,8 @@ class FinanceAgent:
                     }
                 else:
                     try:
-                        arguments = json.loads(tool_call.function.arguments or "{}")
+                        arguments = dict(trace_arguments)
+                        arguments.pop("user_id", None)
 
                         if tool_name == "create_transaction":
                             remove_guessed_account(
