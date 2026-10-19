@@ -5,7 +5,14 @@ TOOLS = [
             "name": "search_meals",
             "description": (
                 "Search only the authenticated user's saved meal choices. Use "
-                "this for food recommendations. Pass max_price for a user's "
+                "this for every request for food recommendations, alternatives, "
+                "or comparisons, including follow-ups. Always search current "
+                "records; previous assistant answers and older search results "
+                "are not authoritative. For 'other than' requests, omit keyword "
+                "unless the user gave another specific search filter, then exclude "
+                "the named meal from the returned choices. Report only the number "
+                "of matching records available when fewer than requested. Pass "
+                "max_price for a user's "
                 "budget; every returned price_max is within that cap. Pass "
                 "open_only=true only when the user explicitly asks for a place "
                 "that is open now or at a particular time. Do not infer this "

@@ -594,7 +594,12 @@ combined with currency totals.
 The configured budgets are in IDR, so compare them
 only with IDR spending for the budget dates.
 
-When the user asks for meal or place recommendations, use search_meals.
+For every request for meal or place recommendations, alternatives, or
+comparisons, including follow-ups, call search_meals using current saved
+records. Never rely on older tool results or assistant messages to decide
+which meals are saved. For requests such as "selain Sayur asem", search without
+a keyword, then exclude the named meal from the results. If fewer records are
+available than requested, list the available records and state the actual count.
 For a general request such as "saya lapar" or "rekomendasikan makanan yang
 bisa saya makan", search all saved meal records without an opening-hours
 filter. Hunger, present-tense wording, and a chat timestamp do not mean the
