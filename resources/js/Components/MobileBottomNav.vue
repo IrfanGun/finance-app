@@ -1,10 +1,11 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { CircleUserRound, Home, MessageCircle, Package, Plus, Utensils } from 'lucide-vue-next';
+import { Bell, CircleUserRound, Home, MessageCircle, Package, Plus, Utensils } from 'lucide-vue-next';
 import { chat as chatIndex } from '@/routes';
 import { edit as profileEdit } from '@/routes/profile';
 import { index as assetsIndex } from '@/routes/assets';
 import { index as mealsIndex } from '@/routes/meals';
+import { index as remindersIndex } from '@/routes/recurring-reminders';
 const emit = defineEmits(['add']);
 
 const page = usePage();
@@ -13,26 +14,31 @@ const isActive = (path) => page.url === path;
 
 <template>
     <nav class="fixed inset-x-0 bottom-0 z-20 mx-auto flex h-[84px] max-w-lg items-center justify-around border-t border-[#E9EDF3] bg-white/95 px-4 pb-2 pt-3 text-[11px] text-[#637083] shadow-[0_-4px_18px_rgba(21,35,56,0.05)] backdrop-blur-sm">
-        <Link href="/dashboard" class="nav-item" :class="{ 'nav-active': isActive('/dashboard') }"><Home class="nav-icon" :size="21" /><span>Home</span></Link>
+        <Link href="/dashboard" class="nav-item" :class="{ 'nav-active': isActive('/dashboard') }" aria-label="Home"><Home class="nav-icon" :size="21" /><span class="hidden sm:inline">Home</span></Link>
         <Link
             :href="assetsIndex.url()"
             class="nav-item"
             :class="{ 'nav-active': isActive(assetsIndex.url()) }"
+            aria-label="Assets"
         >
             <Package class="nav-icon" :size="21" />
-            <span>Asset</span>
+            <span class="hidden sm:inline">Asset</span>
         </Link>
-        <Link :href="mealsIndex.url()" class="nav-item" :class="{ 'nav-active': page.url.startsWith(mealsIndex.url()) }">
+        <Link :href="mealsIndex.url()" class="nav-item" :class="{ 'nav-active': page.url.startsWith(mealsIndex.url()) }" aria-label="Meals">
             <Utensils class="nav-icon" :size="21" />
-            <span>Meals</span>
+            <span class="hidden sm:inline">Meals</span>
         </Link>
-        <button @click="emit('add')" class="group -mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-[#2457DA] text-white shadow-lg shadow-blue-600/30 transition duration-300 hover:scale-105 active:scale-90 focus:outline-none focus:ring-4 focus:ring-blue-200" aria-label="Add transaction"><Plus class="transition duration-300 group-hover:rotate-90" :size="28" /></button>
-        <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }"><MessageCircle class="nav-icon" :size="21" /><span>Chat</span></Link>
-        <Link :href="profileEdit.url()" class="nav-item" :class="{ 'nav-active': isActive(profileEdit.url()) }"><CircleUserRound class="nav-icon" :size="21" /><span>Profile</span></Link>
+        <Link :href="remindersIndex.url()" class="nav-item" :class="{ 'nav-active': page.url.startsWith(remindersIndex.url()) }" aria-label="Recurring reminders">
+            <Bell class="nav-icon" :size="21" />
+            <span class="hidden sm:inline">Reminders</span>
+        </Link>
+        <button @click="emit('add')" class="group -mt-6 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#2457DA] text-white shadow-lg shadow-blue-600/30 transition duration-300 hover:scale-105 active:scale-90 focus:outline-none focus:ring-4 focus:ring-blue-200" aria-label="Add transaction"><Plus class="transition duration-300 group-hover:rotate-90" :size="28" /></button>
+        <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }" aria-label="Chat"><MessageCircle class="nav-icon" :size="21" /><span class="hidden sm:inline">Chat</span></Link>
+        <Link :href="profileEdit.url()" class="nav-item" :class="{ 'nav-active': isActive(profileEdit.url()) }" aria-label="Profile"><CircleUserRound class="nav-icon" :size="21" /><span class="hidden sm:inline">Profile</span></Link>
     </nav>
 </template>
 
 <style scoped>
-.nav-item { @apply flex min-w-[48px] flex-col items-center gap-1 transition duration-200 hover:-translate-y-0.5 hover:text-[#2457DA] active:scale-90; }
+.nav-item { @apply flex min-w-0 flex-1 flex-col items-center gap-1 transition duration-200 hover:-translate-y-0.5 hover:text-[#2457DA] active:scale-90; }
 .nav-active { @apply font-medium text-[#2457DA]; }
 </style>

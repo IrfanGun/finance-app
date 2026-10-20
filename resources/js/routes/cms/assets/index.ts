@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 import depreciation from './depreciation'
 /**
- * @see routes/web.php:114
+ * @see routes/web.php:149
  * @route '/cms/assets'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -15,7 +15,7 @@ index.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:114
+ * @see routes/web.php:149
  * @route '/cms/assets'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -23,7 +23,7 @@ index.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:114
+ * @see routes/web.php:149
  * @route '/cms/assets'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -31,7 +31,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web.php:114
+ * @see routes/web.php:149
  * @route '/cms/assets'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -40,7 +40,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web.php:121
+ * @see routes/web.php:156
  * @route '/cms/assets/{asset}'
  */
 export const show = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -54,7 +54,7 @@ show.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:121
+ * @see routes/web.php:156
  * @route '/cms/assets/{asset}'
  */
 show.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -81,7 +81,7 @@ show.url = (args: { asset: string | number } | [asset: string | number ] | strin
 }
 
 /**
- * @see routes/web.php:121
+ * @see routes/web.php:156
  * @route '/cms/assets/{asset}'
  */
 show.get = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -89,7 +89,7 @@ show.get = (args: { asset: string | number } | [asset: string | number ] | strin
     method: 'get',
 })
 /**
- * @see routes/web.php:121
+ * @see routes/web.php:156
  * @route '/cms/assets/{asset}'
  */
 show.head = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -98,7 +98,7 @@ show.head = (args: { asset: string | number } | [asset: string | number ] | stri
 })
 
 /**
- * @see routes/web.php:129
+ * @see routes/web.php:164
  * @route '/cms/assets/{asset}/edit'
  */
 export const edit = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -112,7 +112,7 @@ edit.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:129
+ * @see routes/web.php:164
  * @route '/cms/assets/{asset}/edit'
  */
 edit.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -139,7 +139,7 @@ edit.url = (args: { asset: string | number } | [asset: string | number ] | strin
 }
 
 /**
- * @see routes/web.php:129
+ * @see routes/web.php:164
  * @route '/cms/assets/{asset}/edit'
  */
 edit.get = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -147,7 +147,7 @@ edit.get = (args: { asset: string | number } | [asset: string | number ] | strin
     method: 'get',
 })
 /**
- * @see routes/web.php:129
+ * @see routes/web.php:164
  * @route '/cms/assets/{asset}/edit'
  */
 edit.head = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

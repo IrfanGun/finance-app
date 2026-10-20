@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'user_id',
@@ -33,5 +34,10 @@ class Transaction extends Model
     public function mealRecord(): BelongsTo
     {
         return $this->belongsTo(MealRecord::class);
+    }
+
+    public function recurringReminderLog(): HasOne
+    {
+        return $this->hasOne(RecurringReminderLog::class);
     }
 }

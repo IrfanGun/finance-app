@@ -13,6 +13,7 @@ The application is built with Laravel and Vue using Inertia.js. AI features run 
 - **AI receipt scanning** - Upload a receipt photo to extract the merchant name, date, items, and total to help record an expense.
 - **Financial dashboard** - View monthly income and expenses, balances, and spending by category.
 - **Transaction management** - Record income and expenses manually, then filter transactions by date, asset, and category.
+- **Recurring reminders** - Schedule in-app income and expense reminders. A reminder never creates a transaction until you review and save it.
 - **Assets and categories** - Manage accounts such as cash or bank accounts, along with income and expense categories.
 - **User accounts** - Register, log in, verify email, and manage your profile.
 
@@ -60,7 +61,23 @@ npm run dev
 
 Open `http://127.0.0.1:8000` in your browser.
 
-### 3. Enable the AI service (optional)
+### 3. Recurring reminder scheduler
+
+Apply the additive database migrations after updating the application:
+
+```bash
+php artisan migrate --force
+```
+
+The recurring reminder command runs every minute through Laravel's scheduler. On a VPS, configure cron to invoke the scheduler once per minute:
+
+```cron
+* * * * * cd /path/to/finance-app && php artisan schedule:run >> /dev/null 2>&1
+```
+
+The current application stores these in-app notifications synchronously in the database, so this feature does not need a queue worker. If notifications are moved to a queued channel later, configure and keep a Laravel queue worker running as well. No Docker Compose service is present in this repository; for container deployments, run `php artisan schedule:work` in a dedicated long-running scheduler container or use the host's cron integration.
+
+### 4. Enable the AI service (optional)
 
 Add the following settings to Laravel's `.env`:
 

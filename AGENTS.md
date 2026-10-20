@@ -3,6 +3,7 @@
 - Write code vertically and keep each statement, parameter, and chained operation readable on separate lines when practical.
 - Do not compress controllers, services, requests, routes, or Vue logic into horizontal one-liners.
 - Use normal multiline Laravel and Vue formatting, especially for methods, validation rules, arrays, and conditional logic.
+- Use the globally registered `<ButtonPrimary>` component for buttons in Vue pages. Use `variant="secondary"` for secondary actions, and use `<Link>` for navigation.
 
 <laravel-boost-guidelines>
 === foundation rules ===

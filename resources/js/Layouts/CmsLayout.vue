@@ -1,8 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import { index as recurringRemindersIndex } from '@/routes/cms/recurring';
 import {
     ChartNoAxesCombined,
+    Bell,
     Menu,
     LayoutDashboard,
     LogOut,
@@ -32,6 +34,7 @@ const navigation = [
     { label: 'Accounts', href: '/cms/accounts', icon: Wallet },
     { label: 'Assets', href: '/cms/assets', icon: Package },
     { label: 'Categories', href: '/cms/categories', icon: Tags },
+    { label: 'Recurring reminders', href: recurringRemindersIndex.url(), icon: Bell },
     { label: 'AI Assistant', href: '/cms/chat', icon: MessageCircle },
 ];
 </script>

@@ -48,6 +48,11 @@ class User extends Authenticatable
         return $this->hasMany(MealRecord::class);
     }
 
+    public function recurringReminders(): HasMany
+    {
+        return $this->hasMany(RecurringReminder::class);
+    }
+
     public function aiConversations(): HasMany
     {
         return $this->hasMany(AiConversation::class);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\DepreciateAssets;
+use App\Console\Commands\ProcessRecurringReminders;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -13,3 +14,7 @@ Schedule::command(DepreciateAssets::class)
     ->dailyAt('00:10')
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping();
+
+Schedule::command(ProcessRecurringReminders::class)
+    ->everyMinute()
+    ->withoutOverlapping(10);
