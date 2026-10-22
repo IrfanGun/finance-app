@@ -8,21 +8,32 @@ use Illuminate\Database\Eloquent\Builder;
 
 class DashboardService
 {
+    public function __construct(private FundBalanceService $funds) {}
+
     public function dataFor(User $user): array
     {
-        $income = $user->transactions()->where('type', 'income')->sum('amount');
-        $expense = $user->transactions()->where('type', 'expense')->sum('amount');
+        $income = $user->transactions()
+            ->where('type', 'income')
+            ->whereHas('account', fn (Builder $query) => $query->where('currency', 'IDR'))
+            ->sum('amount');
+        $expense = $user->transactions()
+            ->where('type', 'expense')
+            ->whereHas('account', fn (Builder $query) => $query->where('currency', 'IDR'))
+            ->sum('amount');
         $assetValue = $user->assets()
             ->where('status', 'active')
             ->where('currency', 'IDR')
             ->sum('current_value');
-        $accountBalance = $user->financialAccounts()->sum('opening_balance') + $income - $expense;
+        $accountBalance = $user->financialAccounts()
+            ->where('currency', 'IDR')
+            ->sum('opening_balance') + $income - $expense;
         $categories = $user->categories()
             ->orderBy('type')
             ->orderBy('name')
             ->get();
         $categoryExpenses = $user->transactions()
             ->where('type', 'expense')
+            ->whereHas('account', fn (Builder $query) => $query->where('currency', 'IDR'))
             ->whereNotNull('category_id')
             ->select('category_id')
             ->selectRaw('SUM(amount) as amount')
@@ -43,6 +54,29 @@ class DashboardService
             ->values();
 
         return [
+            'funds' => $this->funds->totalsFor($user),
+            'budgetPeriods' => $user->budgetPlans()
+                ->where('type', 'spending')
+                ->with(['periods' => fn ($query) => $query->where('status', 'open')])
+                ->get()
+                ->flatMap(fn ($plan) => $plan->periods->map(fn ($period) => [
+                    'id' => $period->id,
+                    'name' => $plan->name,
+                    'starts_on' => $period->starts_on->toDateString(),
+                    'ends_on' => $period->ends_on->toDateString(),
+                    'account_id' => $period->financial_account_id,
+                ]))
+                ->values(),
+            'savingOptions' => $user->savings()
+                ->where('status', 'active')
+                ->with('goalPlan')
+                ->get(['id', 'name', 'currency'])
+                ->map(fn ($saving) => [
+                    'id' => $saving->id,
+                    'name' => $saving->name,
+                    'currency' => $saving->currency,
+                    'goal_plan_id' => $saving->goalPlan?->id,
+                ]),
             'categories' => $categories->where('is_active', true)->values(),
             'spendingCategories' => $spendingCategories,
             'accounts' => $user->financialAccounts()

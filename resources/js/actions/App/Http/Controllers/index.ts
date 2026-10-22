@@ -11,6 +11,8 @@ import FinancialAccountController from './FinancialAccountController'
 import AssetController from './AssetController'
 import AssetDepreciationController from './AssetDepreciationController'
 import TransactionController from './TransactionController'
+import BudgetPlanController from './BudgetPlanController'
+import SavingController from './SavingController'
 import RecurringReminderController from './RecurringReminderController'
 import MealRecordController from './MealRecordController'
 import ReceiptController from './ReceiptController'
@@ -31,6 +33,8 @@ FinancialAccountController: Object.assign(FinancialAccountController, FinancialA
 AssetController: Object.assign(AssetController, AssetController),
 AssetDepreciationController: Object.assign(AssetDepreciationController, AssetDepreciationController),
 TransactionController: Object.assign(TransactionController, TransactionController),
+BudgetPlanController: Object.assign(BudgetPlanController, BudgetPlanController),
+SavingController: Object.assign(SavingController, SavingController),
 RecurringReminderController: Object.assign(RecurringReminderController, RecurringReminderController),
 MealRecordController: Object.assign(MealRecordController, MealRecordController),
 ReceiptController: Object.assign(ReceiptController, ReceiptController),

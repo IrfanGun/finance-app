@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\DepreciateAssets;
+use App\Console\Commands\ProcessBudgetPeriods;
 use App\Console\Commands\ProcessRecurringReminders;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -17,4 +18,8 @@ Schedule::command(DepreciateAssets::class)
 
 Schedule::command(ProcessRecurringReminders::class)
     ->everyMinute()
+    ->withoutOverlapping(10);
+
+Schedule::command(ProcessBudgetPeriods::class)
+    ->hourly()
     ->withoutOverlapping(10);

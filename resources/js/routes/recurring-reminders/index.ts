@@ -412,7 +412,7 @@ transaction.head = (args: { reminder: string | number, log: string | number } | 
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::complete
- * @see app/Http/Controllers/RecurringReminderController.php:138
+ * @see app/Http/Controllers/RecurringReminderController.php:157
  * @route '/recurring-reminders/{reminder}/logs/{log}/complete'
  */
 export const complete = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -427,7 +427,7 @@ complete.definition = {
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::complete
- * @see app/Http/Controllers/RecurringReminderController.php:138
+ * @see app/Http/Controllers/RecurringReminderController.php:157
  * @route '/recurring-reminders/{reminder}/logs/{log}/complete'
  */
 complete.url = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions) => {
@@ -453,7 +453,7 @@ complete.url = (args: { reminder: string | number, log: string | number } | [rem
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::complete
- * @see app/Http/Controllers/RecurringReminderController.php:138
+ * @see app/Http/Controllers/RecurringReminderController.php:157
  * @route '/recurring-reminders/{reminder}/logs/{log}/complete'
  */
 complete.post = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -463,7 +463,7 @@ complete.post = (args: { reminder: string | number, log: string | number } | [re
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::snooze
- * @see app/Http/Controllers/RecurringReminderController.php:157
+ * @see app/Http/Controllers/RecurringReminderController.php:176
  * @route '/recurring-reminders/{reminder}/logs/{log}/snooze'
  */
 export const snooze = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -478,7 +478,7 @@ snooze.definition = {
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::snooze
- * @see app/Http/Controllers/RecurringReminderController.php:157
+ * @see app/Http/Controllers/RecurringReminderController.php:176
  * @route '/recurring-reminders/{reminder}/logs/{log}/snooze'
  */
 snooze.url = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions) => {
@@ -504,7 +504,7 @@ snooze.url = (args: { reminder: string | number, log: string | number } | [remin
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::snooze
- * @see app/Http/Controllers/RecurringReminderController.php:157
+ * @see app/Http/Controllers/RecurringReminderController.php:176
  * @route '/recurring-reminders/{reminder}/logs/{log}/snooze'
  */
 snooze.post = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -514,7 +514,7 @@ snooze.post = (args: { reminder: string | number, log: string | number } | [remi
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::skip
- * @see app/Http/Controllers/RecurringReminderController.php:209
+ * @see app/Http/Controllers/RecurringReminderController.php:228
  * @route '/recurring-reminders/{reminder}/logs/{log}/skip'
  */
 export const skip = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -529,7 +529,7 @@ skip.definition = {
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::skip
- * @see app/Http/Controllers/RecurringReminderController.php:209
+ * @see app/Http/Controllers/RecurringReminderController.php:228
  * @route '/recurring-reminders/{reminder}/logs/{log}/skip'
  */
 skip.url = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions) => {
@@ -555,7 +555,7 @@ skip.url = (args: { reminder: string | number, log: string | number } | [reminde
 
 /**
 * @see \App\Http\Controllers\RecurringReminderController::skip
- * @see app/Http/Controllers/RecurringReminderController.php:209
+ * @see app/Http/Controllers/RecurringReminderController.php:228
  * @route '/recurring-reminders/{reminder}/logs/{log}/skip'
  */
 skip.post = (args: { reminder: string | number, log: string | number } | [reminder: string | number, log: string | number ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({

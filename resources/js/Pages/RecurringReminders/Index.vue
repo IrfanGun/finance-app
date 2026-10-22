@@ -307,7 +307,13 @@ onMounted(() => {
                         </div>
                         <p class="mt-1 text-xs capitalize text-[#637083]">
                             {{ statusLabel(reminder.status) }} ·
-                            {{ reminder.type === 'income' ? 'Pemasukan' : 'Pengeluaran' }} ·
+                            {{ reminder.purpose === 'transaction'
+                                ? (reminder.type === 'income' ? 'Pemasukan' : 'Pengeluaran')
+                                : reminder.purpose === 'goal_contribution'
+                                    ? 'Setoran goal'
+                                    : reminder.purpose === 'budget_savings_claim'
+                                        ? 'Klaim budget'
+                                        : 'Alokasi dana' }} ·
                             {{ frequencyLabel(reminder) }}
                         </p>
                     </div>

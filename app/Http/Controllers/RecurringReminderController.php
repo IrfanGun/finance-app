@@ -116,6 +116,10 @@ class RecurringReminderController extends Controller
             ->findOrFail($reminder);
         $reminderLog = $record->logs()->with('transaction')->findOrFail($log);
 
+        if ($record->purpose !== 'transaction') {
+            abort(404);
+        }
+
         return Inertia::render('RecurringReminders/Transaction', [
             'reminder' => $this->reminderPayload($record, includeLogs: false),
             'log' => [
@@ -132,6 +136,21 @@ class RecurringReminderController extends Controller
                 ->where('type', $record->type)
                 ->orderBy('name')
                 ->get(['id', 'name', 'type']),
+            'budgetPeriods' => $request->user()->budgetPlans()
+                ->where('type', 'spending')
+                ->with(['periods' => fn ($query) => $query->where('status', 'open')])
+                ->get()
+                ->flatMap(fn ($plan) => $plan->periods->map(fn ($period) => [
+                    'id' => $period->id,
+                    'name' => $plan->name,
+                    'account_id' => $period->financial_account_id,
+                    'starts_on' => $period->starts_on->toDateString(),
+                    'ends_on' => $period->ends_on->toDateString(),
+                ]))
+                ->values(),
+            'savings' => $request->user()->savings()
+                ->where('status', 'active')
+                ->get(['id', 'name', 'currency']),
         ]);
     }
 
@@ -240,6 +259,9 @@ class RecurringReminderController extends Controller
         return [
             'id' => $reminder->id,
             'type' => $reminder->type,
+            'purpose' => $reminder->purpose,
+            'budget_plan_id' => $reminder->budget_plan_id,
+            'saving_id' => $reminder->saving_id,
             'priority' => $reminder->priority,
             'title' => $reminder->title,
             'amount' => $reminder->amount,
@@ -261,6 +283,8 @@ class RecurringReminderController extends Controller
                 'scheduled_at' => $log->scheduled_at->setTimezone($reminder->timezone)->format('Y-m-d H:i'),
                 'snoozed_until' => $log->snoozed_until?->setTimezone($reminder->timezone)->format('Y-m-d H:i'),
                 'transaction_id' => $log->transaction_id,
+                'budget_period_id' => $log->budget_period_id,
+                'completed_at' => $log->completed_at,
             ]) : [],
         ];
     }

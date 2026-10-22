@@ -58,4 +58,14 @@ class TransactionController extends Controller
 
         return back();
     }
+
+    public function void(Request $request, int $transaction, TransactionService $transactions): RedirectResponse
+    {
+        $record = $request->user()->transactions()
+            ->withoutGlobalScope('posted')
+            ->findOrFail($transaction);
+        $transactions->void($request->user(), $record);
+
+        return back();
+    }
 }

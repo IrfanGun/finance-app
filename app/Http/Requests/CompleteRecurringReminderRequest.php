@@ -47,6 +47,8 @@ class CompleteRecurringReminderRequest extends FormRequest
             ],
             'title' => ['required', 'string', 'max:255'],
             'note' => ['nullable', 'string', 'max:1000'],
+            'budget_period_id' => ['nullable', 'integer', 'exists:budget_periods,id'],
+            'saving_id' => ['nullable', 'integer', 'exists:savings,id'],
         ];
     }
 }

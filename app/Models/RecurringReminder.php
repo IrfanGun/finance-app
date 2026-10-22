@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'timezone',
     'status',
     'notes',
+    'purpose',
+    'budget_plan_id',
+    'saving_id',
 ])]
 class RecurringReminder extends Model
 {
@@ -58,5 +61,15 @@ class RecurringReminder extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(RecurringReminderLog::class);
+    }
+
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(BudgetPlan::class, 'budget_plan_id');
+    }
+
+    public function pocket(): BelongsTo
+    {
+        return $this->belongsTo(Saving::class, 'saving_id');
     }
 }

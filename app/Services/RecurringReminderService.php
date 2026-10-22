@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\BudgetPeriod;
+use App\Models\BudgetPlan;
+use App\Models\FinancialAccount;
 use App\Models\RecurringReminder;
 use App\Models\RecurringReminderLog;
 use App\Models\Transaction;
@@ -14,6 +17,11 @@ use Illuminate\Validation\ValidationException;
 
 class RecurringReminderService
 {
+    public function __construct(
+        private FundService $funds,
+        private FundBalanceService $balances,
+    ) {}
+
     private const MAX_PERIODS_PER_RULE_PER_RUN = 20;
 
     private const MAX_PERIODS_PER_RUN = 200;
@@ -23,6 +31,10 @@ class RecurringReminderService
      */
     public function create(User $user, array $data): RecurringReminder
     {
+        $data['purpose'] = $data['purpose'] ?? 'transaction';
+        $data['type'] = $data['purpose'] === 'transaction' ? $data['type'] : null;
+        $data['budget_plan_id'] = $data['purpose'] === 'transaction' ? null : ($data['budget_plan_id'] ?? null);
+        $data['saving_id'] = $data['purpose'] === 'saving_allocation' ? $data['saving_id'] : null;
         $data = $this->normalizeSchedule($data);
         $data['next_reminder_at'] = $data['starts_at'];
         $data['status'] = 'active';
@@ -35,6 +47,10 @@ class RecurringReminderService
      */
     public function update(RecurringReminder $reminder, array $data): RecurringReminder
     {
+        $data['purpose'] = $data['purpose'] ?? $reminder->purpose;
+        $data['type'] = $data['purpose'] === 'transaction' ? $data['type'] : null;
+        $data['budget_plan_id'] = $data['purpose'] === 'transaction' ? null : ($data['budget_plan_id'] ?? null);
+        $data['saving_id'] = $data['purpose'] === 'saving_allocation' ? $data['saving_id'] : null;
         $data = $this->normalizeSchedule($data);
 
         return DB::transaction(function () use ($reminder, $data): RecurringReminder {
@@ -157,10 +173,49 @@ class RecurringReminderService
             $reminder = $user->recurringReminders()
                 ->whereKey($reminderId)
                 ->firstOrFail();
+            $existingLog = $reminder->logs()->whereKey($logId)->firstOrFail();
+
+            if ($existingLog->status === 'completed') {
+                return $existingLog->transaction;
+            }
+
+            $account = $user->financialAccounts()
+                ->whereKey($data['account_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
+            $periodId = $data['budget_period_id'] ?? null;
+            $savingId = $data['saving_id'] ?? null;
+            $planId = $periodId !== null
+                ? BudgetPeriod::query()->whereKey($periodId)->value('budget_plan_id')
+                : ($savingId !== null
+                    ? BudgetPlan::query()->where('saving_id', $savingId)->value('id')
+                    : null);
+
+            if ($planId !== null) {
+                $user->budgetPlans()
+                    ->whereKey($planId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+            }
+
+            if ($periodId !== null) {
+                BudgetPeriod::query()->whereKey($periodId)->lockForUpdate()->firstOrFail();
+            }
+
+            if ($savingId !== null) {
+                $user->savings()->whereKey($savingId)->lockForUpdate()->firstOrFail();
+            }
+
             $log = $reminder->logs()
                 ->whereKey($logId)
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            if ($reminder->purpose !== 'transaction') {
+                throw ValidationException::withMessages([
+                    'reminder' => 'Gunakan tindakan budget atau savings untuk pengingat ini.',
+                ]);
+            }
 
             if ($log->status === 'completed') {
                 return $log->transaction;
@@ -172,7 +227,6 @@ class RecurringReminderService
                 ]);
             }
 
-            $account = $user->financialAccounts()->findOrFail($data['account_id']);
             $category = isset($data['category_id'])
                 ? $user->categories()->findOrFail($data['category_id'])
                 : null;
@@ -192,11 +246,14 @@ class RecurringReminderService
                 'date' => $data['date'],
                 'title' => $data['title'],
                 'note' => $data['note'] ?? null,
+                'budget_period_id' => $data['budget_period_id'] ?? null,
+                'saving_id' => $data['saving_id'] ?? null,
             ]);
 
             $log->update([
                 'transaction_id' => $transaction->id,
                 'status' => 'completed',
+                'completed_at' => now('UTC'),
                 'snoozed_until' => null,
             ]);
 
@@ -291,6 +348,23 @@ class RecurringReminderService
 
         for ($processed = 0; $processed < $limit; $processed++) {
             $result = DB::transaction(function () use ($reminderId, $now): array {
+                $snapshot = RecurringReminder::query()->find($reminderId);
+                $lockedPlan = null;
+
+                if ($snapshot?->budget_plan_id !== null) {
+                    $planAccountId = BudgetPlan::query()
+                        ->whereKey($snapshot->budget_plan_id)
+                        ->value('financial_account_id');
+                    $account = FinancialAccount::query()
+                        ->whereKey($planAccountId)
+                        ->lockForUpdate()
+                        ->firstOrFail();
+                    $lockedPlan = BudgetPlan::query()
+                        ->whereKey($snapshot->budget_plan_id)
+                        ->lockForUpdate()
+                        ->firstOrFail();
+                }
+
                 $reminder = RecurringReminder::query()
                     ->whereKey($reminderId)
                     ->lockForUpdate()
@@ -300,6 +374,28 @@ class RecurringReminderService
                     || $reminder->status !== 'active'
                     || $reminder->next_reminder_at === null
                     || $reminder->next_reminder_at->greaterThan($now)) {
+                    return ['created' => false, 'notified' => false, 'continue' => false, 'processed' => false];
+                }
+
+                if ($lockedPlan !== null && $lockedPlan->status !== 'active') {
+                    if (in_array($lockedPlan->status, ['ended', 'completed'], true)) {
+                        $reminder->update([
+                            'status' => 'ended',
+                            'next_reminder_at' => null,
+                        ]);
+                    }
+
+                    return ['created' => false, 'notified' => false, 'continue' => false, 'processed' => false];
+                }
+
+                if ($reminder->purpose === 'saving_allocation'
+                    && ($reminder->pocket?->status !== 'active'
+                        || $reminder->pocket?->goalPlan !== null)) {
+                    $reminder->update([
+                        'status' => 'ended',
+                        'next_reminder_at' => null,
+                    ]);
+
                     return ['created' => false, 'notified' => false, 'continue' => false, 'processed' => false];
                 }
 
@@ -314,22 +410,81 @@ class RecurringReminderService
                     return ['created' => false, 'notified' => false, 'continue' => false, 'processed' => false];
                 }
 
-                $log = $reminder->logs()->firstOrCreate(
-                    ['scheduled_at' => $scheduledAt],
-                    ['status' => 'pending'],
-                );
-                $created = $log->wasRecentlyCreated;
+                $periodId = null;
+
+                if ($lockedPlan !== null) {
+                    $localDate = $scheduledAt->setTimezone($lockedPlan->timezone)->toDateString();
+                    $this->funds->openDuePeriods($lockedPlan, $account, $localDate);
+                    $periodId = $lockedPlan->periods()
+                        ->whereDate('starts_on', '<=', $localDate)
+                        ->whereDate('ends_on', '>=', $localDate)
+                        ->value('id');
+
+                    if ($periodId === null) {
+                        throw ValidationException::withMessages([
+                            'reminder' => 'Periode budget untuk jadwal pengingat belum dapat ditemukan.',
+                        ]);
+                    }
+                }
+
+                $alreadySatisfied = false;
+
+                if ($periodId !== null) {
+                    $period = BudgetPeriod::query()->findOrFail($periodId);
+                    $alreadySatisfied = match ($reminder->purpose) {
+                        'budget_allocation' => $period->status === 'open',
+                        'budget_savings_claim' => bccomp(
+                            $this->balances->periodRemaining($period),
+                            '0',
+                            2,
+                        ) === 0,
+                        'goal_contribution' => $period->status === 'funded'
+                            || bccomp(
+                                bcadd(
+                                    $this->balances->savingBalance($lockedPlan->pocket),
+                                    (string) $lockedPlan->user->transactions()
+                                        ->where('budget_plan_id', $lockedPlan->id)
+                                        ->where('type', 'expense')
+                                        ->sum('amount'),
+                                    2,
+                                ),
+                                (string) $lockedPlan->target_amount,
+                                2,
+                            ) >= 0,
+                        default => false,
+                    };
+
+                    if ($reminder->purpose === 'goal_contribution'
+                        && $period->ends_on->toDateString()
+                            < $now->setTimezone($lockedPlan->timezone)->toDateString()) {
+                        $alreadySatisfied = true;
+                    }
+                }
+
+                $log = $alreadySatisfied
+                    ? null
+                    : $reminder->logs()->firstOrCreate(
+                        ['scheduled_at' => $scheduledAt],
+                        [
+                            'status' => 'pending',
+                            'budget_period_id' => $periodId,
+                        ],
+                    );
+                $created = $log?->wasRecentlyCreated ?? false;
                 $notified = false;
 
-                if ($log->notified_at === null) {
+                if ($log !== null && $log->notified_at === null) {
                     $this->sendNotification($reminder, $log, 'initial');
                     $log->update(['notified_at' => $now]);
                     $notified = true;
                 }
 
                 $index = $this->indexAtOrAfter($reminder, $scheduledAt);
-                $next = $this->occurrenceAtIndex($reminder, $index + 1);
-                $status = $reminder->ends_at !== null && $next->greaterThan($reminder->ends_at)
+                $next = $reminder->purpose === 'budget_savings_claim' && $lockedPlan !== null
+                    ? $this->nextBudgetClaimAt($lockedPlan, $period, $reminder)
+                    : $this->occurrenceAtIndex($reminder, $index + 1);
+                $status = $next === null
+                    || ($reminder->ends_at !== null && $next->greaterThan($reminder->ends_at))
                     ? 'ended'
                     : 'active';
 
@@ -396,6 +551,13 @@ class RecurringReminderService
                             return false;
                         }
 
+                        if (($reminder->budget_plan_id !== null
+                                && $reminder->plan?->status !== 'active')
+                            || ($reminder->saving_id !== null
+                                && $reminder->pocket?->status !== 'active')) {
+                            return false;
+                        }
+
                         $this->sendNotification($reminder, $lockedLog, 'snooze');
                         $lockedLog->update([
                             'status' => 'pending',
@@ -446,6 +608,54 @@ class RecurringReminderService
 
         return $month->setDate($month->year, $month->month, $day)
             ->setTime($anchor->hour, $anchor->minute, $anchor->second);
+    }
+
+    private function nextBudgetClaimAt(
+        BudgetPlan $plan,
+        BudgetPeriod $period,
+        RecurringReminder $reminder,
+    ): ?CarbonImmutable {
+        if (! $plan->is_recurring) {
+            return null;
+        }
+
+        $anchor = CarbonImmutable::parse(
+            $plan->starts_on->toDateString().' 09:00:00',
+            $plan->timezone,
+        );
+
+        for ($index = 0; $index < 240; $index++) {
+            $start = $this->monthlyOccurrence($anchor, $index * $plan->interval);
+
+            if ($start->toDateString() !== $period->starts_on->toDateString()) {
+                continue;
+            }
+
+            $nextStart = $this->monthlyOccurrence($anchor, ($index + 1) * $plan->interval);
+
+            if ($plan->ends_on !== null
+                && $nextStart->toDateString() > $plan->ends_on->toDateString()) {
+                return null;
+            }
+
+            $followingStart = $this->monthlyOccurrence(
+                $anchor,
+                ($index + 2) * $plan->interval,
+            );
+            $nextEnd = $followingStart->subDay();
+
+            if ($plan->ends_on !== null
+                && $nextEnd->toDateString() > $plan->ends_on->toDateString()) {
+                $nextEnd = CarbonImmutable::parse(
+                    $plan->ends_on->toDateString().' 09:00:00',
+                    $plan->timezone,
+                );
+            }
+
+            return $nextEnd->setTimezone('UTC');
+        }
+
+        return null;
     }
 
     private function yearlyOccurrence(CarbonImmutable $anchor, int $years): CarbonImmutable

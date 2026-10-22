@@ -1,11 +1,9 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { Bell, CircleUserRound, Home, MessageCircle, Package, Plus, Utensils } from 'lucide-vue-next';
+import { CircleUserRound, Home, MessageCircle, Package, Plus } from 'lucide-vue-next';
 import { chat as chatIndex } from '@/routes';
 import { edit as profileEdit } from '@/routes/profile';
 import { index as assetsIndex } from '@/routes/assets';
-import { index as mealsIndex } from '@/routes/meals';
-import { index as remindersIndex } from '@/routes/recurring-reminders';
 const emit = defineEmits(['add']);
 
 const page = usePage();
@@ -23,14 +21,6 @@ const isActive = (path) => page.url === path;
         >
             <Package class="nav-icon" :size="21" />
             <span class="hidden sm:inline">Asset</span>
-        </Link>
-        <Link :href="mealsIndex.url()" class="nav-item" :class="{ 'nav-active': page.url.startsWith(mealsIndex.url()) }" aria-label="Meals">
-            <Utensils class="nav-icon" :size="21" />
-            <span class="hidden sm:inline">Meals</span>
-        </Link>
-        <Link :href="remindersIndex.url()" class="nav-item" :class="{ 'nav-active': page.url.startsWith(remindersIndex.url()) }" aria-label="Recurring reminders">
-            <Bell class="nav-icon" :size="21" />
-            <span class="hidden sm:inline">Reminders</span>
         </Link>
         <button @click="emit('add')" class="group -mt-6 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#2457DA] text-white shadow-lg shadow-blue-600/30 transition duration-300 hover:scale-105 active:scale-90 focus:outline-none focus:ring-4 focus:ring-blue-200" aria-label="Add transaction"><Plus class="transition duration-300 group-hover:rotate-90" :size="28" /></button>
         <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }" aria-label="Chat"><MessageCircle class="nav-icon" :size="21" /><span class="hidden sm:inline">Chat</span></Link>

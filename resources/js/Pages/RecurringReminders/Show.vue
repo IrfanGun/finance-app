@@ -11,6 +11,8 @@ import {
     Square,
 } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import { index as budgetIndex } from '@/routes/budget-plans';
+import { index as savingsIndex } from '@/routes/savings';
 import {
     end as endReminder,
     index as remindersIndex,
@@ -63,6 +65,36 @@ const frequencyLabel = (reminder) => {
         ? `Setiap ${labels[reminder.frequency]}`
         : `Setiap ${reminder.interval} ${labels[reminder.frequency]}`;
 };
+
+const actionUrl = (reminder, log) => {
+    if (reminder.purpose === 'transaction') {
+        return reminderTransaction.url({ reminder: reminder.id, log: log.id });
+    }
+
+    if (reminder.purpose === 'saving_allocation') {
+        return savingsIndex.url({
+            query: {
+                saving: reminder.saving_id,
+                reminder_log: log.id,
+            },
+        });
+    }
+
+    return budgetIndex.url({
+        query: {
+            plan: reminder.budget_plan_id,
+            period: log.budget_period_id,
+        },
+    });
+};
+
+const actionLabel = (purpose) => ({
+    transaction: 'Catat transaksi',
+    budget_allocation: 'Danai budget',
+    budget_savings_claim: 'Klaim sisa',
+    goal_contribution: 'Sisihkan Dana',
+    saving_allocation: 'Alokasikan dana',
+}[purpose] ?? 'Buka');
 
 const localDateTime = (date, timezone) => {
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -136,7 +168,7 @@ const submitSnooze = (log) => snoozeForm.post(
             </Link>
             <h1 class="max-w-[65%] truncate text-lg font-semibold">Detail pengingat</h1>
             <ButtonPrimary
-                v-if="reminder.status !== 'ended'"
+                v-if="reminder.status !== 'ended' && reminder.purpose === 'transaction'"
                 type="button"
                 variant="secondary"
                 class="!min-h-0 !rounded-lg !p-2 !text-[#2457DA]"
@@ -163,7 +195,9 @@ const submitSnooze = (log) => snoozeForm.post(
                     <div class="min-w-0 flex-1">
                         <h2 class="break-words text-xl font-semibold">{{ reminder.title }}</h2>
                         <p class="mt-1 text-sm text-[#637083]">
-                            {{ reminder.type === 'income' ? 'Pemasukan' : 'Pengeluaran' }} ·
+                            {{ reminder.purpose === 'transaction'
+                                ? (reminder.type === 'income' ? 'Pemasukan' : 'Pengeluaran')
+                                : actionLabel(reminder.purpose) }} ·
                             {{ frequencyLabel(reminder) }}
                         </p>
                     </div>
@@ -278,10 +312,10 @@ const submitSnooze = (log) => snoozeForm.post(
                             class="flex flex-wrap gap-2"
                         >
                             <Link
-                                :href="reminderTransaction.url({ reminder: reminder.id, log: log.id })"
+                                :href="actionUrl(reminder, log)"
                                 class="rounded-lg bg-[#2457DA] px-3 py-2 text-xs font-semibold text-white"
                             >
-                                Catat
+                                {{ actionLabel(reminder.purpose) }}
                             </Link>
                             <ButtonPrimary
                                 type="button"

@@ -25,8 +25,34 @@ class RecurringReminderRequest extends FormRequest
      */
     public function rules(): array
     {
+        $purpose = $this->input('purpose', 'transaction');
+        $transaction = $purpose === 'transaction';
+        $budget = in_array(
+            $purpose,
+            ['budget_allocation', 'budget_savings_claim', 'goal_contribution'],
+            true,
+        );
+
         return [
-            'type' => ['required', Rule::in(['income', 'expense'])],
+            'purpose' => [
+                'sometimes',
+                Rule::in([
+                    'transaction',
+                    'budget_allocation',
+                    'budget_savings_claim',
+                    'goal_contribution',
+                    'saving_allocation',
+                ]),
+            ],
+            'type' => [$transaction ? 'required' : 'nullable', Rule::in(['income', 'expense'])],
+            'budget_plan_id' => [
+                $budget ? 'required' : 'nullable',
+                Rule::exists('budget_plans', 'id')->where('user_id', $this->user()?->id),
+            ],
+            'saving_id' => [
+                $purpose === 'saving_allocation' ? 'required' : 'nullable',
+                Rule::exists('savings', 'id')->where('user_id', $this->user()?->id),
+            ],
             'priority' => ['required', Rule::in(['low', 'medium', 'high'])],
             'title' => ['required', 'string', 'max:255'],
             'amount' => ['nullable', 'numeric', 'min:0'],
@@ -54,6 +80,31 @@ class RecurringReminderRequest extends FormRequest
     public function after(): array
     {
         return [function (Validator $validator): void {
+            $purpose = $this->input('purpose', 'transaction');
+
+            if ($purpose !== 'transaction') {
+                if ($this->filled('type') || $this->filled('category_id')) {
+                    $validator->errors()->add('type', 'Pengingat alokasi tidak memakai jenis transaksi.');
+                }
+
+                if ($purpose === 'saving_allocation') {
+                    $saving = $this->user()?->savings()->find($this->input('saving_id'));
+
+                    if ($saving?->goalPlan !== null || $saving?->status !== 'active') {
+                        $validator->errors()->add('saving_id', 'Pilih savings mandiri yang aktif.');
+                    }
+                } else {
+                    $plan = $this->user()?->budgetPlans()->find($this->input('budget_plan_id'));
+                    $expected = $purpose === 'goal_contribution' ? 'goal' : 'spending';
+
+                    if ($plan?->type !== $expected || $plan?->status !== 'active') {
+                        $validator->errors()->add('budget_plan_id', 'Plan tidak aktif atau jenisnya tidak sesuai.');
+                    }
+                }
+            } elseif ($this->filled('budget_plan_id') || $this->filled('saving_id')) {
+                $validator->errors()->add('purpose', 'Pengingat transaksi tidak memakai budget atau savings.');
+            }
+
             if ($validator->errors()->hasAny(['starts_at', 'ends_at', 'timezone'])) {
                 return;
             }

@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ArrowLeft, CheckCircle2 } from 'lucide-vue-next';
 import { complete as completeReminder, index as remindersIndex } from '@/routes/recurring-reminders';
@@ -8,8 +9,11 @@ const props = defineProps({
     log: { type: Object, required: true },
     accounts: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] },
+    budgetPeriods: { type: Array, default: () => [] },
+    savings: { type: Array, default: () => [] },
 });
 
+const sourceType = ref('free');
 const form = useForm({
     amount: props.reminder.amount ?? '',
     date: props.log.scheduled_at.slice(0, 10),
@@ -17,9 +21,15 @@ const form = useForm({
     category_id: props.reminder.category_id ?? '',
     title: props.reminder.title,
     note: props.reminder.notes ?? '',
+    budget_period_id: null,
+    saving_id: null,
 });
 
-const submit = () => form.post(completeReminder.url({ reminder: props.reminder.id, log: props.log.id }));
+const submit = () => {
+    form.budget_period_id = sourceType.value === 'budget' ? form.budget_period_id : null;
+    form.saving_id = sourceType.value === 'saving' ? form.saving_id : null;
+    form.post(completeReminder.url({ reminder: props.reminder.id, log: props.log.id }));
+};
 </script>
 
 <template>
@@ -41,6 +51,35 @@ const submit = () => form.post(completeReminder.url({ reminder: props.reminder.i
                 <label class="block text-sm font-medium">Akun
                     <select v-model="form.account_id" required class="mt-1 block w-full rounded-xl border-[#D8DEE8] text-sm"><option value="" disabled>Pilih akun</option><option v-for="account in accounts" :key="account.id" :value="account.id">{{ account.name }} ({{ account.currency || 'IDR' }})</option></select>
                     <span v-if="form.errors.account_id" class="mt-1 block text-xs text-[#B34735]">{{ form.errors.account_id }}</span>
+                </label>
+                <label v-if="reminder.type === 'expense'" class="block text-sm font-medium">Sumber dana
+                    <select v-model="sourceType" class="mt-1 block w-full rounded-xl border-[#D8DEE8] text-sm">
+                        <option value="free">Uang bebas</option>
+                        <option value="budget">Cadangan budget</option>
+                        <option value="saving">Savings</option>
+                    </select>
+                </label>
+                <label v-if="reminder.type === 'expense' && sourceType === 'budget'" class="block text-sm font-medium">
+                    Periode budget
+                    <select v-model="form.budget_period_id" class="mt-1 block w-full rounded-xl border-[#D8DEE8] text-sm" required>
+                        <option :value="null">Pilih periode</option>
+                        <option
+                            v-for="period in budgetPeriods.filter((item) => Number(item.account_id) === Number(form.account_id) && form.date >= item.starts_on && form.date <= item.ends_on)"
+                            :key="period.id"
+                            :value="period.id"
+                        >{{ period.name }} · {{ period.starts_on }} – {{ period.ends_on }}</option>
+                    </select>
+                </label>
+                <label v-if="reminder.type === 'expense' && sourceType === 'saving'" class="block text-sm font-medium">
+                    Savings
+                    <select v-model="form.saving_id" class="mt-1 block w-full rounded-xl border-[#D8DEE8] text-sm" required>
+                        <option :value="null">Pilih savings</option>
+                        <option
+                            v-for="saving in savings.filter((item) => item.currency === accounts.find((account) => Number(account.id) === Number(form.account_id))?.currency)"
+                            :key="saving.id"
+                            :value="saving.id"
+                        >{{ saving.name }}</option>
+                    </select>
                 </label>
                 <label class="block text-sm font-medium">Kategori
                     <select v-model="form.category_id" class="mt-1 block w-full rounded-xl border-[#D8DEE8] text-sm"><option value="">Tanpa kategori</option><option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option></select>

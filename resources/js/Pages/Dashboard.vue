@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Camera, ChevronRight, Flag, MessageCircle, Plus } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Bell, Camera, ChevronRight, Flag, MessageCircle, Plus, Utensils } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import SpendingCategoryChart from '@/Components/SpendingCategoryChart.vue';
 import FormInput from '@/Components/FormInput.vue';
@@ -13,6 +13,10 @@ import { index as accountsIndex } from '@/routes/accounts';
 import { index as assetsIndex } from '@/routes/assets';
 import { show as assetShow } from '@/routes/assets';
 import { index as transactionsIndex } from '@/routes/transactions';
+import { index as budgetIndex } from '@/routes/budget-plans';
+import { index as savingsIndex } from '@/routes/savings';
+import { index as mealsIndex } from '@/routes/meals';
+import { index as remindersIndex } from '@/routes/recurring-reminders';
 import { chat as chatIndex } from '@/routes';
 import { store as transactionStore } from '@/actions/App/Http/Controllers/TransactionController';
 
@@ -25,12 +29,16 @@ const props = defineProps({
     transactions: { type: Array, default: () => [] },
     summary: { type: Object, default: () => ({ income: 0, expense: 0, balance: 0 }) },
     selectedMealRecord: { type: Object, default: null },
+    funds: { type: Object, default: () => ({}) },
+    budgetPeriods: { type: Array, default: () => [] },
+    savingOptions: { type: Array, default: () => [] },
 });
 
 const userName = page.props.auth?.user?.name ?? 'User';
 const showTransactionModal = ref(false);
 const transactionStep = ref(1);
 const transactionType = ref('expense');
+const sourceType = ref('free');
 const transactionForm = useForm({
     type: 'expense',
     amount: '',
@@ -40,9 +48,23 @@ const transactionForm = useForm({
     account_id: props.accounts[0]?.id ?? '',
     category_id: '',
     meal_record_id: props.selectedMealRecord?.id ?? null,
+    budget_period_id: null,
+    saving_id: null,
 });
 const isScrolled = ref(false);
+const fundCurrencies = Object.keys(props.funds);
+const activeFundCurrency = ref(fundCurrencies[0] ?? 'IDR');
+const updateActiveFundCurrency = (event) => {
+    const slideIndex = Math.round(event.target.scrollTop / 88);
+    const currencyIndex = slideIndex % fundCurrencies.length;
+    activeFundCurrency.value = fundCurrencies[Math.min(currencyIndex, fundCurrencies.length - 1)] ?? 'IDR';
+};
 const formatCurrency = (amount) => new Intl.NumberFormat('id-ID').format(Number(amount ?? 0));
+const formatAccountBalance = (account) => new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: account.currency || 'IDR',
+    maximumFractionDigits: 2,
+}).format(Number(account.current_balance ?? 0));
 const transactionCategory = (transaction) => transaction.category?.name ?? 'Uncategorized';
 const transactionAmount = (transaction) => `${transaction.type === 'income' ? '+' : '-'} Rp ${formatCurrency(transaction.amount)}`;
 const openTransactionModal = () => {
@@ -51,10 +73,31 @@ const openTransactionModal = () => {
     transactionForm.date = new Date().toISOString().slice(0, 10);
     transactionForm.account_id = props.accounts[0]?.id ?? '';
     transactionForm.meal_record_id = null;
+    transactionForm.budget_period_id = null;
+    transactionForm.saving_id = null;
+    sourceType.value = 'free';
     transactionStep.value = 1;
     showTransactionModal.value = true;
 };
-const submitTransaction = () => transactionForm.post(transactionStore.url(), { preserveScroll: true, onSuccess: () => { transactionForm.reset(); transactionForm.type = 'expense'; transactionForm.date = new Date().toISOString().slice(0, 10); transactionForm.account_id = props.accounts[0]?.id ?? ''; transactionStep.value = 1; showTransactionModal.value = false; } });
+const submitTransaction = () => {
+    transactionForm.budget_period_id = sourceType.value === 'budget'
+        ? transactionForm.budget_period_id
+        : null;
+    transactionForm.saving_id = sourceType.value === 'saving'
+        ? transactionForm.saving_id
+        : null;
+    transactionForm.post(transactionStore.url(), {
+        preserveScroll: true,
+        onSuccess: () => {
+            transactionForm.reset();
+            transactionForm.type = 'expense';
+            transactionForm.date = new Date().toISOString().slice(0, 10);
+            transactionForm.account_id = props.accounts[0]?.id ?? '';
+            transactionStep.value = 1;
+            showTransactionModal.value = false;
+        },
+    });
+};
 
 const handleScroll = () => {
     isScrolled.value = window.scrollY > 40;
@@ -62,6 +105,29 @@ const handleScroll = () => {
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
+
+    const transactionQuery = new URLSearchParams(window.location.search);
+
+    if (transactionQuery.has('add')) {
+        openTransactionModal();
+
+        if (transactionQuery.has('budget_period')) {
+            sourceType.value = 'budget';
+            transactionForm.budget_period_id = Number(transactionQuery.get('budget_period'));
+            transactionForm.account_id = Number(transactionQuery.get('account_id'))
+                || props.accounts[0]?.id
+                || '';
+        } else if (transactionQuery.has('saving_id')) {
+            sourceType.value = 'saving';
+            transactionForm.saving_id = Number(transactionQuery.get('saving_id'));
+            const saving = props.savingOptions.find(
+                (item) => Number(item.id) === Number(transactionForm.saving_id),
+            );
+            transactionForm.account_id = props.accounts.find(
+                (account) => account.currency === saving?.currency,
+            )?.id ?? props.accounts[0]?.id ?? '';
+        }
+    }
 
     if (props.selectedMealRecord) {
         transactionForm.title = props.selectedMealRecord.name;
@@ -79,7 +145,9 @@ const shortcuts = [
     { icon: Plus, label: 'Add' },
     { icon: Camera, label: 'Scan', href: receiptScan.url() },
     { icon: MessageCircle, label: 'Chat', href: chatIndex.url() },
-    { icon: Flag, label: 'Plan' },
+    { icon: Utensils, label: 'Meals', href: mealsIndex.url() },
+    { icon: Bell, label: 'Reminder', href: remindersIndex.url() },
+    { icon: Flag, label: 'Plan', href: budgetIndex.url() },
 ];
 </script>
 
@@ -122,7 +190,7 @@ const shortcuts = [
                     Includes IDR {{ formatCurrency(summary.asset_value) }} in assets
                 </p>
             </div>
-            <div class="relative mt-7 grid grid-cols-4 gap-3 text-center text-base">
+            <div class="relative mt-7 grid grid-cols-3 gap-3 text-center text-base">
                 <div v-for="item in shortcuts" :key="item.label">
                     <Link v-if="item.href" :href="item.href" class="block"><span
                             class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#2457DA]">
@@ -136,6 +204,64 @@ const shortcuts = [
         </header>
 
         <main class="space-y-7 px-6 pt-6">
+            <section>
+                <div class="flex items-center justify-between px-1">
+                    <h2 class="font-semibold">Dana tersedia</h2>
+                    <div class="flex gap-3 text-sm text-[#2457DA]">
+                        <Link :href="budgetIndex.url()">Budget</Link>
+                        <Link :href="savingsIndex.url()">Savings</Link>
+                    </div>
+                </div>
+                <article
+                    v-if="fundCurrencies.length"
+                    class="mt-4 flex w-full items-stretch gap-3 rounded-xl bg-white p-3"
+                >
+                    <div class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl bg-[#F5F7FA] p-3 text-center">
+                        <Banknote class="mb-2 text-[#2457DA]" :size="19" />
+                        <span class="text-xs text-[#637083]">Saldo {{ activeFundCurrency }}</span>
+                        <strong class="mt-1 text-base font-semibold tracking-tight">
+                            {{ formatCurrency(funds[activeFundCurrency]?.free) }}
+                        </strong>
+                    </div>
+                    <div class="min-w-0 flex-1 overflow-hidden rounded-xl bg-[#F5F7FA] px-3">
+                        <div
+                            class="h-[88px] snap-y snap-mandatory overflow-y-auto text-center [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden"
+                            @scroll.passive="updateActiveFundCurrency"
+                        >
+                            <div
+                                v-for="currency in fundCurrencies"
+                                :key="`${currency}-actual`"
+                                class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
+                            >
+                                <Banknote class="text-[#2457DA]" :size="19" />
+                                <span class="text-xs text-[#637083]">Saldo aktual</span>
+                                <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].actual) }}</strong>
+                                <ArrowUpDown :size="12" class="text-[#2457DA]" />
+                            </div>
+                            <div
+                                v-for="currency in fundCurrencies"
+                                :key="`${currency}-budget`"
+                                class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
+                            >
+                                <Banknote class="text-[#2457DA]" :size="19" />
+                                <span class="text-xs text-[#637083]">Budget dicadangkan</span>
+                                <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].budget) }}</strong>
+                                <ArrowUpDown :size="12" class="text-[#2457DA]" />
+                            </div>
+                            <div
+                                v-for="currency in fundCurrencies"
+                                :key="`${currency}-savings`"
+                                class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
+                            >
+                                <Banknote class="text-[#2457DA]" :size="19" />
+                                <span class="text-xs text-[#637083]">Dana savings</span>
+                                <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].savings) }}</strong>
+                                <ArrowUpDown :size="12" class="text-[#2457DA]" />
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
             <section>
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold">This month</h2><span class="text-sm text-[#637083]">{{ new
@@ -196,16 +322,15 @@ const shortcuts = [
                     <ChevronRight :size="16" />
                 </Link>
             </div>
-            <div v-if="accounts.length"
-                class="-mx-6 mt-4 flex gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+            <div v-if="accounts.length" class="account-slider mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
                 <article v-for="account in accounts" :key="account.id"
-                    class="min-w-[220px] rounded-xl bg-[#F5F7FA] p-4">
+                    class="w-[260px] shrink-0 snap-start rounded-xl bg-[#F5F7FA] p-4">
                     <div class="flex items-center justify-between text-[#2457DA]"><span class="text-base font-medium">{{
                             account.name }}</span>
                         <Banknote :size="19" />
                     </div>
-                    <p class="mt-2 text-[23px] font-semibold tracking-tight">Rp {{
-                        formatCurrency(account.current_balance) }}
+                    <p class="mt-2 text-[23px] font-semibold tracking-tight">
+                        {{ formatAccountBalance(account) }}
                     </p>
                     <p class="mt-1 text-xs text-[#637083] capitalize">{{ account.type }}</p>
                 </article>
@@ -266,6 +391,39 @@ const shortcuts = [
                             @click="transactionStep = 3">Continue</button></div>
                 </template>
                 <template v-else>
+                    <label v-if="transactionForm.type === 'expense'" class="mt-5 block text-sm">Sumber dana
+                        <select v-model="sourceType" class="mt-1 w-full rounded-xl border border-slate-300 p-3">
+                            <option value="free">Uang bebas</option>
+                            <option value="budget">Cadangan budget</option>
+                            <option value="saving">Savings</option>
+                        </select>
+                    </label>
+                    <label v-if="transactionForm.type === 'expense' && sourceType === 'budget'" class="mt-3 block text-sm">
+                        Periode budget
+                        <select v-model="transactionForm.budget_period_id" class="mt-1 w-full rounded-xl border border-slate-300 p-3" required>
+                            <option :value="null">Pilih periode</option>
+                            <option
+                                v-for="period in budgetPeriods.filter((item) => Number(item.account_id) === Number(transactionForm.account_id) && transactionForm.date >= item.starts_on && transactionForm.date <= item.ends_on)"
+                                :key="period.id"
+                                :value="period.id"
+                            >
+                                {{ period.name }} · {{ period.starts_on }} – {{ period.ends_on }}
+                            </option>
+                        </select>
+                    </label>
+                    <label v-if="transactionForm.type === 'expense' && sourceType === 'saving'" class="mt-3 block text-sm">
+                        Savings
+                        <select v-model="transactionForm.saving_id" class="mt-1 w-full rounded-xl border border-slate-300 p-3" required>
+                            <option :value="null">Pilih savings</option>
+                            <option
+                                v-for="saving in savingOptions.filter((item) => item.currency === accounts.find((account) => Number(account.id) === Number(transactionForm.account_id))?.currency)"
+                                :key="saving.id"
+                                :value="saving.id"
+                            >
+                                {{ saving.name }}
+                            </option>
+                        </select>
+                    </label>
                     <label class="mt-5 block text-sm text-[#637083]">Amount
                         <FormInput v-model="transactionForm.amount" type="number" min="0.01" step="0.01" required
                             placeholder="Rp 0" variant="amount" />
@@ -301,6 +459,14 @@ const shortcuts = [
 </template>
 
 <style scoped>
+.account-slider {
+    scrollbar-width: none;
+}
+
+.account-slider::-webkit-scrollbar {
+    display: none;
+}
+
 .mini-header-enter-active,
 .mini-header-leave-active {
     transition: opacity 180ms ease, transform 180ms ease;

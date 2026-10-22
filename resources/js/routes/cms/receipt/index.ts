@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 /**
- * @see routes/web.php:187
+ * @see routes/web/cms.php:125
  * @route '/cms/receipt/scan'
  */
 export const scan = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ scan.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web.php:187
+ * @see routes/web/cms.php:125
  * @route '/cms/receipt/scan'
  */
 scan.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ scan.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web.php:187
+ * @see routes/web/cms.php:125
  * @route '/cms/receipt/scan'
  */
 scan.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -30,7 +30,7 @@ scan.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web.php:187
+ * @see routes/web/cms.php:125
  * @route '/cms/receipt/scan'
  */
 scan.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

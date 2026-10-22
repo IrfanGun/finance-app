@@ -13,6 +13,11 @@ use Illuminate\Validation\ValidationException;
 
 class AiTransactionService
 {
+    public function __construct(
+        private TransactionService $transactions,
+        private FundBalanceService $balances,
+    ) {}
+
     /**
      * @return Collection<int, Transaction>
      */
@@ -56,7 +61,7 @@ class AiTransactionService
         );
         $description = $data['description'] ?? null;
 
-        return $user->transactions()->create([
+        return $this->transactions->create($user, [
             'account_id' => $account->getKey(),
             'category_id' => $category?->getKey(),
             'type' => $data['transaction_type'],
@@ -187,36 +192,91 @@ class AiTransactionService
 
     public function update(User $user, int $transactionId, array $data): Transaction
     {
-        $transaction = $user->transactions()->findOrFail($transactionId);
-        $attributes = [];
+        return DB::transaction(function () use ($user, $transactionId, $data): Transaction {
+            $accountId = $user->transactions()->whereKey($transactionId)->value('account_id');
+            $account = $user->financialAccounts()
+                ->whereKey($accountId)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $transaction = $user->transactions()
+                ->whereKey($transactionId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if (array_key_exists('amount', $data)) {
-            $attributes['amount'] = $data['amount'];
-        }
+            if ($transaction->budget_period_id !== null || $transaction->saving_id !== null) {
+                throw ValidationException::withMessages([
+                    'transaction' => 'Transaksi terkait cadangan memerlukan alur koreksi khusus.',
+                ]);
+            }
 
-        if (array_key_exists('category', $data)) {
-            $attributes['category_id'] = $this->findCategory($user, $data['category'])?->getKey();
-        }
+            $attributes = [];
 
-        if (array_key_exists('description', $data)) {
-            $attributes['title'] = $data['description'] ?: $transaction->title;
-            $attributes['note'] = $data['description'];
-        }
+            if (array_key_exists('amount', $data)) {
+                $newAmount = (string) $data['amount'];
+                $difference = bcsub($newAmount, (string) $transaction->amount, 2);
+                $free = $this->balances->free($account);
 
-        if ($attributes === []) {
-            throw ValidationException::withMessages([
-                'transaction' => 'Setidaknya satu field harus diubah.',
-            ]);
-        }
+                if (($transaction->type === 'expense' && bccomp($difference, '0', 2) > 0
+                        && bccomp($free, $difference, 2) < 0)
+                    || ($transaction->type === 'income' && bccomp($difference, '0', 2) < 0
+                        && bccomp($free, bcmul($difference, '-1', 2), 2) < 0)) {
+                    throw ValidationException::withMessages([
+                        'amount' => 'Uang bebas tidak mencukupi untuk perubahan nominal.',
+                    ]);
+                }
 
-        $transaction->update($attributes);
+                $attributes['amount'] = $newAmount;
+            }
 
-        return $transaction->refresh()->load(['category', 'account']);
+            if (array_key_exists('category', $data)) {
+                $attributes['category_id'] = $this->findCategory($user, $data['category'])?->getKey();
+            }
+
+            if (array_key_exists('description', $data)) {
+                $attributes['title'] = $data['description'] ?: $transaction->title;
+                $attributes['note'] = $data['description'];
+            }
+
+            if ($attributes === []) {
+                throw ValidationException::withMessages([
+                    'transaction' => 'Setidaknya satu field harus diubah.',
+                ]);
+            }
+
+            $transaction->update($attributes);
+
+            return $transaction->refresh()->load(['category', 'account']);
+        }, attempts: 3);
     }
 
     public function delete(User $user, int $transactionId): void
     {
-        $user->transactions()->findOrFail($transactionId)->delete();
+        DB::transaction(function () use ($user, $transactionId): void {
+            $accountId = $user->transactions()->whereKey($transactionId)->value('account_id');
+            $account = $user->financialAccounts()
+                ->whereKey($accountId)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $transaction = $user->transactions()
+                ->whereKey($transactionId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($transaction->budget_period_id !== null || $transaction->saving_id !== null) {
+                throw ValidationException::withMessages([
+                    'transaction' => 'Transaksi terkait cadangan tidak dapat dihapus tanpa rekonsiliasi.',
+                ]);
+            }
+
+            if ($transaction->type === 'income'
+                && bccomp($this->balances->free($account), (string) $transaction->amount, 2) < 0) {
+                throw ValidationException::withMessages([
+                    'transaction' => 'Pemasukan tidak dapat dihapus karena dananya sudah dicadangkan.',
+                ]);
+            }
+
+            $transaction->delete();
+        }, attempts: 3);
     }
 
     private function findAccount(

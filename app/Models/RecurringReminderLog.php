@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'notified_at',
     'snoozed_until',
     'transaction_id',
+    'budget_period_id',
+    'completed_at',
+    'completion_operation_id',
 ])]
 class RecurringReminderLog extends Model
 {
@@ -25,6 +28,7 @@ class RecurringReminderLog extends Model
             'scheduled_at' => 'immutable_datetime',
             'notified_at' => 'immutable_datetime',
             'snoozed_until' => 'immutable_datetime',
+            'completed_at' => 'immutable_datetime',
         ];
     }
 
@@ -36,5 +40,10 @@ class RecurringReminderLog extends Model
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class);
+    }
+
+    public function budgetPeriod(): BelongsTo
+    {
+        return $this->belongsTo(BudgetPeriod::class);
     }
 }

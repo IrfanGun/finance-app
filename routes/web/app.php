@@ -4,6 +4,7 @@ use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AiChatTransactionController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssetDepreciationController;
+use App\Http\Controllers\BudgetPlanController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\MealRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RecurringReminderController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +64,52 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('transactions', TransactionController::class)
         ->only(['index', 'store']);
+    Route::post('transactions/{transaction}/void', [TransactionController::class, 'void'])
+        ->name('transactions.void');
+
+    Route::get('budget-plans/create', [BudgetPlanController::class, 'create'])
+        ->name('budget-plans.create');
+    Route::get('budget-plans', [BudgetPlanController::class, 'index'])
+        ->name('budget-plans.index');
+    Route::post('budget-plans', [BudgetPlanController::class, 'store'])
+        ->name('budget-plans.store');
+    Route::patch('budget-plans/{plan}', [BudgetPlanController::class, 'update'])
+        ->name('budget-plans.update');
+    Route::post('budget-plans/{plan}/status', [BudgetPlanController::class, 'status'])
+        ->name('budget-plans.status');
+    Route::get('budget-plans/{plan}', [BudgetPlanController::class, 'show'])
+        ->name('budget-plans.show');
+    Route::post('budget-periods/{period}/fund', [BudgetPlanController::class, 'fund'])
+        ->name('budget-periods.fund');
+    Route::post('budget-periods/{period}/claim', [BudgetPlanController::class, 'claim'])
+        ->name('budget-periods.claim');
+    Route::post('budget-claims/{claim}/reverse', [BudgetPlanController::class, 'reverseClaim'])
+        ->name('budget-claims.reverse');
+    Route::post('budget-periods/{period}/release', [BudgetPlanController::class, 'release'])
+        ->name('budget-periods.release');
+    Route::post('budget-periods/{period}/close', [BudgetPlanController::class, 'close'])
+        ->name('budget-periods.close');
+
+    Route::get('savings/create', [SavingController::class, 'create'])
+        ->name('savings.create');
+    Route::get('savings', [SavingController::class, 'index'])
+        ->name('savings.index');
+    Route::get('savings/{saving}/manage', [SavingController::class, 'manage'])
+        ->name('savings.manage');
+    Route::get('savings/{saving}', [SavingController::class, 'show'])
+        ->name('savings.show');
+    Route::post('savings', [SavingController::class, 'store'])
+        ->name('savings.store');
+    Route::patch('savings/{saving}', [SavingController::class, 'update'])
+        ->name('savings.update');
+    Route::post('savings/{saving}/allocate', [SavingController::class, 'allocate'])
+        ->name('savings.allocate');
+    Route::post('savings/{saving}/release', [SavingController::class, 'release'])
+        ->name('savings.release');
+    Route::post('savings/{saving}/archive', [SavingController::class, 'archive'])
+        ->name('savings.archive');
+    Route::post('saving-logs/{log}/reverse', [SavingController::class, 'reverseAllocation'])
+        ->name('saving-logs.reverse');
 
     Route::get('recurring-reminders', [RecurringReminderController::class, 'index'])
         ->name('recurring-reminders.index');
