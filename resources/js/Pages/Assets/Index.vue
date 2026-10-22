@@ -23,6 +23,20 @@ const createForm = ref(null);
 const businessToday = () => new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'Asia/Jakarta',
 }).format(new Date());
+const formatDate = (value) => {
+    if (!value) {
+        return '—';
+    }
+
+    const date = new Date(`${String(value).slice(0, 10)}T00:00:00Z`);
+
+    return new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC',
+    }).format(date);
+};
 const form = useForm({
     name: '',
     description: '',
@@ -181,7 +195,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                     <div class="min-w-0">
                         <h2 class="truncate font-semibold">{{ asset.name }}</h2>
                         <p class="mt-1 text-xs capitalize text-[#637083]">
-                            {{ asset.status }} · Dibeli {{ asset.purchase_date }}
+                            {{ asset.status }} · Dibeli {{ formatDate(asset.purchase_date) }}
                         </p>
                     </div>
                     <ChevronRight :size="18" class="mt-1 shrink-0 text-[#2457DA]" />

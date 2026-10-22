@@ -1,5 +1,12 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import {
+    computed,
+    nextTick,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+} from 'vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Bell, Camera, ChevronRight, Flag, MessageCircle, Plus, Utensils } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
@@ -32,6 +39,10 @@ const props = defineProps({
     funds: { type: Object, default: () => ({}) },
     budgetPeriods: { type: Array, default: () => [] },
     savingOptions: { type: Array, default: () => [] },
+    wealthTrend: {
+        type: Object,
+        default: () => ({ series: [], change: 0, change_percentage: 0 }),
+    },
 });
 
 const userName = page.props.auth?.user?.name ?? 'User';
@@ -54,12 +65,85 @@ const transactionForm = useForm({
 const isScrolled = ref(false);
 const fundCurrencies = Object.keys(props.funds);
 const activeFundCurrency = ref(fundCurrencies[0] ?? 'IDR');
+const wealthChartElement = ref(null);
+let wealthChart = null;
+let apexChartsConstructor = null;
 const updateActiveFundCurrency = (event) => {
     const slideIndex = Math.round(event.target.scrollTop / 88);
     const currencyIndex = slideIndex % fundCurrencies.length;
     activeFundCurrency.value = fundCurrencies[Math.min(currencyIndex, fundCurrencies.length - 1)] ?? 'IDR';
 };
 const formatCurrency = (amount) => new Intl.NumberFormat('id-ID').format(Number(amount ?? 0));
+const wealthChartOptions = computed(() => ({
+    series: [{
+        name: 'Kekayaan bersih',
+        data: props.wealthTrend.series.map((point) => ({
+            x: new Date(`${point.date}T00:00:00Z`).getTime(),
+            y: Number(point.value),
+        })),
+    }],
+    chart: {
+        type: 'area',
+        height: 64,
+        width: 128,
+        parentHeightOffset: 0,
+        sparkline: { enabled: true },
+        toolbar: { show: false },
+        animations: { enabled: false },
+    },
+    colors: [props.wealthTrend.change_percentage >= 0 ? '#6EE7B7' : '#FCA5A5'],
+    dataLabels: { enabled: false },
+    fill: {
+        type: 'gradient',
+        gradient: {
+            opacityFrom: 0.3,
+            opacityTo: 0.02,
+        },
+    },
+    grid: { show: false, padding: { top: 3, right: 0, bottom: 0, left: 0 } },
+    markers: { size: 0, hover: { size: 3 } },
+    stroke: {
+        curve: 'monotoneCubic',
+        width: 3,
+        lineCap: 'round',
+    },
+    tooltip: {
+        x: { format: 'dd MMM' },
+        y: { formatter: (amount) => `Rp ${formatCurrency(amount)}` },
+    },
+    xaxis: { type: 'datetime' },
+    yaxis: { show: false },
+}));
+const renderWealthChart = async () => {
+    await nextTick();
+
+    if (!wealthChartElement.value) {
+        wealthChart?.destroy();
+        wealthChart = null;
+
+        return;
+    }
+
+    if (wealthChart) {
+        await wealthChart.updateOptions(wealthChartOptions.value);
+
+        return;
+    }
+
+    if (!apexChartsConstructor) {
+        const apexChartsModule = await import('apexcharts/core');
+
+        await import('apexcharts/area');
+
+        apexChartsConstructor = apexChartsModule.default;
+    }
+
+    wealthChart = new apexChartsConstructor(
+        wealthChartElement.value,
+        wealthChartOptions.value,
+    );
+    await wealthChart.render();
+};
 const formatAccountBalance = (account) => new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: account.currency || 'IDR',
@@ -67,6 +151,12 @@ const formatAccountBalance = (account) => new Intl.NumberFormat('id-ID', {
 }).format(Number(account.current_balance ?? 0));
 const transactionCategory = (transaction) => transaction.category?.name ?? 'Uncategorized';
 const transactionAmount = (transaction) => `${transaction.type === 'income' ? '+' : '-'} Rp ${formatCurrency(transaction.amount)}`;
+
+watch(wealthChartOptions, renderWealthChart, { deep: true });
+
+onMounted(renderWealthChart);
+onUnmounted(() => wealthChart?.destroy());
+
 const openTransactionModal = () => {
     transactionForm.reset();
     transactionForm.type = 'expense';
@@ -169,39 +259,56 @@ const shortcuts = [
     </Transition>
 
     <div class="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-app pb-24 text-app-heading">
-        <header
-            class="relative overflow-hidden bg-gradient-to-br from-[#11297A] via-[#1F4AC2] to-[#2969E6] px-6 pb-10 pt-5 text-white">
+        <div class="mx-6 mt-5 flex items-center justify-between">
+            <div>
+                <p class="text-sm text-[#637083]">Good morning,</p>
+                <h1 class="text-2xl font-semibold">{{ userName }}</h1>
+            </div>
             <div
-                class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border-[80px] border-white/10">
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA] shadow-sm">
+                {{ userName.slice(0, 2).toUpperCase() }}
             </div>
-            <div class="relative mt-5 flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-blue-100">Good morning,</p>
-                    <h1 class="text-2xl font-semibold">{{ userName }}</h1>
-                </div>
-                <div
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA]">
-                    {{ userName.slice(0, 2).toUpperCase() }}</div>
-            </div>
-            <div class="relative mt-7">
-                <p class="text-sm text-blue-100">Net worth estimate</p>
-                <p class="mt-1 text-[32px] font-semibold">Rp {{ formatCurrency(summary.balance) }}</p>
+        </div>
+
+        <header
+            class="relative mx-5 mt-5 overflow-hidden rounded-2xl bg-gradient-to-br from-[#11297A] via-[#1F4AC2] to-[#2969E6] px-6 py-7 text-white shadow-[0_16px_36px_rgba(31,74,194,0.2)]">
+            <div
+                ref="wealthChartElement"
+                class="pointer-events-none absolute right-3 top-4 h-16 w-32"
+                aria-hidden="true"
+            ></div>
+            <div class="relative">
+                <p class="text-sm text-blue-100">Estimasi kekayaan bersih</p>
+                <p class="mt-1 text-[32px] font-semibold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
+                <p
+                    class="mt-1 text-xs font-medium"
+                    :class="wealthTrend.change_percentage >= 0 ? 'text-emerald-200' : 'text-red-200'"
+                >
+                    {{ wealthTrend.change_percentage >= 0 ? '+' : '' }}{{ wealthTrend.change_percentage }}%
+                    dibanding 1 bulan lalu
+                </p>
                 <p class="mt-1 text-xs text-blue-100">
                     Includes IDR {{ formatCurrency(summary.asset_value) }} in assets
                 </p>
             </div>
-            <div class="relative mt-7 grid grid-cols-3 gap-3 text-center text-base">
-                <div v-for="item in shortcuts" :key="item.label">
-                    <Link v-if="item.href" :href="item.href" class="block"><span
-                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#2457DA]">
-                            <component :is="item.icon" :size="24" />
-                        </span><span class="mt-2 block">{{ item.label }}</span></Link><template v-else><span
-                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#2457DA]">
-                            <component :is="item.icon" :size="24" />
-                        </span><span class="mt-2 block">{{ item.label }}</span></template>
-                </div>
-            </div>
         </header>
+
+        <nav class="mx-5 mt-5 grid grid-cols-3 gap-x-3 gap-y-5 rounded-2xl bg-white px-3 py-4 text-center text-xs font-medium text-[#26354C]">
+            <div v-for="item in shortcuts" :key="item.label">
+                <Link v-if="item.href" :href="item.href" class="block">
+                    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF3FF] text-[#2457DA] transition hover:-translate-y-0.5">
+                        <component :is="item.icon" :size="24" />
+                    </span>
+                    <span class="mt-2 block">{{ item.label }}</span>
+                </Link>
+                <template v-else>
+                    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF3FF] text-[#2457DA]">
+                        <component :is="item.icon" :size="24" />
+                    </span>
+                    <span class="mt-2 block">{{ item.label }}</span>
+                </template>
+            </div>
+        </nav>
 
         <main class="space-y-7 px-6 pt-6">
             <section>
@@ -322,17 +429,29 @@ const shortcuts = [
                     <ChevronRight :size="16" />
                 </Link>
             </div>
-            <div v-if="accounts.length" class="account-slider mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-                <article v-for="account in accounts" :key="account.id"
-                    class="w-[260px] shrink-0 snap-start rounded-xl bg-[#F5F7FA] p-4">
-                    <div class="flex items-center justify-between text-[#2457DA]"><span class="text-base font-medium">{{
-                            account.name }}</span>
-                        <Banknote :size="19" />
+            <div v-if="accounts.length" class="account-slider mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+                <article
+                    v-for="(account, index) in accounts"
+                    :key="account.id"
+                    class="account-card relative isolate flex h-40 w-[280px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-2xl p-5 text-white"
+                    :class="`account-card--${index % 4}`"
+                >
+                    <div class="relative z-10 flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[22px] font-black italic leading-none tracking-tight">VISA</p>
+                            <p class="mt-2 truncate text-xs font-medium text-white/75">{{ account.name }}</p>
+                        </div>
+                        <Banknote :size="22" class="shrink-0 text-white/85" />
                     </div>
-                    <p class="mt-2 text-[23px] font-semibold tracking-tight">
-                        {{ formatAccountBalance(account) }}
-                    </p>
-                    <p class="mt-1 text-xs text-[#637083] capitalize">{{ account.type }}</p>
+                    <div class="relative z-10">
+                        <p class="text-[21px] font-semibold tracking-tight">
+                            {{ formatAccountBalance(account) }}
+                        </p>
+                        <div class="mt-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.16em] text-white/75">
+                            <span class="capitalize">{{ account.type }}</span>
+                            <span>{{ account.currency || 'IDR' }}</span>
+                        </div>
+                    </div>
                 </article>
             </div>
             <p v-else class="mt-4 text-sm text-[#637083]">No accounts yet.</p>
@@ -465,6 +584,53 @@ const shortcuts = [
 
 .account-slider::-webkit-scrollbar {
     display: none;
+}
+
+.account-card {
+    background: linear-gradient(135deg, #2457da 0%, #1686dc 55%, #25b8dc 100%);
+    isolation: isolate;
+}
+
+.account-card::before,
+.account-card::after {
+    position: absolute;
+    z-index: -1;
+    content: '';
+    pointer-events: none;
+}
+
+.account-card::before {
+    inset: -35% -12% auto auto;
+    width: 78%;
+    height: 170%;
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 3%);
+    box-shadow: 0 0 24px rgb(255 255 255 / 6%);
+    backdrop-filter: blur(2px);
+    transform: rotate(-28deg);
+}
+
+.account-card::after {
+    inset: auto -20% -70% auto;
+    width: 85%;
+    height: 125%;
+    border: 1px solid rgb(255 255 255 / 18%);
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(255 255 255 / 8%), transparent 65%);
+    transform: rotate(-24deg);
+}
+
+.account-card--1 {
+    background: linear-gradient(135deg, #a92346 0%, #dc3b4f 55%, #f27b69 100%);
+}
+
+.account-card--2 {
+    background: linear-gradient(135deg, #a96312 0%, #d99724 55%, #efc35d 100%);
+}
+
+.account-card--3 {
+    background: linear-gradient(135deg, #11664d 0%, #16966c 55%, #54c995 100%);
 }
 
 .mini-header-enter-active,
