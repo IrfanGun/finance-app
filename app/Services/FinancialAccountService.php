@@ -6,6 +6,7 @@ use App\Models\BudgetPeriod;
 use App\Models\FinancialAccount;
 use App\Models\SavingLog;
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -58,14 +59,13 @@ class FinancialAccountService
             }
 
             if (isset($data['opening_balance'])) {
-                $decrease = bcsub(
-                    (string) $lockedAccount->opening_balance,
-                    (string) $data['opening_balance'],
-                    2,
-                );
+                $decrease = BigDecimal::of((string) $lockedAccount->opening_balance)
+                    ->minus((string) $data['opening_balance'])
+                    ->toScale(2);
 
-                if (bccomp($decrease, '0', 2) > 0
-                    && bccomp($this->balances->free($lockedAccount), $decrease, 2) < 0) {
+                if ($decrease->compareTo('0') > 0
+                    && BigDecimal::of($this->balances->free($lockedAccount))
+                        ->compareTo($decrease) < 0) {
                     throw ValidationException::withMessages([
                         'opening_balance' => 'Saldo awal tidak dapat diturunkan melebihi uang bebas.',
                     ]);
@@ -84,7 +84,8 @@ class FinancialAccountService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (bccomp($this->balances->reserved($lockedAccount), '0', 2) > 0) {
+            if (BigDecimal::of($this->balances->reserved($lockedAccount))
+                ->compareTo('0') > 0) {
                 throw ValidationException::withMessages([
                     'account' => 'Selesaikan seluruh cadangan sebelum menghapus akun.',
                 ]);
