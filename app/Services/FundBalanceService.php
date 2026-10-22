@@ -6,6 +6,7 @@ use App\Models\BudgetPeriod;
 use App\Models\FinancialAccount;
 use App\Models\Saving;
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Illuminate\Support\Facades\DB;
 
 class FundBalanceService
@@ -15,10 +16,9 @@ class FundBalanceService
         $income = $account->transactions()->where('type', 'income')->sum('amount');
         $expense = $account->transactions()->where('type', 'expense')->sum('amount');
 
-        return bcsub(
-            bcadd((string) $account->opening_balance, (string) $income, 2),
+        return $this->subtract(
+            $this->add((string) $account->opening_balance, (string) $income),
             (string) $expense,
-            2,
         );
     }
 
@@ -27,14 +27,12 @@ class FundBalanceService
         $spent = $period->transactions()->where('type', 'expense')->sum('amount');
         $claimed = $period->claims()->whereNull('reversed_at')->sum('amount');
 
-        return bcsub(
-            bcsub(
-                bcsub((string) $period->allocated_amount, (string) $spent, 2),
+        return $this->subtract(
+            $this->subtract(
+                $this->subtract((string) $period->allocated_amount, (string) $spent),
                 (string) $claimed,
-                2,
             ),
             (string) $period->released_amount,
-            2,
         );
     }
 
@@ -49,7 +47,7 @@ class FundBalanceService
         $allocated = (clone $logs)->where('type', 'allocation')->sum('amount');
         $released = (clone $logs)->where('type', 'release')->sum('amount');
 
-        return bcsub((string) $allocated, (string) $released, 2);
+        return $this->subtract((string) $allocated, (string) $released);
     }
 
     public function goalContribution(BudgetPeriod $period): string
@@ -59,7 +57,7 @@ class FundBalanceService
         $allocated = (clone $logs)->where('type', 'allocation')->sum('amount');
         $released = (clone $logs)->where('type', 'release')->sum('amount');
 
-        return bcsub((string) $allocated, (string) $released, 2);
+        return $this->subtract((string) $allocated, (string) $released);
     }
 
     public function reserved(FinancialAccount $account): string
@@ -74,7 +72,7 @@ class FundBalanceService
         $budget = '0.00';
 
         foreach ($periods as $period) {
-            $budget = bcadd($budget, $this->periodRemaining($period), 2);
+            $budget = $this->add($budget, $this->periodRemaining($period));
         }
 
         $savingLogs = DB::table('saving_logs')
@@ -84,12 +82,15 @@ class FundBalanceService
         $allocated = (clone $savingLogs)->where('saving_logs.type', 'allocation')->sum('saving_logs.amount');
         $released = (clone $savingLogs)->where('saving_logs.type', 'release')->sum('saving_logs.amount');
 
-        return bcadd($budget, bcsub((string) $allocated, (string) $released, 2), 2);
+        return $this->add(
+            $budget,
+            $this->subtract((string) $allocated, (string) $released),
+        );
     }
 
     public function free(FinancialAccount $account): string
     {
-        return bcsub($this->actual($account), $this->reserved($account), 2);
+        return $this->subtract($this->actual($account), $this->reserved($account));
     }
 
     /**
@@ -115,19 +116,33 @@ class FundBalanceService
                 ->where('saving_logs.financial_account_id', $account->id);
             $allocated = (clone $savingLogs)->where('saving_logs.type', 'allocation')->sum('saving_logs.amount');
             $released = (clone $savingLogs)->where('saving_logs.type', 'release')->sum('saving_logs.amount');
-            $savings = bcsub((string) $allocated, (string) $released, 2);
-            $budget = bcsub($reserved, $savings, 2);
+            $savings = $this->subtract((string) $allocated, (string) $released);
+            $budget = $this->subtract($reserved, $savings);
 
             foreach ([
                 'actual' => $actual,
                 'budget' => $budget,
                 'savings' => $savings,
-                'free' => bcsub($actual, $reserved, 2),
+                'free' => $this->subtract($actual, $reserved),
             ] as $key => $value) {
-                $totals[$currency][$key] = bcadd($totals[$currency][$key], $value, 2);
+                $totals[$currency][$key] = $this->add($totals[$currency][$key], $value);
             }
         }
 
         return $totals;
+    }
+
+    private function add(string $left, string $right): string
+    {
+        return (string) BigDecimal::of($left)
+            ->plus($right)
+            ->toScale(2);
+    }
+
+    private function subtract(string $left, string $right): string
+    {
+        return (string) BigDecimal::of($left)
+            ->minus($right)
+            ->toScale(2);
     }
 }
