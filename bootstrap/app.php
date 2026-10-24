@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+$bcmathPolyfill = __DIR__.'/../app/Support/bcmath_polyfill.php';
+
+if (is_file($bcmathPolyfill)) {
+    require_once $bcmathPolyfill;
+}
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
