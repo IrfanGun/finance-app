@@ -48,6 +48,7 @@ const form = useForm({
 
 const startCreate = () => {
     form.reset();
+    form.clearErrors();
     form.currency = props.currencyOptions[0] ?? 'IDR';
     form.purchase_date = businessToday();
     currentStep.value = 1;
@@ -70,6 +71,7 @@ const backCreateStep = () => {
 };
 
 const toggleDepreciation = (enabled) => {
+    form.clearErrors();
     form.depreciation = enabled
         ? {
             depreciation_type: 'fixed',
@@ -129,7 +131,7 @@ const removeRateStep = (depreciation, index) => {
 };
 
 const continueToDepreciation = () => {
-    if (!createForm.value?.reportValidity()) {
+    if (createForm.value?.reportValidity() === false) {
         return;
     }
 
@@ -137,19 +139,28 @@ const continueToDepreciation = () => {
 };
 
 const save = () => {
-    if (!createForm.value?.reportValidity()) {
-        return;
-    }
-
     form.post(store.url(), {
         onSuccess: () => {
             closeCreate();
             form.reset();
         },
         onError: (errors) => {
-            if (Object.keys(errors).some((key) => key.startsWith('depreciation'))) {
-                currentStep.value = 2;
-            }
+            const hasAssetDetailsErrors = [
+                'name',
+                'currency',
+                'purchase_price',
+                'purchase_date',
+            ].some((key) => errors[key]);
+
+            const hasDepreciationErrors = Object.keys(errors).some(
+                (key) => key.startsWith('depreciation'),
+            );
+
+            currentStep.value = hasAssetDetailsErrors
+                ? 1
+                : hasDepreciationErrors
+                    ? 2
+                    : currentStep.value;
         },
     });
 };
@@ -268,6 +279,18 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                 novalidate
                 @submit.prevent="save"
             >
+                <div
+                    v-if="Object.keys(form.errors).length"
+                    class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+                    role="alert"
+                >
+                    <p
+                        v-for="(error, key) in form.errors"
+                        :key="key"
+                    >
+                        {{ error }}
+                    </p>
+                </div>
                 <div v-if="currentStep === 1" class="space-y-4">
                     <div>
                         <h2 class="text-lg font-semibold">Detail aset</h2>

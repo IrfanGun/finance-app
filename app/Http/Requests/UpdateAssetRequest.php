@@ -59,6 +59,7 @@ class UpdateAssetRequest extends FormRequest
                 'boolean',
             ],
             'depreciation.depreciation_value' => [
+                'sometimes',
                 'exclude_if:depreciation.is_tiered,1',
                 'required_unless:depreciation.is_tiered,1',
                 'numeric',

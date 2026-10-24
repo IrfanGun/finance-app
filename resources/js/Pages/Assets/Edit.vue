@@ -41,6 +41,7 @@ const form = useForm({
 const save = () => form.patch(update.url(props.asset.id));
 
 const toggleDepreciation = (enabled) => {
+    form.clearErrors();
     form.depreciation = enabled
         ? {
             depreciation_type: 'fixed',
@@ -189,15 +190,27 @@ const removeRateStep = (index) => {
                     </p>
                 </label>
 
-                <label class="flex items-center gap-3 rounded-xl bg-[#F5F7FA] p-4 text-sm font-medium">
-                    <input
-                        type="checkbox"
-                        :checked="form.depreciation !== null"
-                        class="rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]"
-                        @change="toggleDepreciation($event.target.checked)"
-                    />
-                    Atur perubahan nilai otomatis
-                </label>
+                <section class="space-y-3 rounded-xl border border-[#DCE3EE] bg-[#F8FAFF] p-4">
+                    <div>
+                        <h2 class="font-semibold">Depresiasi dan apresiasi</h2>
+                    </div>
+                    <label class="flex cursor-pointer items-start gap-3 rounded-lg bg-white p-3 text-sm font-medium">
+                        <input
+                            type="checkbox"
+                            :checked="form.depreciation !== null"
+                            class="mt-0.5 rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]"
+                            @change="toggleDepreciation($event.target.checked)"
+                        />
+                        <span>
+                            <span class="block">Aktifkan perubahan nilai otomatis</span>
+                            <span class="mt-1 block text-xs font-normal leading-5 text-[#637083]">
+                                {{ form.depreciation
+                                    ? 'Pengaturan di bawah ini akan dipakai untuk menghitung perubahan nilai aset.'
+                                    : 'Belum ada jadwal perubahan nilai. Centang untuk mengatur depresiasi atau apresiasi.' }}
+                            </span>
+                        </span>
+                    </label>
+                </section>
 
                 <div v-if="form.depreciation" class="space-y-4">
                     <label class="block text-sm font-medium">
