@@ -72,7 +72,7 @@ class TransactionService
                 if ($plan->type !== 'spending'
                     || $period->status !== 'open'
                     || $period->financial_account_id !== $account->id
-                    || $period->currency !== $account->currency
+                    || $period->currency !== $account->currencyCode()
                     || $data['date'] < $period->starts_on->toDateString()
                     || $data['date'] > $period->ends_on->toDateString()
                     || bccomp($this->balances->periodRemaining($period), (string) $data['amount'], 2) < 0) {
@@ -98,7 +98,7 @@ class TransactionService
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                if ($saving->currency !== $account->currency
+                if ($saving->currency !== $account->currencyCode()
                     || bccomp($this->balances->savingBalance($saving, $account->id), (string) $data['amount'], 2) < 0) {
                     throw ValidationException::withMessages([
                         'saving_id' => 'Dana savings pada akun ini tidak mencukupi.',

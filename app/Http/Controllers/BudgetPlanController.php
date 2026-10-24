@@ -31,15 +31,22 @@ class BudgetPlanController extends Controller
         Request $request,
         FundBalanceService $balances,
         bool $createMode,
+        ?int $selectedPlanId = null,
     ): Response {
         $user = $request->user();
-        $plans = $user->budgetPlans()
+        $plansQuery = $user->budgetPlans()
             ->with([
                 'pocket',
                 'items',
                 'periods' => fn ($query) => $query->with('claims.pocket')->orderByDesc('starts_on'),
             ])
-            ->latest()
+            ->latest();
+
+        if ($selectedPlanId !== null) {
+            $plansQuery->whereKey($selectedPlanId);
+        }
+
+        $plans = $plansQuery
             ->get()
             ->map(function (BudgetPlan $plan) use ($balances): array {
                 $periods = $plan->periods->map(function (BudgetPeriod $period) use ($balances, $plan): array {
@@ -88,14 +95,19 @@ class BudgetPlanController extends Controller
                 ];
             });
 
+        abort_if($selectedPlanId !== null && $plans->isEmpty(), 404);
+
         return Inertia::render('BudgetPlans/Index', [
             'createMode' => $createMode,
+            'selectedPlanId' => $selectedPlanId,
             'plans' => $plans,
             'legacyBudgets' => $user->budgets()
                 ->with('category')
                 ->orderByDesc('period_start')
                 ->get(),
-            'accounts' => $user->financialAccounts()->orderBy('name')->get(['id', 'name', 'currency']),
+            'accounts' => $user->financialAccounts()
+                ->orderBy('name')
+                ->get(['id', 'name', 'type', 'currency']),
             'categories' => $user->categories()->where('is_active', true)->orderBy('name')->get(['id', 'name', 'type']),
             'savings' => $user->savings()
                 ->where('status', 'active')
@@ -119,11 +131,12 @@ class BudgetPlanController extends Controller
         ]);
     }
 
-    public function show(Request $request, int $plan): RedirectResponse
-    {
-        $request->user()->budgetPlans()->findOrFail($plan);
-
-        return redirect()->route('budget-plans.index', ['plan' => $plan]);
+    public function show(
+        Request $request,
+        int $plan,
+        FundBalanceService $balances,
+    ): Response {
+        return $this->renderPage($request, $balances, false, $plan);
     }
 
     public function store(BudgetPlanRequest $request, FundService $funds): RedirectResponse

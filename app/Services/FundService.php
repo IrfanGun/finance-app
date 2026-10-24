@@ -35,7 +35,9 @@ class FundService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($account->currency !== $data['currency']) {
+            $accountCurrency = $account->currencyCode();
+
+            if ($accountCurrency !== $data['currency']) {
                 $this->fail('currency', 'Mata uang plan harus sama dengan akun.');
             }
 
@@ -52,7 +54,7 @@ class FundService
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                if ($saving->currency !== $account->currency
+                if ($saving->currency !== $accountCurrency
                     || $saving->target_amount !== null
                     || $saving->target_date !== null
                     || $saving->status !== 'active'
@@ -174,7 +176,7 @@ class FundService
                 ->firstOrFail();
             $account = $accounts->get($data['financial_account_id']);
 
-            if ($account === null || $account->currency !== $data['currency']) {
+            if ($account === null || $account->currencyCode() !== $data['currency']) {
                 $this->fail('financial_account_id', 'Akun atau mata uang tidak valid.');
             }
 
@@ -533,7 +535,7 @@ class FundService
                 ->firstOrFail();
 
             if ($lockedSaving->status !== 'active'
-                || $lockedSaving->currency !== $lockedAccount->currency
+                || $lockedSaving->currency !== $lockedAccount->currencyCode()
                 || bccomp($amount, '0', 2) <= 0) {
                 $this->fail('amount', 'Savings, akun, atau nominal tidak valid.');
             }
@@ -642,7 +644,7 @@ class FundService
                 return;
             }
 
-            if ($lockedSaving->currency !== $lockedAccount->currency
+            if ($lockedSaving->currency !== $lockedAccount->currencyCode()
                 || bccomp($amount, '0', 2) <= 0
                 || bccomp($this->balances->savingBalance($lockedSaving, $account->id), $amount, 2) < 0) {
                 $this->fail('amount', 'Dana savings pada akun ini tidak mencukupi.');

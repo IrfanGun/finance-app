@@ -1,210 +1,122 @@
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
-    categories: { type: Array, default: () => [] },
+    days: { type: Array, default: () => [] },
 });
 
-const showAllCategories = ref(false);
-const chartElement = ref(null);
-let chart = null;
-let apexChartsConstructor = null;
+const weekdayLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+const today = new Date().toLocaleDateString('sv-SE');
+const selectedDate = ref(today);
 
 const formatCurrency = (amount) =>
     new Intl.NumberFormat('id-ID').format(Number(amount ?? 0));
-const formatCompactCurrency = (amount) =>
-    new Intl.NumberFormat('id-ID', {
-        notation: 'compact',
-        maximumFractionDigits: 1,
-    }).format(Number(amount ?? 0));
+const formatDayDate = (date) =>
+    new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'long',
+    }).format(new Date(`${date}T00:00:00`));
 
-const spendingCategories = computed(() => {
-    const total = props.categories.reduce(
-        (sum, category) => sum + Number(category.amount),
-        0,
-    );
+const chartDays = computed(() => {
+    const maximum = Math.max(...props.days.map((day) => Number(day.total)), 0);
 
-    return props.categories.map((category) => ({
-        ...category,
-        amount: Number(category.amount),
-        percentage: total
-            ? Math.round((Number(category.amount) / total) * 100)
-            : 0,
+    return props.days.map((day, index) => ({
+        ...day,
+        label: weekdayLabels[index],
+        barHeight: maximum > 0
+            ? Math.max((Number(day.total) / maximum) * 100, day.total > 0 ? 8 : 4)
+            : 4,
     }));
 });
 
-const spendingTotal = computed(() =>
-    spendingCategories.value.reduce((sum, category) => sum + category.amount, 0),
+const selectedDay = computed(() =>
+    chartDays.value.find((day) => day.date === selectedDate.value)
+        ?? chartDays.value.find((day) => day.total > 0)
+        ?? chartDays.value[0],
 );
-const visibleCategories = computed(() => spendingCategories.value.slice(0, 5));
-const chartOptions = computed(() => ({
-    series: spendingCategories.value.map((category) => category.amount),
-    chart: {
-        type: 'donut',
-        height: 208,
-        parentHeightOffset: 0,
-        toolbar: { show: false },
-        animations: { enabled: false },
-    },
-    labels: spendingCategories.value.map((category) => category.name),
-    colors: spendingCategories.value.map((category) => category.color),
-    plotOptions: {
-        pie: {
-            borderRadius: 8,
-            spacing: 1.5,
-            donut: { size: '62%' },
-        },
-    },
-    stroke: { width: 0 },
-    dataLabels: { enabled: false },
-    legend: { show: false },
-    tooltip: {
-        y: {
-            formatter: (amount) => `Rp ${formatCurrency(amount)}`,
-        },
-    },
-    responsive: [
-        {
-            breakpoint: 768,
-            options: { chart: { height: 176 } },
-        },
-    ],
-}));
+const weeklyTotal = computed(() =>
+    chartDays.value.reduce((total, day) => total + Number(day.total), 0),
+);
 
-const renderChart = async () => {
-    await nextTick();
-
-    if (!chartElement.value) {
-        chart?.destroy();
-        chart = null;
-
-        return;
-    }
-
-    if (chart) {
-        await chart.updateOptions(chartOptions.value);
-
-        return;
-    }
-
-    if (!apexChartsConstructor) {
-        const apexChartsModule = await import('apexcharts/core');
-
-        await import('apexcharts/pie');
-
-        apexChartsConstructor = apexChartsModule.default;
-    }
-
-    chart = new apexChartsConstructor(chartElement.value, chartOptions.value);
-    await chart.render();
+const selectDay = (day) => {
+    selectedDate.value = day.date;
 };
-
-watch(chartOptions, renderChart, { deep: true });
-
-onMounted(renderChart);
-onUnmounted(() => chart?.destroy());
 </script>
 
 <template>
     <div class="w-full">
-        <div v-if="spendingCategories.length" class="mt-5 flex items-center gap-2">
-            <div
-                class="relative h-44 w-44 shrink-0 rounded-full md:h-52 md:w-52"
-                aria-hidden="true"
-            >
-                <div ref="chartElement" class="h-full w-full"></div>
-                <div class="absolute inset-8 flex flex-col items-center justify-center rounded-full bg-white md:inset-10">
-                    <span class="text-[10px] text-[#637083]">Total</span>
-                    <strong class="max-w-full truncate px-1 text-xs">
-                        Rp {{ formatCompactCurrency(spendingTotal) }}
-                    </strong>
+        <div v-if="chartDays.length" class="mt-4">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-xs text-[#637083]">Total minggu ini</p>
+                    <p class="mt-1 text-lg font-semibold">Rp {{ formatCurrency(weeklyTotal) }}</p>
+                </div>
+                <p class="pt-1 text-xs text-[#637083]">Senin – Minggu</p>
+            </div>
+
+            <div class="relative mt-4 h-36 border-b border-[#E8ECF2]">
+                <div class="pointer-events-none absolute inset-x-0 top-0 border-t border-dashed border-[#E8ECF2]"></div>
+                <div class="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-[#E8ECF2]"></div>
+                <div class="flex h-full items-end justify-between gap-1 px-1">
+                    <button
+                        v-for="day in chartDays"
+                        :key="day.date"
+                        type="button"
+                        class="group relative z-10 flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2 rounded-t-lg pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2457DA]"
+                        :aria-label="`${day.label}, ${formatDayDate(day.date)}: Rp ${formatCurrency(day.total)}`"
+                        :aria-pressed="selectedDay?.date === day.date"
+                        @click="selectDay(day)"
+                    >
+                        <span
+                            v-if="selectedDay?.date === day.date && day.total > 0"
+                            class="absolute top-0 z-20 whitespace-nowrap rounded-md bg-[#17243A] px-2 py-1 text-[10px] font-medium text-white shadow-sm"
+                        >
+                            Rp {{ formatCurrency(day.total) }}
+                        </span>
+                        <span class="flex w-full flex-1 items-end justify-center">
+                            <span
+                                class="block w-6 rounded-t-md transition-colors sm:w-8"
+                                :class="selectedDay?.date === day.date ? 'bg-[#2457DA]' : 'bg-[#F4C05A] group-hover:bg-[#E8AD35]'"
+                                :style="{ height: `${day.barHeight}%` }"
+                            ></span>
+                        </span>
+                        <span
+                            class="pb-2 text-[10px] font-medium"
+                            :class="selectedDay?.date === day.date ? 'text-[#2457DA]' : 'text-[#637083]'"
+                        >
+                            {{ day.label }}
+                        </span>
+                    </button>
                 </div>
             </div>
 
-            <div class="min-w-0 flex-1">
-                <ul class="space-y-3">
-                    <li
-                        v-for="category in visibleCategories"
-                        :key="category.id"
-                        class="min-w-0"
-                    >
-                        <div class="flex min-w-0 items-center justify-between gap-1 text-sm">
-                            <div class="flex min-w-0 items-center gap-2">
-                                <span
-                                    class="h-2.5 w-2.5 shrink-0 rounded-full"
-                                    :style="{ backgroundColor: category.color }"
-                                ></span>
-                                <span class="truncate">{{ category.name }}</span>
-                            </div>
-                            <strong class="shrink-0">{{ category.percentage }}%</strong>
-                        </div>
-                        <p class="truncate pl-4 text-xs text-[#637083]">
-                            Rp {{ formatCurrency(category.amount) }}
-                        </p>
-                    </li>
-                </ul>
-                <button
-                    v-if="spendingCategories.length > 5"
-                    type="button"
-                    class="mt-3 text-sm font-medium text-[#2457DA]"
-                    @click="showAllCategories = true"
-                >
-                    View all categories
-                </button>
-            </div>
-        </div>
-        <p v-else class="mt-4 text-sm text-[#637083]">No spending recorded yet.</p>
-
-        <div
-            v-if="showAllCategories"
-            class="fixed inset-0 z-40 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-            @click.self="showAllCategories = false"
-        >
-            <section
-                class="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white text-[#152338] shadow-xl"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="spending-categories-title"
-            >
-                <header class="flex items-center justify-between border-b border-[#EEF1F5] px-5 py-4">
+            <section v-if="selectedDay" class="mt-5" aria-live="polite">
+                <div class="flex items-center justify-between gap-3">
                     <div>
-                        <h2 id="spending-categories-title" class="text-lg font-semibold">
-                            All spending categories
-                        </h2>
-                        <p class="mt-1 text-sm text-[#637083]">
-                            {{ spendingCategories.length }} categories
-                        </p>
+                        <p class="text-sm font-semibold">{{ selectedDay.label }}, {{ formatDayDate(selectedDay.date) }}</p>
+                        <p class="mt-0.5 text-xs text-[#637083]">{{ selectedDay.transactions.length }} transaksi</p>
                     </div>
-                    <button
-                        type="button"
-                        class="rounded-lg px-3 py-2 text-sm font-medium text-[#2457DA]"
-                        @click="showAllCategories = false"
-                    >
-                        Close
-                    </button>
-                </header>
-                <ul class="space-y-4 overflow-y-auto px-5 py-4">
+                    <strong class="shrink-0 text-sm">Rp {{ formatCurrency(selectedDay.total) }}</strong>
+                </div>
+
+                <ul v-if="selectedDay.transactions.length" class="mt-3 divide-y divide-[#EEF1F5]">
                     <li
-                        v-for="category in spendingCategories"
-                        :key="category.id"
-                        class="flex items-center justify-between gap-3"
+                        v-for="transaction in selectedDay.transactions"
+                        :key="transaction.id"
+                        class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
                     >
-                        <div class="flex min-w-0 items-center gap-3">
-                            <span
-                                class="h-3 w-3 shrink-0 rounded-full"
-                                :style="{ backgroundColor: category.color }"
-                            ></span>
-                            <div class="min-w-0">
-                                <p class="truncate text-sm font-medium">{{ category.name }}</p>
-                                <p class="mt-1 text-xs text-[#637083]">
-                                    Rp {{ formatCurrency(category.amount) }}
-                                </p>
-                            </div>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-medium">{{ transaction.title }}</p>
+                            <p class="mt-0.5 truncate text-xs text-[#637083]">{{ transaction.category }}</p>
                         </div>
-                        <strong class="shrink-0 text-sm">{{ category.percentage }}%</strong>
+                        <strong class="shrink-0 text-sm">Rp {{ formatCurrency(transaction.amount) }}</strong>
                     </li>
                 </ul>
+                <p v-else class="mt-3 rounded-xl bg-[#F5F7FA] px-3 py-3 text-sm text-[#637083]">
+                    Belum ada pengeluaran pada hari ini.
+                </p>
             </section>
         </div>
+        <p v-else class="mt-4 text-sm text-[#637083]">Belum ada pengeluaran minggu ini.</p>
     </div>
 </template>

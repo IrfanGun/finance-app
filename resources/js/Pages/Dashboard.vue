@@ -8,7 +8,7 @@ import {
     watch,
 } from 'vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, Bell, Camera, ChevronRight, Flag, MessageCircle, Plus, Utensils } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChevronRight } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import SpendingCategoryChart from '@/Components/SpendingCategoryChart.vue';
 import FormInput from '@/Components/FormInput.vue';
@@ -31,6 +31,7 @@ const page = usePage();
 const props = defineProps({
     categories: { type: Array, default: () => [] },
     spendingCategories: { type: Array, default: () => [] },
+    weeklySpending: { type: Array, default: () => [] },
     accounts: { type: Array, default: () => [] },
     assets: { type: Array, default: () => [] },
     transactions: { type: Array, default: () => [] },
@@ -232,12 +233,41 @@ onUnmounted(() => {
 });
 
 const shortcuts = [
-    { icon: Plus, label: 'Add' },
-    { icon: Camera, label: 'Scan', href: receiptScan.url() },
-    { icon: MessageCircle, label: 'Chat', href: chatIndex.url() },
-    { icon: Utensils, label: 'Meals', href: mealsIndex.url() },
-    { icon: Bell, label: 'Reminder', href: remindersIndex.url() },
-    { icon: Flag, label: 'Plan', href: budgetIndex.url() },
+    {
+        image: '/dashboard-icons/add.png',
+        label: 'Add',
+        gradient: 'from-[#DBEAFE] to-[#EFF6FF]',
+    },
+    {
+        image: '/dashboard-icons/scan.png',
+        label: 'Scan',
+        href: receiptScan.url(),
+        gradient: 'from-[#CCFBF1] to-[#F0FDFA]',
+    },
+    {
+        image: '/dashboard-icons/chat.png',
+        label: 'Chat',
+        href: chatIndex.url(),
+        gradient: 'from-[#EDE9FE] to-[#F5F3FF]',
+    },
+    {
+        image: '/dashboard-icons/meals.png',
+        label: 'Meals',
+        href: mealsIndex.url(),
+        gradient: 'from-[#FFEDD5] to-[#FFF7ED]',
+    },
+    {
+        image: '/dashboard-icons/reminder.png',
+        label: 'Reminder',
+        href: remindersIndex.url(),
+        gradient: 'from-[#FEF9C3] to-[#FEFCE8]',
+    },
+    {
+        image: '/dashboard-icons/plan.png',
+        label: 'Plan',
+        href: budgetIndex.url(),
+        gradient: 'from-[#DCFCE7] to-[#F0FDF4]',
+    },
 ];
 </script>
 
@@ -296,14 +326,28 @@ const shortcuts = [
         <nav class="mx-5 mt-5 grid grid-cols-3 gap-x-3 gap-y-5 rounded-2xl bg-white px-3 py-4 text-center text-xs font-medium text-[#26354C]">
             <div v-for="item in shortcuts" :key="item.label">
                 <Link v-if="item.href" :href="item.href" class="block">
-                    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF3FF] text-[#2457DA] transition hover:-translate-y-0.5">
-                        <component :is="item.icon" :size="24" />
+                    <span
+                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-[inset_0_1px_3px_rgba(255,255,255,0.45),inset_0_-2px_5px_rgba(10,35,110,0.06)] transition hover:-translate-y-0.5"
+                        :class="item.gradient"
+                    >
+                        <img
+                            :src="item.image"
+                            alt=""
+                            class="h-8 w-8 object-contain"
+                        />
                     </span>
                     <span class="mt-2 block">{{ item.label }}</span>
                 </Link>
                 <template v-else>
-                    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF3FF] text-[#2457DA]">
-                        <component :is="item.icon" :size="24" />
+                    <span
+                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-[inset_0_1px_3px_rgba(255,255,255,0.45),inset_0_-2px_5px_rgba(10,35,110,0.06)]"
+                        :class="item.gradient"
+                    >
+                        <img
+                            :src="item.image"
+                            alt=""
+                            class="h-8 w-8 object-contain"
+                        />
                     </span>
                     <span class="mt-2 block">{{ item.label }}</span>
                 </template>
@@ -391,12 +435,12 @@ const shortcuts = [
             </section>
             <section>
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">Spending by category</h2>
+                    <h2 class="text-lg font-semibold">Spending this week</h2>
                     <button class="text-sm text-[#2457DA]" @click="router.visit(categoriesIndex.url())">
                         Details
                     </button>
                 </div>
-                <SpendingCategoryChart :categories="spendingCategories" />
+                <SpendingCategoryChart :days="weeklySpending" />
             </section>
             <section>
                 <div class="flex items-center justify-between">

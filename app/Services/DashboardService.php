@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\AssetDepreciationLog;
 use App\Models\Category;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class DashboardService
 {
@@ -81,6 +83,7 @@ class DashboardService
                 ]),
             'categories' => $categories->where('is_active', true)->values(),
             'spendingCategories' => $spendingCategories,
+            'weeklySpending' => $this->weeklySpendingFor($user),
             'accounts' => $user->financialAccounts()
                 ->withSum([
                     'transactions as income_total' => fn (Builder $query) => $query->where('type', 'income'),
@@ -108,6 +111,65 @@ class DashboardService
             ],
             'wealthTrend' => $this->wealthTrendFor($user, (float) $netWorth),
         ];
+    }
+
+    /**
+     * @return array<int, array{
+     *     date: string,
+     *     total: float,
+     *     transactions: array<int, array{
+     *         id: int,
+     *         title: string,
+     *         category: string,
+     *         amount: float
+     *     }>
+     * }>
+     */
+    private function weeklySpendingFor(User $user): array
+    {
+        $weekStart = now()->startOfWeek(Carbon::MONDAY);
+        $weekEnd = $weekStart->copy()->addDays(6);
+
+        $transactionsByDate = $user->transactions()
+            ->where('type', 'expense')
+            ->whereBetween('date', [
+                $weekStart->toDateString(),
+                $weekEnd->toDateString(),
+            ])
+            ->whereHas('account', fn (Builder $query) => $query
+                ->where(fn (Builder $query) => $query
+                    ->where('currency', 'IDR')
+                    ->orWhereNull('currency')))
+            ->with('category:id,name')
+            ->orderBy('date')
+            ->orderBy('id')
+            ->get(['id', 'date', 'title', 'amount', 'category_id'])
+            ->groupBy(fn (Transaction $transaction): string => substr((string) $transaction->date, 0, 10));
+
+        $days = [];
+        $date = $weekStart->copy();
+
+        while ($date->lte($weekEnd)) {
+            $dayTransactions = $transactionsByDate->get($date->toDateString(), collect());
+
+            $days[] = [
+                'date' => $date->toDateString(),
+                'total' => (float) $dayTransactions->sum('amount'),
+                'transactions' => $dayTransactions
+                    ->map(fn (Transaction $transaction): array => [
+                        'id' => $transaction->id,
+                        'title' => $transaction->title ?: 'Pengeluaran',
+                        'category' => $transaction->category?->name ?? 'Tanpa kategori',
+                        'amount' => (float) $transaction->amount,
+                    ])
+                    ->values()
+                    ->all(),
+            ];
+
+            $date->addDay();
+        }
+
+        return $days;
     }
 
     /**

@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ArrowLeft, Plus } from 'lucide-vue-next';
+import { ArrowLeft, ChevronRight, Plus, Target, Wallet } from 'lucide-vue-next';
 import { dashboard } from '@/routes';
 import { create as createSavingPage, index as savingsIndex } from '@/routes/savings';
 import { reverse as reverseClaim } from '@/routes/budget-claims';
@@ -11,6 +11,7 @@ import {
     store as storePlan,
     update as updatePlan,
     create as createPlanPage,
+    show as showPlanPage,
 } from '@/routes/budget-plans';
 import {
     claim as claimPeriod,
@@ -27,6 +28,7 @@ const props = defineProps({
     categories: { type: Array, default: () => [] },
     savings: { type: Array, default: () => [] },
     createMode: { type: Boolean, default: false },
+    selectedPlanId: { type: Number, default: null },
     totals: { type: Object, default: () => ({}) },
     fundingNotices: { type: Array, default: () => [] },
 });
@@ -44,6 +46,65 @@ const localDate = (date) => {
 };
 const today = localDate(new Date());
 const formatMoney = (amount) => new Intl.NumberFormat('id-ID').format(Number(amount ?? 0));
+const displayAccountCurrency = (account) => account.currency
+    ?? (account.type === 'investment' ? 'mata uang belum diatur' : 'IDR');
+const periodUsagePercentage = (period) => {
+    const allocation = Number(period.allocated_amount ?? 0);
+    const spent = Number(period.spent ?? 0);
+
+    if (allocation <= 0) {
+        return 0;
+    }
+
+    return Math.min(Math.max((spent / allocation) * 100, 0), 100);
+};
+const periodUsageColor = (period) => {
+    const percentage = periodUsagePercentage(period);
+
+    if (percentage >= 100) {
+        return 'bg-[#B34735]';
+    }
+
+    if (percentage >= 75) {
+        return 'bg-[#D99A1B]';
+    }
+
+    return 'bg-[#2457DA]';
+};
+const periodStatusLabel = (status) => ({
+    awaiting_funding: 'Menunggu dana',
+    open: 'Berjalan',
+    funded: 'Didanai',
+    closed: 'Selesai',
+}[status] ?? status);
+const planStatusLabel = (status) => ({
+    active: 'Aktif',
+    paused: 'Dijeda',
+    ended: 'Dihentikan',
+    completed: 'Selesai',
+}[status] ?? status);
+const planStatusColor = (status) => ({
+    active: 'bg-[#E8F8EF] text-[#16815B]',
+    paused: 'bg-[#FFF4DB] text-[#9A6700]',
+    ended: 'bg-[#EEF1F5] text-[#637083]',
+    completed: 'bg-[#F0EAFE] text-[#7046B8]',
+}[status] ?? 'bg-[#EEF1F5] text-[#637083]');
+const selectedPlan = computed(() => props.plans.find(
+    (plan) => Number(plan.id) === Number(props.selectedPlanId),
+) ?? null);
+const isDetailPage = computed(() => props.selectedPlanId !== null);
+const currentPeriodForPlan = (plan) =>
+    plan.periods?.find((period) => period.status === 'open')
+        ?? plan.periods?.find((period) => period.status === 'awaiting_funding')
+        ?? plan.periods?.[0]
+        ?? null;
+const goalProgressPercentage = (plan) => {
+    const target = Number(plan.target_amount ?? 0);
+
+    return target > 0
+        ? Math.min((Number(plan.goal_funded ?? 0) / target) * 100, 100)
+        : 0;
+};
 const showCreate = ref(props.createMode);
 const activeStep = ref(1);
 const steps = computed(() => [
@@ -321,10 +382,21 @@ const actOnPeriod = (route, period, data = {}) => {
 
 <template>
     <div class="mx-auto min-h-screen w-full max-w-lg bg-[#F7F9FC] pb-28 text-[#152338]">
-        <Head :title="showCreate ? (editingId ? 'Ubah Budget Plan' : 'Budget Plan baru') : 'Budget Plan'" />
+        <Head
+            :title="showCreate
+                ? (editingId ? 'Ubah Budget Plan' : 'Budget Plan baru')
+                : (isDetailPage ? selectedPlan?.name ?? 'Detail Budget Plan' : 'Budget Plan')"
+        />
         <header v-if="!showCreate" class="flex items-center justify-between bg-white px-6 py-5">
-            <Link :href="dashboard.url()" class="text-sm font-semibold text-[#2457DA]">Kembali</Link>
-            <h1 class="text-lg font-semibold">Budget Plan</h1>
+            <Link
+                :href="isDetailPage ? budgetPlansIndex.url() : dashboard.url()"
+                class="text-sm font-semibold text-[#2457DA]"
+            >
+                {{ isDetailPage ? 'Semua plan' : 'Kembali' }}
+            </Link>
+            <h1 class="text-lg font-semibold">
+                {{ isDetailPage ? 'Detail plan' : 'Budget Plan' }}
+            </h1>
             <Link :href="savingsIndex.url()" class="text-sm font-semibold text-[#2457DA]">Savings</Link>
         </header>
 
@@ -357,7 +429,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 />
             </div>
 
-            <section v-if="!showCreate && fundingNotices.length" class="rounded-2xl bg-[#FFF3DE] p-4 text-sm">
+            <section v-if="!showCreate && !isDetailPage && fundingNotices.length" class="rounded-2xl bg-[#FFF3DE] p-4 text-sm">
                 <h2 class="font-semibold">Budget perlu didanai</h2>
                 <Link
                     v-for="notice in fundingNotices"
@@ -366,7 +438,7 @@ const actOnPeriod = (route, period, data = {}) => {
                     class="mt-2 block text-[#8A5900]"
                 >{{ notice.data.title }}</Link>
             </section>
-            <section v-if="!showCreate" class="grid grid-cols-2 gap-3">
+            <section v-if="!showCreate && !isDetailPage" class="grid grid-cols-2 gap-3">
                 <article
                     v-for="(total, currency) in totals"
                     :key="currency"
@@ -383,7 +455,7 @@ const actOnPeriod = (route, period, data = {}) => {
             </section>
 
             <Link
-                v-if="!showCreate"
+                v-if="!showCreate && !isDetailPage"
                 :href="createPlanPage.url()"
                 class="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#2457DA] px-5 py-3 font-semibold text-white shadow-sm"
             >
@@ -428,7 +500,7 @@ const actOnPeriod = (route, period, data = {}) => {
                     <label class="text-sm">Akun sumber
                         <select v-model="form.financial_account_id" class="field" required @change="accountChanged">
                             <option v-for="account in accounts" :key="account.id" :value="account.id">
-                                {{ account.name }} ({{ account.currency }})
+                                {{ account.name }} ({{ displayAccountCurrency(account) }})
                             </option>
                         </select>
                     </label>
@@ -566,16 +638,113 @@ const actOnPeriod = (route, period, data = {}) => {
                 </div>
             </form>
 
-            <p v-if="!showCreate && !plans.length" class="rounded-2xl bg-white p-5 text-sm text-[#637083]">
+            <p
+                v-if="!showCreate && !isDetailPage && !plans.length"
+                class="rounded-2xl bg-white p-5 text-sm text-[#637083]"
+            >
                 Belum ada budget plan.
             </p>
-            <article v-for="plan in plans" v-show="!showCreate" :key="plan.id" class="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm">
+            <article
+                v-for="plan in plans"
+                v-show="!showCreate && !isDetailPage"
+                :key="`summary-${plan.id}`"
+                class="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-[#E4EAF2] bg-white p-5 shadow-sm"
+            >
+                <div class="absolute inset-x-0 top-0 h-1 bg-[#4F7EF6]"></div>
+
+                <div class="relative flex items-start justify-between gap-3">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <span
+                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm"
+                            :class="plan.type === 'goal'
+                                ? 'bg-[#7046B8]'
+                                : 'bg-[#2457DA]'"
+                        >
+                            <component :is="plan.type === 'goal' ? Target : Wallet" :size="20" />
+                        </span>
+                        <div class="min-w-0">
+                            <h2 class="truncate text-lg font-semibold">{{ plan.name }}</h2>
+                            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                                <span class="text-[#637083]">
+                                    {{ plan.type === 'goal' ? 'Rencana Tujuan' : 'Anggaran Belanja' }}
+                                </span>
+                                <span class="rounded-full px-2 py-1 font-medium" :class="planStatusColor(plan.status)">
+                                    {{ planStatusLabel(plan.status) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <strong class="shrink-0 rounded-xl bg-[#EEF3FF] px-3 py-2 text-sm text-[#2457DA]">
+                        Rp {{ formatMoney(plan.type === 'goal' ? plan.target_amount : plan.amount) }}
+                    </strong>
+                </div>
+
+                <div
+                    v-if="plan.type === 'spending' && currentPeriodForPlan(plan)"
+                    class="relative rounded-xl border border-[#E9EDF3] bg-[#F8FAFD] p-3"
+                >
+                    <div class="flex items-center justify-between gap-3 text-xs">
+                        <span class="text-[#637083]">
+                            Penggunaan · {{ currentPeriodForPlan(plan).starts_on }}
+                        </span>
+                        <strong>{{ Math.round(periodUsagePercentage(currentPeriodForPlan(plan))) }}%</strong>
+                    </div>
+                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#E3E8F0]">
+                        <div
+                            class="h-full rounded-full"
+                            :class="periodUsageColor(currentPeriodForPlan(plan))"
+                            :style="{ width: `${periodUsagePercentage(currentPeriodForPlan(plan))}%` }"
+                        ></div>
+                    </div>
+                    <p class="mt-2 text-xs text-[#637083]">
+                        Rp {{ formatMoney(currentPeriodForPlan(plan).spent) }} terpakai dari
+                        Rp {{ formatMoney(currentPeriodForPlan(plan).allocated_amount) }} dialokasikan
+                    </p>
+                </div>
+                <div v-else-if="plan.type === 'goal'" class="rounded-xl border border-[#EBE4FC] bg-[#F8F5FF] p-3">
+                    <div class="flex items-center justify-between gap-3 text-xs">
+                        <span class="text-[#637083]">Progress tujuan</span>
+                        <strong>{{ Math.round(goalProgressPercentage(plan)) }}%</strong>
+                    </div>
+                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#E3E8F0]">
+                        <div
+                            class="h-full rounded-full bg-[#7046B8]"
+                            :style="{ width: `${goalProgressPercentage(plan)}%` }"
+                        ></div>
+                    </div>
+                    <p class="mt-2 text-xs text-[#637083]">
+                        Rp {{ formatMoney(plan.goal_funded) }} terkumpul dari
+                        Rp {{ formatMoney(plan.target_amount) }}
+                    </p>
+                </div>
+
+                <Link
+                    :href="showPlanPage.url(plan.id)"
+                    class="flex items-center justify-between rounded-xl bg-[#F1F5FF] px-3 py-3 text-sm font-semibold text-[#2457DA] transition hover:bg-[#E6EDFF]"
+                >
+                    <span>Lihat detail dan kelola plan</span>
+                    <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#2457DA] shadow-sm">
+                        <ChevronRight :size="17" />
+                    </span>
+                </Link>
+            </article>
+            <article
+                v-for="plan in plans"
+                v-show="!showCreate && isDetailPage"
+                :key="`detail-${plan.id}`"
+                class="flex flex-col gap-4 rounded-2xl border border-[#E9EDF3] bg-white p-5 shadow-sm"
+            >
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <h2 class="text-lg font-semibold">{{ plan.name }}</h2>
-                        <p class="text-xs text-[#637083]">
-                            {{ plan.type === 'goal' ? 'Rencana Tujuan' : 'Anggaran Belanja' }} · {{ plan.status }}
-                        </p>
+                        <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                            <span class="text-[#637083]">
+                                {{ plan.type === 'goal' ? 'Rencana Tujuan' : 'Anggaran Belanja' }}
+                            </span>
+                            <span class="rounded-full bg-[#EEF3FF] px-2 py-1 font-medium text-[#2457DA]">
+                                {{ planStatusLabel(plan.status) }}
+                            </span>
+                        </div>
                     </div>
                     <strong class="text-sm text-[#2457DA]">
                         Rp {{ formatMoney(plan.type === 'goal' ? plan.target_amount : plan.amount) }}
@@ -624,20 +793,69 @@ const actOnPeriod = (route, period, data = {}) => {
                         <span>Rp {{ formatMoney(item.amount) }}</span>
                     </p>
                 </div>
-                <div v-for="period in plan.periods" :key="period.id" class="flex flex-col gap-2 border-t border-[#E9EDF3] pt-3 text-sm">
-                    <p class="font-semibold">{{ period.starts_on }} – {{ period.ends_on }}</p>
-                    <p class="text-[#637083]">
+                <div
+                    v-for="period in plan.periods"
+                    :key="period.id"
+                    class="flex flex-col gap-3 rounded-2xl border border-[#E9EDF3] bg-[#F8FAFD] p-4 text-sm"
+                >
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold">{{ period.starts_on }} – {{ period.ends_on }}</p>
+                            <p class="mt-1 text-xs text-[#637083]">
+                                {{ plan.type === 'goal' ? 'Setoran tujuan' : 'Anggaran belanja' }}
+                            </p>
+                        </div>
+                        <span class="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-[#637083]">
+                            {{ periodStatusLabel(period.status) }}
+                        </span>
+                    </div>
+
+                    <div v-if="plan.type === 'spending'" class="mt-4 rounded-xl bg-white p-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="text-xs font-medium text-[#637083]">Penggunaan cadangan</p>
+                            <strong class="text-xs" :class="periodUsagePercentage(period) >= 100 ? 'text-[#B34735]' : 'text-[#17243A]'">
+                                {{ Math.round(periodUsagePercentage(period)) }}%
+                            </strong>
+                        </div>
+                        <div
+                            class="mt-2 h-2.5 overflow-hidden rounded-full bg-[#E9EDF3]"
+                            role="progressbar"
+                            :aria-label="`Penggunaan anggaran ${plan.name}`"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            :aria-valuenow="Math.round(periodUsagePercentage(period))"
+                        >
+                            <div
+                                class="h-full rounded-full transition-[width] duration-300"
+                                :class="periodUsageColor(period)"
+                                :style="{ width: `${periodUsagePercentage(period)}%` }"
+                            ></div>
+                        </div>
+                        <div class="mt-3 grid grid-cols-3 gap-2">
+                            <div>
+                                <p class="text-[10px] text-[#637083]">Dialokasikan</p>
+                                <p class="mt-0.5 text-xs font-semibold">Rp {{ formatMoney(period.allocated_amount) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-[#637083]">Terpakai</p>
+                                <p class="mt-0.5 text-xs font-semibold">Rp {{ formatMoney(period.spent) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-[#637083]">Sisa</p>
+                                <p class="mt-0.5 text-xs font-semibold">Rp {{ formatMoney(period.remaining) }}</p>
+                            </div>
+                        </div>
+                        <p class="mt-2 text-[10px] text-[#637083]">
+                            Rencana Rp {{ formatMoney(period.planned_amount) }} ·
+                            Dilepas Rp {{ formatMoney(period.released_amount) }}
+                        </p>
+                    </div>
+                    <div v-else class="mt-4 rounded-xl bg-white p-3 text-xs text-[#637083]">
                         Rencana Rp {{ formatMoney(period.planned_amount) }} ·
-                        {{ plan.type === 'goal' ? 'Setoran' : 'Cadangan' }}
-                        Rp {{ formatMoney(plan.type === 'goal' ? period.contributed : period.allocated_amount) }}
-                    </p>
-                    <p v-if="plan.type === 'spending'">Sisa Rp {{ formatMoney(period.remaining) }}</p>
-                    <p v-if="plan.type === 'spending'" class="text-[#637083]">
-                        Terpakai Rp {{ formatMoney(period.spent) }} ·
-                        Dilepas Rp {{ formatMoney(period.released_amount) }}
-                    </p>
-                    <p v-else>Status setoran: {{ period.status }}</p>
-                    <div v-if="period.claims?.length" class="flex flex-col gap-1 text-xs text-[#637083]">
+                        Setoran Rp {{ formatMoney(period.contributed) }}
+                    </div>
+
+                    <div v-if="period.claims?.length" class="mt-1 flex flex-col gap-1 text-xs text-[#637083]">
                         <div v-for="claim in period.claims" :key="claim.id" class="flex items-center justify-between gap-2">
                             <span>
                                 {{ claim.pocket?.name }} · Rp {{ formatMoney(claim.amount) }}
@@ -652,7 +870,7 @@ const actOnPeriod = (route, period, data = {}) => {
                             >Balik klaim</ButtonPrimary>
                         </div>
                     </div>
-                    <div v-if="period.status !== 'closed'" class="flex flex-wrap gap-2">
+                    <div v-if="period.status !== 'closed'" class="mt-1 flex flex-wrap gap-2">
                         <ButtonPrimary
                             v-if="plan.type === 'spending' && period.status === 'awaiting_funding'"
                             type="button"
@@ -686,7 +904,7 @@ const actOnPeriod = (route, period, data = {}) => {
                             @click="actOnPeriod(closePeriod, period)"
                         >Tutup periode</ButtonPrimary>
                     </div>
-                    <div v-if="activeClaim === period.id" class="flex flex-col gap-2 rounded-xl bg-[#F7F9FC] p-3">
+                    <div v-if="activeClaim === period.id" class="mt-1 flex flex-col gap-2 rounded-xl bg-[#F7F9FC] p-3">
                         <p class="font-semibold">Bagi sisa ke savings</p>
                         <div v-for="(part, index) in claimParts" :key="index" class="flex gap-2">
                             <select v-model="part.saving_id" class="field" required>
@@ -712,7 +930,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 </div>
             </article>
             <p v-if="actionError" class="text-sm text-red-600">{{ actionError }}</p>
-            <section v-if="!showCreate && legacyBudgets.length" class="rounded-2xl bg-white p-5 text-sm">
+            <section v-if="!showCreate && !isDetailPage && legacyBudgets.length" class="rounded-2xl bg-white p-5 text-sm">
                 <h2 class="font-semibold">Anggaran lama</h2>
                 <p class="mt-1 text-xs text-[#637083]">
                     Anggaran ini dipakai laporan lama dan belum mencadangkan dana karena akun sumbernya tidak tercatat.
