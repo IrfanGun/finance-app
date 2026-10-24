@@ -9,7 +9,7 @@ namespace {
         {
             return (string) BigDecimal::of($num1)
                 ->plus($num2)
-                ->toScale($scale ?? 0, RoundingMode::DOWN);
+                ->toScale($scale ?? 0, RoundingMode::Down);
         }
     }
 
@@ -18,7 +18,7 @@ namespace {
         {
             return (string) BigDecimal::of($num1)
                 ->minus($num2)
-                ->toScale($scale ?? 0, RoundingMode::DOWN);
+                ->toScale($scale ?? 0, RoundingMode::Down);
         }
     }
 
@@ -27,7 +27,7 @@ namespace {
         {
             return (string) BigDecimal::of($num1)
                 ->multipliedBy($num2)
-                ->toScale($scale ?? 0, RoundingMode::DOWN);
+                ->toScale($scale ?? 0, RoundingMode::Down);
         }
     }
 
@@ -35,7 +35,7 @@ namespace {
         function bcdiv(string $num1, string $num2, ?int $scale = null): string
         {
             return (string) BigDecimal::of($num1)
-                ->dividedBy($num2, $scale ?? 0, RoundingMode::DOWN);
+                ->dividedBy($num2, $scale ?? 0, RoundingMode::Down);
         }
     }
 
@@ -45,9 +45,9 @@ namespace {
             $scale ??= 0;
 
             return BigDecimal::of($num1)
-                ->toScale($scale, RoundingMode::DOWN)
+                ->toScale($scale, RoundingMode::Down)
                 ->compareTo(
-                    BigDecimal::of($num2)->toScale($scale, RoundingMode::DOWN),
+                    BigDecimal::of($num2)->toScale($scale, RoundingMode::Down),
                 );
         }
     }
