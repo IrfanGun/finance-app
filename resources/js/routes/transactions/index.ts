@@ -78,7 +78,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::voidMethod
- * @see app/Http/Controllers/TransactionController.php:62
+ * @see app/Http/Controllers/TransactionController.php:69
  * @route '/transactions/{transaction}/void'
  */
 export const voidMethod = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -93,7 +93,7 @@ voidMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::voidMethod
- * @see app/Http/Controllers/TransactionController.php:62
+ * @see app/Http/Controllers/TransactionController.php:69
  * @route '/transactions/{transaction}/void'
  */
 voidMethod.url = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ voidMethod.url = (args: { transaction: string | number } | [transaction: string 
 
 /**
 * @see \App\Http\Controllers\TransactionController::voidMethod
- * @see app/Http/Controllers/TransactionController.php:62
+ * @see app/Http/Controllers/TransactionController.php:69
  * @route '/transactions/{transaction}/void'
  */
 voidMethod.post = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

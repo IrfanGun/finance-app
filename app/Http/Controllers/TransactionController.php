@@ -50,10 +50,17 @@ class TransactionController extends Controller
 
     public function store(TransactionRequest $request, TransactionService $transactions): RedirectResponse
     {
-        $transactions->create($request->user(), $request->validated());
+        $transaction = $transactions->create($request->user(), $request->validated());
 
         if ($request->filled('meal_record_id')) {
             return redirect()->route('dashboard');
+        }
+
+        if ($transaction->budget_period_id !== null) {
+            return redirect()->route(
+                'budget-plans.show',
+                $transaction->budgetPeriod->budget_plan_id,
+            );
         }
 
         return back();
