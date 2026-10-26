@@ -1,7 +1,18 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ArrowLeft, ChevronRight, Plus, Target, Wallet } from 'lucide-vue-next';
+import {
+    ArrowLeft,
+    CalendarDays,
+    ChevronDown,
+    ChevronRight,
+    Eye,
+    PiggyBank,
+    Plus,
+    ShoppingBag,
+    Target,
+    Wallet,
+} from 'lucide-vue-next';
 import { dashboard } from '@/routes';
 import { create as createSavingPage, index as savingsIndex } from '@/routes/savings';
 import { reverse as reverseClaim } from '@/routes/budget-claims';
@@ -85,14 +96,73 @@ const planStatusLabel = (status) => ({
     completed: 'Selesai',
 }[status] ?? status);
 const planStatusColor = (status) => ({
-    active: 'bg-[#E8F8EF] text-[#16815B]',
+    active: 'bg-budget-success-surface text-budget-success',
     paused: 'bg-[#FFF4DB] text-[#9A6700]',
     ended: 'bg-[#EEF1F5] text-[#637083]',
-    completed: 'bg-[#F0EAFE] text-[#7046B8]',
+    completed: 'bg-budget-goal-surface text-budget-goal',
 }[status] ?? 'bg-[#EEF1F5] text-[#637083]');
 const selectedPlan = computed(() => props.plans.find(
     (plan) => Number(plan.id) === Number(props.selectedPlanId),
 ) ?? null);
+const availableCurrencies = computed(() => Object.keys(props.totals));
+const selectedCurrency = ref(
+    props.totals.IDR
+        ? 'IDR'
+        : Object.keys(props.totals)[0] ?? 'IDR',
+);
+const secondaryCurrency = computed(() => availableCurrencies.value.find(
+    (currency) => currency !== selectedCurrency.value,
+) ?? null);
+const activePlanFilter = ref('all');
+const monthLabel = new Intl.DateTimeFormat('id-ID', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+}).format(new Date());
+const activePlanCount = computed(() => props.plans.filter(
+    (plan) => plan.status === 'active',
+).length);
+const filteredPlans = computed(() => {
+    if (activePlanFilter.value === 'active') {
+        return props.plans.filter((plan) => plan.status === 'active');
+    }
+
+    if (activePlanFilter.value === 'completed') {
+        return props.plans.filter((plan) => ['completed', 'ended'].includes(plan.status));
+    }
+
+    return props.plans;
+});
+const formatCurrency = (amount, currency = 'IDR') => {
+    const safeCurrency = String(currency || 'IDR').trim();
+    const value = Number(amount ?? 0);
+
+    try {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: safeCurrency,
+            maximumFractionDigits: 0,
+        }).format(value);
+    } catch {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            maximumFractionDigits: 0,
+        }).format(value);
+    }
+};
+const formatDate = (date) => {
+    if (!date) {
+        return '';
+    }
+
+    return new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'Asia/Jakarta',
+    }).format(new Date(`${date}T00:00:00+07:00`));
+};
 const isDetailPage = computed(() => props.selectedPlanId !== null);
 const currentPeriodForPlan = (plan) =>
     plan.periods?.find((period) => period.status === 'open')
@@ -424,26 +494,46 @@ const actOnPeriod = (route, period, data = {}) => {
 </script>
 
 <template>
-    <div class="mx-auto min-h-screen w-full max-w-lg bg-[#F7F9FC] pb-28 text-[#152338]">
+    <div class="mx-auto min-h-screen w-full max-w-lg bg-budget-page pb-28 text-budget-heading">
         <Head
             :title="showCreate
                 ? (editingId ? 'Ubah Budget Plan' : 'Budget Plan baru')
                 : (isDetailPage ? selectedPlan?.name ?? 'Detail Budget Plan' : 'Budget Plan')"
         />
-        <header v-if="!showCreate" class="flex items-center justify-between bg-white px-6 py-5">
+        <header
+            v-if="!showCreate && !isDetailPage"
+            class="grid grid-cols-[52px_1fr_104px] items-center gap-3 px-5 pb-2 pt-6"
+        >
             <Link
-                :href="isDetailPage ? budgetPlansIndex.url() : dashboard.url()"
-                class="text-sm font-semibold text-[#2457DA]"
+                :href="dashboard.url()"
+                aria-label="Kembali ke dashboard"
+                class="flex h-[52px] w-[52px] items-center justify-center rounded-[20px] bg-budget-surface text-budget-ink shadow-[0_8px_24px_rgba(41,82,160,0.08)]"
             >
-                {{ isDetailPage ? 'Semua plan' : 'Kembali' }}
+                <ArrowLeft :size="23" />
             </Link>
-            <h1 class="text-lg font-semibold">
-                {{ isDetailPage ? 'Detail plan' : 'Budget Plan' }}
+            <h1 class="text-center text-xl font-bold tracking-tight sm:text-2xl">
+                Budget Planner
             </h1>
+            <Link
+                :href="savingsIndex.url()"
+                class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-budget-primary bg-budget-surface px-3 text-sm font-semibold text-budget-link sm:px-4"
+            >
+                <PiggyBank :size="20" />
+                Savings
+            </Link>
+        </header>
+        <header v-else-if="!showCreate" class="flex items-center justify-between bg-white px-6 py-5">
+            <Link :href="budgetPlansIndex.url()" class="text-sm font-semibold text-[#2457DA]">
+                ← Semua plan
+            </Link>
+            <h1 class="text-lg font-semibold">Detail plan</h1>
             <Link :href="savingsIndex.url()" class="text-sm font-semibold text-[#2457DA]">Savings</Link>
         </header>
 
-        <main class="flex flex-col gap-5 px-6 pt-6">
+        <main
+            class="flex flex-col gap-5 px-5 pt-4"
+            :class="!showCreate && !isDetailPage ? 'pb-4' : 'sm:px-6 sm:pt-6'"
+        >
             <header v-if="showCreate" class="flex items-center gap-4">
                 <button
                     type="button"
@@ -481,29 +571,112 @@ const actOnPeriod = (route, period, data = {}) => {
                     class="mt-2 block text-[#8A5900]"
                 >{{ notice.data.title }}</Link>
             </section>
-            <section v-if="!showCreate && !isDetailPage" class="grid grid-cols-2 gap-3">
-                <article
-                    v-for="(total, currency) in totals"
-                    :key="currency"
-                    class="col-span-2 rounded-2xl bg-[#EAF0FF] p-4"
-                >
-                    <p class="text-xs text-[#637083]">Uang bebas {{ currency }}</p>
-                    <p class="text-xl font-semibold">Rp {{ formatMoney(total.free) }}</p>
-                    <p class="text-xs text-[#637083]">
-                        Saldo aktual Rp {{ formatMoney(total.actual) }} ·
-                        Budget Rp {{ formatMoney(total.budget) }} ·
-                        Savings Rp {{ formatMoney(total.savings) }}
+            <div v-if="!showCreate && !isDetailPage" class="flex justify-center">
+                <div class="inline-flex items-center gap-3 rounded-[20px] bg-budget-surface/80 px-5 py-3 text-budget-ink shadow-[0_6px_22px_rgba(41,82,160,0.06)]">
+                    <CalendarDays :size="21" class="text-[#52627E]" />
+                    <span class="font-semibold capitalize">{{ monthLabel }}</span>
+                    <ChevronDown :size="18" class="text-[#52627E]" />
+                </div>
+            </div>
+
+            <section
+                v-if="!showCreate && !isDetailPage && totals[selectedCurrency]"
+                class="relative isolate overflow-hidden rounded-[28px] bg-budget-header p-6 text-white shadow-[0_18px_42px_rgba(36,87,218,0.22)] sm:p-8"
+            >
+                <div class="pointer-events-none absolute -right-10 -top-16 -z-10 h-56 w-56 rounded-full bg-white/10"></div>
+                <div class="pointer-events-none absolute -right-16 top-28 -z-10 h-48 w-48 rounded-full bg-budget-header-middle/25"></div>
+                <div class="relative">
+                    <p class="flex items-center gap-3 pr-32 text-base font-medium text-white/90 sm:text-lg">
+                        Uang tersedia
+                        <Eye :size="20" />
                     </p>
-                </article>
+                    <div
+                        v-if="availableCurrencies.length > 1"
+                        class="absolute right-0 top-0 flex h-10 w-[116px] shrink-0 rounded-full bg-white/15 p-1"
+                    >
+                        <ButtonPrimary
+                            v-for="currency in availableCurrencies"
+                            :key="currency"
+                            type="button"
+                            :variant="selectedCurrency === currency ? 'primary' : 'secondary'"
+                            class="!min-h-0 !w-1/2 !rounded-full !px-1 !py-2 !text-xs !shadow-none"
+                            :class="selectedCurrency === currency
+                                ? '!bg-white !text-budget-link'
+                                : '!border-transparent !bg-transparent !text-white'"
+                            @click="selectedCurrency = currency"
+                        >{{ currency || 'IDR' }}</ButtonPrimary>
+                    </div>
+                    <p class="mt-3 text-[clamp(2.3rem,10vw,3.6rem)] font-bold leading-none tracking-tight">
+                        {{ formatCurrency(totals[selectedCurrency].free, selectedCurrency) }}
+                    </p>
+                    <p class="mt-2 text-base text-white/75 sm:text-lg">Siap dialokasikan</p>
+                </div>
+                <div class="mt-7 grid grid-cols-3 border-t border-white/25 pt-5">
+                    <div class="pr-2">
+                        <p class="text-xs text-white/75 sm:text-sm">Saldo aktual</p>
+                        <p class="mt-1 text-sm font-bold sm:text-lg">
+                            {{ formatCurrency(totals[selectedCurrency].actual, selectedCurrency) }}
+                        </p>
+                    </div>
+                    <div class="border-l border-white/25 px-3 sm:px-5">
+                        <p class="text-xs text-white/75 sm:text-sm">Budget tersisa</p>
+                        <p class="mt-1 text-sm font-bold sm:text-lg">
+                            {{ formatCurrency(totals[selectedCurrency].budget, selectedCurrency) }}
+                        </p>
+                    </div>
+                    <div class="border-l border-white/25 pl-3 sm:pl-5">
+                        <p class="text-xs text-white/75 sm:text-sm">Savings</p>
+                        <p class="mt-1 text-sm font-bold sm:text-lg">
+                            {{ formatCurrency(totals[selectedCurrency].savings, selectedCurrency) }}
+                        </p>
+                    </div>
+                </div>
             </section>
 
             <Link
-                v-if="!showCreate && !isDetailPage"
-                :href="createPlanPage.url()"
-                class="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#2457DA] px-5 py-3 font-semibold text-white shadow-sm"
+                v-if="!showCreate && !isDetailPage && secondaryCurrency && totals[secondaryCurrency]"
+                :href="savingsIndex.url()"
+                class="flex items-center gap-4 rounded-[24px] bg-white p-4 shadow-[0_8px_28px_rgba(41,82,160,0.08)]"
             >
-                <Plus :size="18" class="mr-2" /> Buat Budget Plan
+                <span class="flex h-14 w-14 items-center justify-center rounded-[20px] bg-budget-icon-surface text-budget-primary">
+                    <Wallet :size="25" />
+                </span>
+                <span class="min-w-0 flex-1">
+                    <span class="block text-sm text-budget-muted">Saldo {{ secondaryCurrency || 'IDR' }}</span>
+                    <strong class="block text-xl font-bold text-budget-heading">
+                        {{ formatCurrency(totals[secondaryCurrency].actual, secondaryCurrency) }}
+                    </strong>
+                </span>
+                <span class="flex h-11 w-11 items-center justify-center rounded-full bg-budget-control-surface text-budget-link">
+                    <ChevronRight :size="21" />
+                </span>
             </Link>
+
+            <section v-if="!showCreate && !isDetailPage" class="flex flex-col gap-4 pt-1">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-bold tracking-tight sm:text-[28px]">Budget saya</h2>
+                    <span class="rounded-full bg-budget-success-surface px-3 py-1.5 text-sm font-semibold text-budget-success">
+                        {{ activePlanCount }} aktif
+                    </span>
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-0.5">
+                    <ButtonPrimary
+                        v-for="filter in [
+                            { value: 'all', label: 'Semua' },
+                            { value: 'active', label: 'Aktif' },
+                            { value: 'completed', label: 'Selesai' },
+                        ]"
+                        :key="filter.value"
+                        type="button"
+                        :variant="activePlanFilter === filter.value ? 'primary' : 'secondary'"
+                        class="!min-h-11 !min-w-[92px] !rounded-full !px-5 !py-2 !font-medium"
+                        :class="activePlanFilter === filter.value
+                            ? '!border-budget-primary !bg-budget-primary'
+                            : '!border-[#E2EAF8] !bg-white/60 !text-budget-muted'"
+                        @click="activePlanFilter = filter.value"
+                    >{{ filter.label }}</ButtonPrimary>
+                </div>
+            </section>
 
             <form
                 v-if="showCreate"
@@ -682,95 +855,101 @@ const actOnPeriod = (route, period, data = {}) => {
             </form>
 
             <p
-                v-if="!showCreate && !isDetailPage && !plans.length"
+                v-if="!showCreate && !isDetailPage && !filteredPlans.length"
                 class="rounded-2xl bg-white p-5 text-sm text-[#637083]"
             >
-                Belum ada budget plan.
+                {{ plans.length ? 'Tidak ada budget pada filter ini.' : 'Belum ada budget plan.' }}
             </p>
-            <article
-                v-for="plan in plans"
+            <Link
+                v-for="plan in filteredPlans"
                 v-show="!showCreate && !isDetailPage"
                 :key="`summary-${plan.id}`"
-                class="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-[#E4EAF2] bg-white p-5 shadow-sm"
+                :href="showPlanPage.url(plan.id)"
+                class="block rounded-[26px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-budget-primary/25"
             >
-                <div class="absolute inset-x-0 top-0 h-1 bg-[#4F7EF6]"></div>
-
+                <article class="relative flex flex-col gap-4 overflow-hidden rounded-[26px] border border-budget-border bg-budget-surface p-5 shadow-[0_10px_28px_rgba(41,82,160,0.08)] transition hover:shadow-[0_14px_34px_rgba(41,82,160,0.14)] sm:p-6">
                 <div class="relative flex items-start justify-between gap-3">
-                    <div class="flex min-w-0 items-center gap-3">
+                    <div class="flex min-w-0 items-center gap-3.5">
                         <span
-                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm"
+                            class="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-[20px] bg-budget-icon-surface text-budget-primary"
                             :class="plan.type === 'goal'
-                                ? 'bg-[#7046B8]'
-                                : 'bg-[#2457DA]'"
+                            ? 'bg-budget-goal-surface text-budget-goal'
+                                : ''"
                         >
-                            <component :is="plan.type === 'goal' ? Target : Wallet" :size="20" />
+                            <component :is="plan.type === 'goal' ? Target : ShoppingBag" :size="27" />
                         </span>
                         <div class="min-w-0">
-                            <h2 class="truncate text-lg font-semibold">{{ plan.name }}</h2>
-                            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                                <span class="text-[#637083]">
-                                    {{ plan.type === 'goal' ? 'Rencana Tujuan' : 'Anggaran Belanja' }}
-                                </span>
-                                <span class="rounded-full px-2 py-1 font-medium" :class="planStatusColor(plan.status)">
-                                    {{ planStatusLabel(plan.status) }}
-                                </span>
-                            </div>
+                            <h2 class="truncate text-lg font-bold tracking-tight text-budget-heading sm:text-xl">{{ plan.name }}</h2>
+                            <p class="mt-0.5 truncate text-sm text-budget-muted">
+                                {{ plan.type === 'goal' ? 'Rencana tujuan' : 'Anggaran belanja' }}
+                            </p>
+                            <span
+                                class="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                                :class="planStatusColor(plan.status)"
+                            >
+                                <span class="h-2 w-2 rounded-full bg-current"></span>
+                                {{ planStatusLabel(plan.status) }}
+                            </span>
                         </div>
                     </div>
-                    <strong class="shrink-0 rounded-xl bg-[#EEF3FF] px-3 py-2 text-sm text-[#2457DA]">
-                        Rp {{ formatMoney(plan.type === 'goal' ? plan.target_amount : plan.amount) }}
-                    </strong>
+                    <span class="shrink-0 pt-1 text-xs text-budget-muted">
+                        {{ formatDate(plan.starts_on) }}
+                    </span>
                 </div>
 
                 <div
                     v-if="plan.type === 'spending' && currentPeriodForPlan(plan)"
-                    class="relative rounded-xl border border-[#E9EDF3] bg-[#F8FAFD] p-3"
+                    class="relative flex flex-col gap-3 pt-1"
                 >
-                    <div class="flex items-center justify-between gap-3 text-xs">
-                        <span class="text-[#637083]">
-                            Penggunaan · {{ currentPeriodForPlan(plan).starts_on }}
-                        </span>
-                        <strong>{{ Math.round(periodUsagePercentage(currentPeriodForPlan(plan))) }}%</strong>
+                    <div class="flex items-end justify-between gap-3">
+                        <p class="min-w-0 truncate text-sm text-budget-muted">
+                            <strong class="text-2xl font-bold tracking-tight text-budget-heading sm:text-[28px]">
+                                {{ formatCurrency(currentPeriodForPlan(plan).spent, plan.currency) }}
+                            </strong>
+                            <span> / {{ formatCurrency(currentPeriodForPlan(plan).allocated_amount, plan.currency) }}</span>
+                        </p>
+                        <strong class="shrink-0 text-lg font-bold text-budget-heading">
+                            {{ Math.round(periodUsagePercentage(currentPeriodForPlan(plan))) }}%
+                        </strong>
                     </div>
-                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#E3E8F0]">
+                    <div class="h-2.5 overflow-hidden rounded-full bg-budget-progress-track">
                         <div
                             class="h-full rounded-full"
                             :class="periodUsageColor(currentPeriodForPlan(plan))"
                             :style="{ width: `${periodUsagePercentage(currentPeriodForPlan(plan))}%` }"
                         ></div>
                     </div>
-                    <p class="mt-2 text-xs text-[#637083]">
-                        Rp {{ formatMoney(currentPeriodForPlan(plan).spent) }} terpakai dari
-                        Rp {{ formatMoney(currentPeriodForPlan(plan).allocated_amount) }} dialokasikan
-                    </p>
                 </div>
-                <div v-else-if="plan.type === 'goal'" class="rounded-xl border border-[#EBE4FC] bg-[#F8F5FF] p-3">
-                    <div class="flex items-center justify-between gap-3 text-xs">
-                        <span class="text-[#637083]">Progress tujuan</span>
-                        <strong>{{ Math.round(goalProgressPercentage(plan)) }}%</strong>
+                <div v-else-if="plan.type === 'goal'" class="flex flex-col gap-3 pt-1">
+                    <div class="flex items-end justify-between gap-3">
+                        <p class="min-w-0 truncate text-sm text-budget-muted">
+                            <strong class="text-2xl font-bold tracking-tight text-budget-heading">
+                                {{ formatCurrency(plan.goal_funded, plan.currency) }}
+                            </strong>
+                            <span> / {{ formatCurrency(plan.target_amount, plan.currency) }}</span>
+                        </p>
+                        <strong class="shrink-0 text-lg font-bold text-budget-heading">
+                            {{ Math.round(goalProgressPercentage(plan)) }}%
+                        </strong>
                     </div>
-                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#E3E8F0]">
+                    <div class="h-2.5 overflow-hidden rounded-full bg-budget-progress-track">
                         <div
-                            class="h-full rounded-full bg-[#7046B8]"
+                            class="h-full rounded-full bg-budget-goal"
                             :style="{ width: `${goalProgressPercentage(plan)}%` }"
                         ></div>
                     </div>
-                    <p class="mt-2 text-xs text-[#637083]">
-                        Rp {{ formatMoney(plan.goal_funded) }} terkumpul dari
-                        Rp {{ formatMoney(plan.target_amount) }}
-                    </p>
                 </div>
+                </article>
+            </Link>
 
-                <Link
-                    :href="showPlanPage.url(plan.id)"
-                    class="flex items-center justify-between rounded-xl bg-[#F1F5FF] px-3 py-3 text-sm font-semibold text-[#2457DA] transition hover:bg-[#E6EDFF]"
-                >
-                    <span>Lihat detail dan kelola plan</span>
-                    <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#2457DA] shadow-sm">
-                        <ChevronRight :size="17" />
-                    </span>
-                </Link>
-            </article>
+            <ButtonPrimary
+                v-if="!showCreate && !isDetailPage"
+                :href="createPlanPage.url()"
+                class="!inline-flex !min-h-[58px] !w-full !items-center !justify-center !gap-3 !rounded-[20px] !bg-budget-primary !px-5 !py-3 !text-lg !font-semibold !text-white !shadow-[0_12px_24px_rgba(36,98,243,0.2)] transition hover:!bg-budget-primary-hover"
+            >
+                <Plus :size="25" />
+                Buat budget baru
+            </ButtonPrimary>
             <article
                 v-for="plan in plans"
                 v-show="!showCreate && isDetailPage"
@@ -1105,7 +1284,10 @@ const actOnPeriod = (route, period, data = {}) => {
                 </form>
             </section>
         </div>
-        <MobileBottomNav @add="router.visit(dashboard.url({ query: { add: 1 } }))" />
+        <MobileBottomNav
+            :show-labels="!showCreate && !isDetailPage"
+            @add="router.visit(dashboard.url({ query: { add: 1 } }))"
+        />
     </div>
 </template>
 

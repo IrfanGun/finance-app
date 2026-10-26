@@ -1,5 +1,11 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
+    href: {
+        type: String,
+        default: null,
+    },
     type: {
         type: String,
         default: 'button',
@@ -16,14 +22,14 @@ defineProps({
 </script>
 
 <template>
-    <button
-        :type="type"
-        :disabled="disabled"
+    <component
+        :is="href ? Link : 'button'"
+        v-bind="href ? { href } : { type, disabled }"
         class="button-primary"
         :class="`button-primary--${variant}`"
     >
         <slot />
-    </button>
+    </component>
 </template>
 
 <style scoped>

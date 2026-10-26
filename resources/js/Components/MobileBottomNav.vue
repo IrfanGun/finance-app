@@ -6,6 +6,12 @@ import { edit as profileEdit } from '@/routes/profile';
 import { index as assetsIndex } from '@/routes/assets';
 import { useTranslation } from '@/Composables/useTranslation';
 const emit = defineEmits(['add']);
+defineProps({
+    showLabels: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const page = usePage();
 const { t } = useTranslation();
@@ -14,7 +20,7 @@ const isActive = (path) => page.url === path;
 
 <template>
     <nav class="fixed inset-x-0 bottom-0 z-20 mx-auto flex h-[84px] max-w-lg items-center justify-around border-t border-[#E9EDF3] bg-white/95 px-4 pb-2 pt-3 text-[11px] text-[#637083] shadow-[0_-4px_18px_rgba(21,35,56,0.05)] backdrop-blur-sm">
-        <Link href="/dashboard" class="nav-item" :class="{ 'nav-active': isActive('/dashboard') }" :aria-label="t('Home')"><Home class="nav-icon" :size="21" /><span class="hidden sm:inline">{{ t('Home') }}</span></Link>
+        <Link href="/dashboard" class="nav-item" :class="{ 'nav-active': isActive('/dashboard') }" :aria-label="t('Home')"><Home class="nav-icon" :size="21" /><span :class="showLabels ? 'inline' : 'hidden sm:inline'">{{ t('Home') }}</span></Link>
         <Link
             :href="assetsIndex.url()"
             class="nav-item"
@@ -22,11 +28,11 @@ const isActive = (path) => page.url === path;
             :aria-label="t('Assets')"
         >
             <Package class="nav-icon" :size="21" />
-            <span class="hidden sm:inline">{{ t('Asset') }}</span>
+            <span :class="showLabels ? 'inline' : 'hidden sm:inline'">{{ t('Asset') }}</span>
         </Link>
         <button @click="emit('add')" class="group -mt-6 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#2457DA] text-white shadow-lg shadow-blue-600/30 transition duration-300 hover:scale-105 active:scale-90 focus:outline-none focus:ring-4 focus:ring-blue-200" :aria-label="t('Add transaction')"><Plus class="transition duration-300 group-hover:rotate-90" :size="28" /></button>
-        <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }" :aria-label="t('Chat')"><MessageCircle class="nav-icon" :size="21" /><span class="hidden sm:inline">{{ t('Chat') }}</span></Link>
-        <Link :href="profileEdit.url()" class="nav-item" :class="{ 'nav-active': isActive(profileEdit.url()) }" :aria-label="t('Profile')"><CircleUserRound class="nav-icon" :size="21" /><span class="hidden sm:inline">{{ t('Profile') }}</span></Link>
+        <Link :href="chatIndex.url()" class="nav-item" :class="{ 'nav-active': isActive(chatIndex.url()) }" :aria-label="t('Chat')"><MessageCircle class="nav-icon" :size="21" /><span :class="showLabels ? 'inline' : 'hidden sm:inline'">{{ t('Chat') }}</span></Link>
+        <Link :href="profileEdit.url()" class="nav-item" :class="{ 'nav-active': isActive(profileEdit.url()) }" :aria-label="t('Profile')"><CircleUserRound class="nav-icon" :size="21" /><span :class="showLabels ? 'inline' : 'hidden sm:inline'">{{ t('Profile') }}</span></Link>
     </nav>
 </template>
 
