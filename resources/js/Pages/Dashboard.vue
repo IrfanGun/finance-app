@@ -8,7 +8,7 @@ import {
     watch,
 } from 'vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChevronRight } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChevronRight, Wallet } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import SpendingCategoryChart from '@/Components/SpendingCategoryChart.vue';
@@ -78,10 +78,52 @@ const updateActiveFundCurrency = (event) => {
     activeFundCurrency.value = fundCurrencies[Math.min(currencyIndex, fundCurrencies.length - 1)] ?? 'IDR';
 };
 const formatCurrency = (amount) => new Intl.NumberFormat(locale.value === 'id' ? 'id-ID' : 'en-US').format(Number(amount ?? 0));
+const wealthChange = computed(() => Number(props.wealthTrend.change ?? 0));
+const wealthChangePercentage = computed(() => Number(props.wealthTrend.change_percentage ?? 0));
+const wealthTrendColor = computed(() => {
+    if (wealthChange.value > 0) {
+        return '#4DFF88';
+    }
+
+    if (wealthChange.value < 0) {
+        return '#F87171';
+    }
+
+    return '#FFFFFF';
+});
+const formattedWealthChange = computed(() => {
+    const sign = wealthChange.value > 0
+        ? '+'
+        : wealthChange.value < 0
+            ? '-'
+            : '';
+
+    return `${sign}Rp ${formatCurrency(Math.abs(wealthChange.value))}`;
+});
+const formattedWealthChangePercentage = computed(() => {
+    const sign = wealthChangePercentage.value > 0
+        ? '+'
+        : wealthChangePercentage.value < 0
+            ? '-'
+            : '';
+
+    return `${sign}${Math.abs(wealthChangePercentage.value)}%`;
+});
+const wealthTrendPoints = computed(() => {
+    const points = props.wealthTrend.series;
+    const lastIndex = points.length - 1;
+    const sampleInterval = Math.max(1, Math.floor(lastIndex / 5));
+
+    return points.filter((_, index) =>
+        index === 0
+        || index === lastIndex
+        || index % sampleInterval === 0,
+    );
+});
 const wealthChartOptions = computed(() => ({
     series: [{
         name: t('Kekayaan bersih'),
-        data: props.wealthTrend.series.map((point) => ({
+        data: wealthTrendPoints.value.map((point) => ({
             x: new Date(`${point.date}T00:00:00Z`).getTime(),
             y: Number(point.value),
         })),
@@ -89,34 +131,55 @@ const wealthChartOptions = computed(() => ({
     chart: {
         type: 'area',
         height: 64,
-        width: 128,
+        width: 160,
         parentHeightOffset: 0,
         sparkline: { enabled: true },
         toolbar: { show: false },
         animations: { enabled: false },
     },
-    colors: [props.wealthTrend.change_percentage >= 0 ? '#6EE7B7' : '#FCA5A5'],
+    colors: [wealthTrendColor.value],
     dataLabels: { enabled: false },
     fill: {
         type: 'gradient',
         gradient: {
-            opacityFrom: 0.3,
-            opacityTo: 0.02,
+            shadeIntensity: 0.3,
+            opacityFrom: 0.46,
+            opacityTo: 0.04,
+            stops: [0, 100],
+            colorStops: [
+                {
+                    offset: 0,
+                    color: wealthTrendColor.value,
+                    opacity: 0.46,
+                },
+                {
+                    offset: 100,
+                    color: wealthTrendColor.value,
+                    opacity: 0.04,
+                },
+            ],
         },
     },
     grid: { show: false, padding: { top: 3, right: 0, bottom: 0, left: 0 } },
-    markers: { size: 0, hover: { size: 3 } },
+    markers: { size: 0, hover: { size: 0 } },
     stroke: {
-        curve: 'monotoneCubic',
-        width: 3,
+        curve: 'smooth',
+        colors: [wealthTrendColor.value],
+        width: 2.5,
         lineCap: 'round',
     },
     tooltip: {
         x: { format: 'dd MMM' },
         y: { formatter: (amount) => `Rp ${formatCurrency(amount)}` },
     },
-    xaxis: { type: 'datetime' },
-    yaxis: { show: false },
+    xaxis: {
+        type: 'datetime',
+        crosshairs: { show: false },
+    },
+    yaxis: {
+        show: false,
+        crosshairs: { show: false },
+    },
 }));
 const renderWealthChart = async () => {
     await nextTick();
@@ -309,25 +372,38 @@ const shortcuts = [
         </div>
 
         <header
-            class="relative mx-5 mt-5 overflow-hidden rounded-2xl bg-gradient-to-br from-[#11297A] via-[#1F4AC2] to-[#2969E6] px-6 py-7 text-white shadow-[0_16px_36px_rgba(31,74,194,0.2)]">
+            class="relative mx-5 mt-5 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#1F4AC2] via-[#2457DA] to-[#2F7BFF] px-6 py-7 text-white">
             <div
                 ref="wealthChartElement"
-                class="pointer-events-none absolute right-3 top-4 h-16 w-32"
+                class="wealth-chart pointer-events-none absolute right-3 top-4 h-16 w-40"
                 aria-hidden="true"
             ></div>
             <div class="relative">
-                <p class="text-sm text-blue-100">{{ t('Estimasi kekayaan bersih') }}</p>
-                <p class="mt-1 text-[32px] font-semibold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
-                <p
-                    class="mt-1 text-xs font-medium"
-                    :class="wealthTrend.change_percentage >= 0 ? 'text-emerald-200' : 'text-red-200'"
-                >
-                    {{ wealthTrend.change_percentage >= 0 ? '+' : '' }}{{ wealthTrend.change_percentage }}%
-                    {{ t('dibanding 1 bulan lalu') }}
-                </p>
-                <p class="mt-1 text-xs text-blue-100">
-                    {{ t('Includes IDR') }} {{ formatCurrency(summary.asset_value) }} {{ t('in assets') }}
-                </p>
+                <div class="flex items-center gap-2 text-white/90">
+                    <Wallet :size="19" :stroke-width="2" aria-hidden="true" />
+                    <p class="text-sm font-medium">{{ t('Total Worth') }}</p>
+                </div>
+                <p class="mt-2 text-[32px] font-semibold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+                        :class="wealthChange > 0
+                            ? 'bg-[#4DFF88]/20 text-[#73FFA3]'
+                            : wealthChange < 0
+                                ? 'bg-red-300/20 text-red-200'
+                                : 'bg-white/15 text-white/90'"
+                    >
+                        <span class="flex h-4 w-4 items-center justify-center rounded-full border border-current">
+                            <ArrowUp v-if="wealthChange > 0" :size="11" />
+                            <ArrowDown v-else-if="wealthChange < 0" :size="11" />
+                            <span v-else class="h-px w-2 bg-current"></span>
+                        </span>
+                        {{ formattedWealthChangePercentage }}
+                    </span>
+                    <span class="text-xs font-medium text-white/85">
+                        {{ t('This month') }} ({{ formattedWealthChange }})
+                    </span>
+                </div>
             </div>
         </header>
 
@@ -630,6 +706,12 @@ const shortcuts = [
 </template>
 
 <style scoped>
+.wealth-chart :deep(.apexcharts-xcrosshairs),
+.wealth-chart :deep(.apexcharts-ycrosshairs),
+.wealth-chart :deep(.apexcharts-series-markers-wrap) {
+    display: none !important;
+}
+
 .account-slider {
     scrollbar-width: none;
 }

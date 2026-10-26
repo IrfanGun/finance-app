@@ -75,7 +75,7 @@ const selectDay = (day) => {
                         </span>
                         <span class="flex w-full flex-1 items-end justify-center">
                             <span
-                                class="block w-6 rounded-t-md transition-colors sm:w-8"
+                                class="block w-6 rounded-t-full transition-[height,background-color] duration-500 ease-out sm:w-8"
                                 :class="selectedDay?.date === day.date ? 'bg-[#2457DA]' : 'bg-[#F4C05A] group-hover:bg-[#E8AD35]'"
                                 :style="{ height: `${day.barHeight}%` }"
                             ></span>
