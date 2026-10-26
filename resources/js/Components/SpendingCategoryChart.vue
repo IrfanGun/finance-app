@@ -45,44 +45,44 @@ const selectDay = (day) => {
 
 <template>
     <div class="w-full">
-        <div v-if="chartDays.length" class="mt-4">
+        <div v-if="chartDays.length">
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <p class="text-xs text-[#637083]">Total minggu ini</p>
+                    <p class="text-xs text-budget-muted">Total minggu ini</p>
                     <p class="mt-1 text-lg font-semibold">Rp {{ formatCurrency(weeklyTotal) }}</p>
                 </div>
-                <p class="pt-1 text-xs text-[#637083]">Senin – Minggu</p>
+                <p class="pt-1 text-xs text-budget-muted">Senin – Minggu</p>
             </div>
 
-            <div class="relative mt-4 h-36 border-b border-[#E8ECF2]">
-                <div class="pointer-events-none absolute inset-x-0 top-0 border-t border-dashed border-[#E8ECF2]"></div>
-                <div class="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-[#E8ECF2]"></div>
+            <div class="relative mt-4 h-36 border-b border-budget-border">
+                <div class="pointer-events-none absolute inset-x-0 top-0 border-t border-dashed border-budget-border"></div>
+                <div class="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-budget-border"></div>
                 <div class="flex h-full items-end justify-between gap-1 px-1">
                     <button
                         v-for="day in chartDays"
                         :key="day.date"
                         type="button"
-                        class="group relative z-10 flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2 rounded-t-lg pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2457DA]"
+                        class="group relative z-10 flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2 rounded-t-lg pt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-budget-primary"
                         :aria-label="`${day.label}, ${formatDayDate(day.date)}: Rp ${formatCurrency(day.total)}`"
                         :aria-pressed="selectedDay?.date === day.date"
                         @click="selectDay(day)"
                     >
                         <span
                             v-if="selectedDay?.date === day.date && day.total > 0"
-                            class="absolute top-0 z-20 whitespace-nowrap rounded-md bg-[#17243A] px-2 py-1 text-[10px] font-medium text-white shadow-sm"
+                            class="absolute top-0 z-20 whitespace-nowrap rounded-md bg-budget-heading px-2 py-1 text-[10px] font-medium text-white shadow-sm"
                         >
                             Rp {{ formatCurrency(day.total) }}
                         </span>
                         <span class="flex w-full flex-1 items-end justify-center">
                             <span
                                 class="block w-6 rounded-t-full transition-[height,background-color] duration-500 ease-out sm:w-8"
-                                :class="selectedDay?.date === day.date ? 'bg-[#2457DA]' : 'bg-[#F4C05A] group-hover:bg-[#E8AD35]'"
+                                :class="selectedDay?.date === day.date ? 'bg-budget-primary' : 'bg-budget-primary/30 group-hover:bg-budget-primary/50'"
                                 :style="{ height: `${day.barHeight}%` }"
                             ></span>
                         </span>
                         <span
                             class="pb-2 text-[10px] font-medium"
-                            :class="selectedDay?.date === day.date ? 'text-[#2457DA]' : 'text-[#637083]'"
+                            :class="selectedDay?.date === day.date ? 'text-budget-primary' : 'text-budget-muted'"
                         >
                             {{ day.label }}
                         </span>
@@ -94,12 +94,12 @@ const selectDay = (day) => {
                 <div class="flex items-center justify-between gap-3">
                     <div>
                         <p class="text-sm font-semibold">{{ selectedDay.label }}, {{ formatDayDate(selectedDay.date) }}</p>
-                        <p class="mt-0.5 text-xs text-[#637083]">{{ selectedDay.transactions.length }} transaksi</p>
+                        <p class="mt-0.5 text-xs text-budget-muted">{{ selectedDay.transactions.length }} transaksi</p>
                     </div>
                     <strong class="shrink-0 text-sm">Rp {{ formatCurrency(selectedDay.total) }}</strong>
                 </div>
 
-                <ul v-if="selectedDay.transactions.length" class="mt-3 divide-y divide-[#EEF1F5]">
+                <ul v-if="selectedDay.transactions.length" class="mt-3 divide-y divide-budget-border">
                     <li
                         v-for="transaction in selectedDay.transactions"
                         :key="transaction.id"
@@ -107,16 +107,16 @@ const selectDay = (day) => {
                     >
                         <div class="min-w-0">
                             <p class="truncate text-sm font-medium">{{ transaction.title }}</p>
-                            <p class="mt-0.5 truncate text-xs text-[#637083]">{{ transaction.category }}</p>
+                            <p class="mt-0.5 truncate text-xs text-budget-muted">{{ transaction.category }}</p>
                         </div>
                         <strong class="shrink-0 text-sm">Rp {{ formatCurrency(transaction.amount) }}</strong>
                     </li>
                 </ul>
-                <p v-else class="mt-3 rounded-xl bg-[#F5F7FA] px-3 py-3 text-sm text-[#637083]">
+                <p v-else class="mt-3 rounded-xl bg-budget-control-surface px-3 py-3 text-sm text-budget-muted">
                     Belum ada pengeluaran pada hari ini.
                 </p>
             </section>
         </div>
-        <p v-else class="mt-4 text-sm text-[#637083]">Belum ada pengeluaran minggu ini.</p>
+        <p v-else class="mt-4 text-sm text-budget-muted">Belum ada pengeluaran minggu ini.</p>
     </div>
 </template>

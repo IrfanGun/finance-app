@@ -7,9 +7,10 @@ import {
     ref,
     watch,
 } from 'vue';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChevronRight, Wallet } from 'lucide-vue-next';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChevronRight, Eye, EyeOff, Wallet } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import ButtonPrimary from '@/Components/ButtonPrimary.vue';
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import SpendingCategoryChart from '@/Components/SpendingCategoryChart.vue';
 import FormInput from '@/Components/FormInput.vue';
@@ -67,19 +68,26 @@ const transactionForm = useForm({
     saving_id: null,
 });
 const isScrolled = ref(false);
-const fundCurrencies = Object.keys(props.funds);
-const activeFundCurrency = ref(fundCurrencies[0] ?? 'IDR');
+const isFinancialDetailsVisible = ref(false);
+const fundCurrencies = Object.keys(props.funds).length
+    ? Object.keys(props.funds)
+    : ['IDR'];
+const activeFundCurrency = ref(fundCurrencies[0]);
 const wealthChartElement = ref(null);
 let wealthChart = null;
 let apexChartsConstructor = null;
-const updateActiveFundCurrency = (event) => {
-    const slideIndex = Math.round(event.target.scrollTop / 88);
-    const currencyIndex = slideIndex % fundCurrencies.length;
-    activeFundCurrency.value = fundCurrencies[Math.min(currencyIndex, fundCurrencies.length - 1)] ?? 'IDR';
-};
 const formatCurrency = (amount) => new Intl.NumberFormat(locale.value === 'id' ? 'id-ID' : 'en-US').format(Number(amount ?? 0));
 const wealthChange = computed(() => Number(props.wealthTrend.change ?? 0));
 const wealthChangePercentage = computed(() => Number(props.wealthTrend.change_percentage ?? 0));
+const activeFunds = computed(() => props.funds[activeFundCurrency.value] ?? {});
+const formatFundCurrency = (amount, currency = activeFundCurrency.value) => new Intl.NumberFormat(
+    locale.value === 'id' ? 'id-ID' : 'en-US',
+    {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: currency === 'IDR' ? 0 : 2,
+    },
+).format(Number(amount ?? 0));
 const wealthTrendColor = computed(() => {
     if (wealthChange.value > 0) {
         return '#4DFF88';
@@ -300,39 +308,40 @@ onUnmounted(() => {
 
 const shortcuts = [
     {
-        image: '/dashboard-icons/add.png',
-        label: 'Add',
-        gradient: 'from-[#DBEAFE] to-[#EFF6FF]',
+        image: '/dashboard-icons/savings.png',
+        label: 'Savings',
+        href: savingsIndex.url(),
+        gradient: 'from-budget-shortcut-savings-start to-budget-shortcut-savings-end',
     },
     {
         image: '/dashboard-icons/scan.png',
         label: 'Scan',
         href: receiptScan.url(),
-        gradient: 'from-[#CCFBF1] to-[#F0FDFA]',
+        gradient: 'from-budget-shortcut-scan-start to-budget-shortcut-scan-end',
     },
     {
         image: '/dashboard-icons/chat.png',
         label: 'Chat',
         href: chatIndex.url(),
-        gradient: 'from-[#EDE9FE] to-[#F5F3FF]',
+        gradient: 'from-budget-shortcut-chat-start to-budget-shortcut-chat-end',
     },
     {
         image: '/dashboard-icons/meals.png',
         label: 'Meals',
         href: mealsIndex.url(),
-        gradient: 'from-[#FFEDD5] to-[#FFF7ED]',
+        gradient: 'from-budget-shortcut-meals-start to-budget-shortcut-meals-end',
     },
     {
         image: '/dashboard-icons/reminder.png',
         label: 'Reminder',
         href: remindersIndex.url(),
-        gradient: 'from-[#FEF9C3] to-[#FEFCE8]',
+        gradient: 'from-budget-shortcut-reminder-start to-budget-shortcut-reminder-end',
     },
     {
         image: '/dashboard-icons/plan.png',
         label: 'Plan',
         href: budgetIndex.url(),
-        gradient: 'from-[#DCFCE7] to-[#F0FDF4]',
+        gradient: 'from-budget-shortcut-plan-start to-budget-shortcut-plan-end',
     },
 ];
 </script>
@@ -343,36 +352,36 @@ const shortcuts = [
 
     <Transition name="mini-header">
         <div v-if="isScrolled"
-            class="fixed inset-x-0 top-0 z-20 mx-auto flex h-16 w-full max-w-lg items-center justify-between bg-[#1F4AC2] px-6 text-white shadow-md">
+            class="fixed inset-x-0 top-0 z-20 mx-auto flex h-16 w-full max-w-lg items-center justify-between bg-budget-header px-6 text-white shadow-md">
             <div>
                 <p class="text-xs text-blue-100">{{ t('Good morning,') }}</p>
                 <h1 class="text-lg font-semibold">{{ userName }}</h1>
             </div>
             <div class="flex items-center gap-2">
                 <LanguageSwitcher :floating="false" />
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA]">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-semibold text-budget-primary">
                     {{ userName.slice(0, 2).toUpperCase() }}
                 </div>
             </div>
         </div>
     </Transition>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-app pb-24 text-app-heading">
-        <div class="mx-6 mt-5 flex items-center justify-between">
+    <div class="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-budget-page pb-28 text-budget-heading">
+        <div class="mx-5 mt-6 flex items-center justify-between">
             <div>
-                <p class="text-sm text-[#637083]">{{ t('Good morning,') }}</p>
-                <h1 class="text-2xl font-semibold">{{ userName }}</h1>
+                <p class="text-sm text-budget-muted">{{ t('Good morning,') }}</p>
+                <h1 class="text-2xl font-bold tracking-tight">{{ userName }}</h1>
             </div>
             <div class="flex items-center gap-2">
                 <LanguageSwitcher :floating="false" />
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA] shadow-sm">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-budget-primary shadow-[0_8px_24px_rgba(41,82,160,0.08)]">
                     {{ userName.slice(0, 2).toUpperCase() }}
                 </div>
             </div>
         </div>
 
         <header
-            class="relative mx-5 mt-5 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#1F4AC2] via-[#2457DA] to-[#2F7BFF] px-6 py-7 text-white">
+            class="relative mx-5 mt-5 overflow-hidden rounded-[28px] bg-budget-header px-6 py-7 text-white shadow-[0_18px_42px_rgba(36,87,218,0.22)]">
             <div
                 ref="wealthChartElement"
                 class="wealth-chart pointer-events-none absolute right-3 top-4 h-16 w-40"
@@ -383,35 +392,95 @@ const shortcuts = [
                     <Wallet :size="19" :stroke-width="2" aria-hidden="true" />
                     <p class="text-sm font-medium">{{ t('Total Worth') }}</p>
                 </div>
-                <p class="mt-2 text-[32px] font-semibold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
-                <div class="mt-3 flex flex-wrap items-center gap-2">
-                    <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
-                        :class="wealthChange > 0
-                            ? 'bg-[#4DFF88]/20 text-[#73FFA3]'
-                            : wealthChange < 0
-                                ? 'bg-red-300/20 text-red-200'
-                                : 'bg-white/15 text-white/90'"
-                    >
-                        <span class="flex h-4 w-4 items-center justify-center rounded-full border border-current">
-                            <ArrowUp v-if="wealthChange > 0" :size="11" />
-                            <ArrowDown v-else-if="wealthChange < 0" :size="11" />
-                            <span v-else class="h-px w-2 bg-current"></span>
+                <p class="mt-2 text-[clamp(2rem,9vw,2.5rem)] font-bold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span
+                            class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+                            :class="wealthChange > 0
+                                ? 'bg-[#4DFF88]/20 text-[#73FFA3]'
+                                : wealthChange < 0
+                                    ? 'bg-red-300/20 text-red-200'
+                                    : 'bg-white/15 text-white/90'"
+                        >
+                            <span class="flex h-4 w-4 items-center justify-center rounded-full border border-current">
+                                <ArrowUp v-if="wealthChange > 0" :size="11" />
+                                <ArrowDown v-else-if="wealthChange < 0" :size="11" />
+                                <span v-else class="h-px w-2 bg-current"></span>
+                            </span>
+                            {{ formattedWealthChangePercentage }}
                         </span>
-                        {{ formattedWealthChangePercentage }}
-                    </span>
-                    <span class="text-xs font-medium text-white/85">
-                        {{ t('This month') }} ({{ formattedWealthChange }})
-                    </span>
+                        <span class="text-xs font-medium text-white/85">
+                            {{ t('This month') }} ({{ formattedWealthChange }})
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <ButtonPrimary
+                            v-for="currency in fundCurrencies"
+                            :key="currency"
+                            type="button"
+                            variant="secondary"
+                            class="!min-h-0 !rounded-full !px-2.5 !py-1 !text-[11px] !shadow-none"
+                            :class="activeFundCurrency === currency
+                                ? '!border-white !bg-white !text-budget-primary'
+                                : '!border-white/30 !bg-transparent !text-white/80'"
+                            :aria-pressed="activeFundCurrency === currency"
+                            @click="activeFundCurrency = currency"
+                        >{{ currency }}</ButtonPrimary>
+                        <ButtonPrimary
+                            type="button"
+                            variant="secondary"
+                            class="!min-h-0 !h-8 !w-8 !rounded-none !border-0 !bg-transparent !p-0 !text-white !shadow-none"
+                            :aria-label="t(isFinancialDetailsVisible ? 'Hide details' : 'Show details')"
+                            aria-controls="financial-summary-details"
+                            :aria-expanded="isFinancialDetailsVisible"
+                            @click="isFinancialDetailsVisible = !isFinancialDetailsVisible"
+                        >
+                            <EyeOff v-if="isFinancialDetailsVisible" :size="16" />
+                            <Eye v-else :size="16" />
+                        </ButtonPrimary>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-show="isFinancialDetailsVisible"
+                id="financial-summary-details"
+                class="mt-6 border-t border-white/20 pt-4"
+            >
+                <div class="mt-4 grid grid-cols-2">
+                    <div class="min-w-0 border-r border-b border-white/25 pb-3 pr-3">
+                        <p class="text-sm text-white/75">{{ t('Total assets') }}</p>
+                        <strong class="mt-1 block truncate text-lg font-semibold tracking-tight">
+                            {{ formatFundCurrency(summary.asset_value, 'IDR') }}
+                        </strong>
+                    </div>
+                    <div class="min-w-0 border-b border-white/25 pb-3 pl-3">
+                        <p class="text-sm text-white/75">{{ t('Current balance') }}</p>
+                        <strong class="mt-1 block truncate text-lg font-semibold tracking-tight">
+                            {{ formatFundCurrency(activeFunds.actual) }}
+                        </strong>
+                    </div>
+                    <div class="min-w-0 border-r border-white/25 pt-3 pr-3">
+                        <p class="text-sm text-white/75">{{ t('Budget reserved') }}</p>
+                        <strong class="mt-1 block truncate text-lg font-semibold tracking-tight">
+                            {{ formatFundCurrency(activeFunds.budget) }}
+                        </strong>
+                    </div>
+                    <div class="min-w-0 pt-3 pl-3">
+                        <p class="text-sm text-white/75">{{ t('Savings funds') }}</p>
+                        <strong class="mt-1 block truncate text-lg font-semibold tracking-tight">
+                            {{ formatFundCurrency(activeFunds.savings) }}
+                        </strong>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <nav class="mx-5 mt-5 grid grid-cols-3 gap-x-3 gap-y-5 rounded-2xl bg-white px-3 py-4 text-center text-xs font-medium text-[#26354C]">
+        <nav class="mx-5 mt-5 grid grid-cols-3 gap-x-3 gap-y-5 px-1 py-2 text-center text-xs font-semibold text-budget-heading">
             <div v-for="item in shortcuts" :key="item.label">
-                <Link v-if="item.href" :href="item.href" class="block">
+                <Link :href="item.href" class="block">
                     <span
-                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-[inset_0_1px_3px_rgba(255,255,255,0.45),inset_0_-2px_5px_rgba(10,35,110,0.06)] transition hover:-translate-y-0.5"
+                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br transition hover:-translate-y-0.5"
                         :class="item.gradient"
                     >
                         <img
@@ -422,95 +491,24 @@ const shortcuts = [
                     </span>
                     <span class="mt-2 block">{{ t(item.label) }}</span>
                 </Link>
-                <template v-else>
-                    <span
-                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-[inset_0_1px_3px_rgba(255,255,255,0.45),inset_0_-2px_5px_rgba(10,35,110,0.06)]"
-                        :class="item.gradient"
-                    >
-                        <img
-                            :src="item.image"
-                            alt=""
-                            class="h-8 w-8 object-contain"
-                        />
-                    </span>
-                    <span class="mt-2 block">{{ t(item.label) }}</span>
-                </template>
             </div>
         </nav>
 
-        <main class="space-y-7 px-6 pt-6">
-            <section>
-                <div class="flex items-center justify-between px-1">
-                    <h2 class="font-semibold">{{ t('Dana tersedia') }}</h2>
-                    <div class="flex gap-3 text-sm text-[#2457DA]">
-                        <Link :href="budgetIndex.url()">{{ t('Budget') }}</Link>
-                        <Link :href="savingsIndex.url()">{{ t('Savings') }}</Link>
-                    </div>
-                </div>
-                <article
-                    v-if="fundCurrencies.length"
-                    class="mt-4 flex w-full items-stretch gap-3 rounded-xl bg-white p-3"
-                >
-                    <div class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl bg-[#F5F7FA] p-3 text-center">
-                        <Banknote class="mb-2 text-[#2457DA]" :size="19" />
-                        <span class="text-xs text-[#637083]">{{ t('Saldo') }} {{ activeFundCurrency }}</span>
-                        <strong class="mt-1 text-base font-semibold tracking-tight">
-                            {{ formatCurrency(funds[activeFundCurrency]?.free) }}
-                        </strong>
-                    </div>
-                    <div class="min-w-0 flex-1 overflow-hidden rounded-xl bg-[#F5F7FA] px-3">
-                        <div
-                            class="h-[88px] snap-y snap-mandatory overflow-y-auto text-center [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden"
-                            @scroll.passive="updateActiveFundCurrency"
-                        >
-                            <div
-                                v-for="currency in fundCurrencies"
-                                :key="`${currency}-actual`"
-                                class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
-                            >
-                                <Banknote class="text-[#2457DA]" :size="19" />
-                                <span class="text-xs text-[#637083]">{{ t('Saldo aktual') }}</span>
-                                <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].actual) }}</strong>
-                                <ArrowUpDown :size="12" class="text-[#2457DA]" />
-                            </div>
-                            <div
-                                v-for="currency in fundCurrencies"
-                                :key="`${currency}-budget`"
-                                class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
-                            >
-                                <Banknote class="text-[#2457DA]" :size="19" />
-                                <span class="text-xs text-[#637083]">{{ t('Budget dicadangkan') }}</span>
-                                <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].budget) }}</strong>
-                                <ArrowUpDown :size="12" class="text-[#2457DA]" />
-                            </div>
-                            <div
-                                v-for="currency in fundCurrencies"
-                                :key="`${currency}-savings`"
-                                class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
-                            >
-                                <Banknote class="text-[#2457DA]" :size="19" />
-                                <span class="text-xs text-[#637083]">{{ t('Dana savings') }}</span>
-                                <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].savings) }}</strong>
-                                <ArrowUpDown :size="12" class="text-[#2457DA]" />
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            </section>
+        <main class="space-y-7 px-5 pt-6">
             <section>
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">{{ t('This month') }}</h2><span class="text-sm text-[#637083]">{{ new
+                    <h2 class="text-lg font-bold tracking-tight">{{ t('This month') }}</h2><span class="text-sm text-budget-muted">{{ new
                         Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { month: 'short', year: 'numeric' }) }}</span>
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    <div class="rounded-xl bg-[#F5F7FA] p-4">
-                        <p class="flex items-center gap-1 text-sm text-[#16815B]">
+                    <div class="rounded-[20px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                        <p class="flex items-center gap-1 text-sm text-income">
                             <ArrowDown :size="15" />{{ t('Income') }}
                         </p>
                         <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.income) }}</p>
                     </div>
-                    <div class="rounded-xl bg-[#F5F7FA] p-4">
-                        <p class="flex items-center gap-1 text-sm text-[#B34735]">
+                    <div class="rounded-[20px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                        <p class="flex items-center gap-1 text-sm text-expense">
                             <ArrowUp :size="15" />{{ t('Expense') }}
                         </p>
                         <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.expense) }}</p>
@@ -519,41 +517,45 @@ const shortcuts = [
             </section>
             <section>
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">{{ t('Spending this week') }}</h2>
-                    <button class="text-sm text-[#2457DA]" @click="router.visit(categoriesIndex.url())">
-                        {{ t('Details') }}
-                    </button>
+                    <h2 class="text-lg font-bold tracking-tight">{{ t('Spending this week') }}</h2>
+                    <ButtonPrimary
+                        :href="categoriesIndex.url()"
+                        variant="secondary"
+                        class="!min-h-0 !border-0 !bg-transparent !px-2 !py-1 !text-sm !text-budget-link !shadow-none"
+                    >{{ t('Details') }}</ButtonPrimary>
                 </div>
-                <SpendingCategoryChart :days="weeklySpending" />
+                <div class="mt-4 rounded-[24px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                    <SpendingCategoryChart :days="weeklySpending" />
+                </div>
             </section>
             <section>
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold">{{ t('Recent transactions') }}</h2>
-                    <Link :href="transactionsIndex.url()" class="text-sm text-[#2457DA]">{{ t('See all') }}</Link>
+                    <Link :href="transactionsIndex.url()" class="text-sm font-semibold text-budget-link">{{ t('See all') }}</Link>
                 </div>
-                <div v-if="transactions.length" class="mt-4 space-y-4">
-                    <div v-for="transaction in transactions" :key="transaction.id" class="flex items-center gap-4"><span
-                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F5F7FA]"
-                            :class="transaction.type === 'income' ? 'text-[#16815B]' : 'text-[#B34735]'">
+                <div v-if="transactions.length" class="mt-4 rounded-[24px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                    <div v-for="transaction in transactions" :key="transaction.id" class="flex items-center gap-4 border-b border-budget-border py-3 first:pt-0 last:border-0 last:pb-0"><span
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-budget-icon-surface"
+                            :class="transaction.type === 'income' ? 'text-income' : 'text-expense'">
                             <component :is="transaction.type === 'income' ? ArrowDown : ArrowUpRight" :size="20" />
                         </span>
                         <div class="flex-1">
                             <p class="text-sm font-medium">{{ transaction.note || t('Transaction') }}</p>
-                            <p class="text-xs text-[#637083]">{{ transactionCategory(transaction) }} · {{
+                            <p class="text-xs text-budget-muted">{{ transactionCategory(transaction) }} · {{
                                 transaction.date }}
                             </p>
-                        </div><strong class="text-sm" :class="transaction.type === 'income' ? 'text-[#16815B]' : ''">{{
+                        </div><strong class="text-sm" :class="transaction.type === 'income' ? 'text-income' : ''">{{
                             transactionAmount(transaction) }}</strong>
                     </div>
                 </div>
-                <p v-else class="mt-4 text-sm text-[#637083]">{{ t('No transactions yet.') }}</p>
+                <p v-else class="mt-4 text-sm text-budget-muted">{{ t('No transactions yet.') }}</p>
             </section>
         </main>
 
         <section class="mt-7 px-6">
             <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold">{{ t('Accounts') }}</h2>
-                <Link :href="accountsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">{{ t('See all') }}
+                <Link :href="accountsIndex.url()" class="flex items-center text-sm font-semibold text-budget-link">{{ t('See all') }}
                     <ChevronRight :size="16" />
                 </Link>
             </div>
@@ -561,7 +563,7 @@ const shortcuts = [
                 <article
                     v-for="(account, index) in accounts"
                     :key="account.id"
-                    class="account-card relative isolate flex h-40 w-[280px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-2xl p-5 text-white"
+                    class="account-card relative isolate flex h-40 w-[280px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[24px] bg-budget-header p-5 text-white shadow-[0_16px_32px_rgba(36,87,218,0.16)]"
                     :class="`account-card--${index % 4}`"
                 >
                     <div class="relative z-10 flex items-start justify-between gap-3">
@@ -582,12 +584,12 @@ const shortcuts = [
                     </div>
                 </article>
             </div>
-            <p v-else class="mt-4 text-sm text-[#637083]">{{ t('No accounts yet.') }}</p>
+            <p v-else class="mt-4 text-sm text-budget-muted">{{ t('No accounts yet.') }}</p>
         </section>
         <section class="mt-7 px-6">
             <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold">{{ t('Assets') }}</h2>
-                <Link :href="assetsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">
+                <Link :href="assetsIndex.url()" class="flex items-center text-sm font-semibold text-budget-link">
                     {{ t('See all') }} <ChevronRight :size="16" />
                 </Link>
             </div>
@@ -596,34 +598,51 @@ const shortcuts = [
                     v-for="asset in assets"
                     :key="asset.id"
                     :href="assetShow.url(asset.id)"
-                    class="flex items-center justify-between rounded-xl bg-[#F5F7FA] p-4"
+                    class="flex items-center justify-between rounded-[20px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]"
                 >
                     <span class="font-medium">{{ asset.name }}</span>
                     <span class="text-sm font-semibold">{{ asset.currency }} {{ formatCurrency(asset.current_value) }}</span>
                 </Link>
             </div>
-            <p v-else class="mt-4 text-sm text-[#637083]">{{ t('No assets yet.') }}</p>
+            <p v-else class="mt-4 text-sm text-budget-muted">{{ t('No assets yet.') }}</p>
         </section>
         <div v-if="showTransactionModal" class="fixed inset-0 z-30 flex items-end bg-black/30"
             @click.self="showTransactionModal = false">
-            <form class="mx-auto w-full max-w-lg rounded-t-[28px] bg-white px-6 pb-8 pt-3 text-[#152338]"
+            <form class="mx-auto w-full max-w-lg rounded-t-[28px] border border-budget-border bg-budget-surface px-6 pb-8 pt-3 text-budget-heading shadow-[0_-12px_40px_rgba(41,82,160,0.14)]"
                 @submit.prevent="submitTransaction">
-                <div class="mx-auto mb-5 h-1 w-9 rounded-full bg-[#D5DBE5]"></div>
+                <div class="mx-auto mb-5 h-1 w-9 rounded-full bg-budget-progress-track"></div>
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-xs font-medium text-[#637083]">Step {{ transactionStep }} of 2</p>
+                        <p class="text-xs font-medium text-budget-muted">Step {{ transactionStep }} of 2</p>
                         <h2 class="text-[22px] font-semibold">{{ transactionForm.meal_record_id ? 'Catat pengeluaran' : 'New transaction' }}</h2>
-                    </div><button type="button" class="text-2xl text-[#637083]"
-                        @click="showTransactionModal = false">×</button>
+                    </div>
+                    <ButtonPrimary
+                        type="button"
+                        variant="secondary"
+                        class="!min-h-0 !rounded-full !px-3 !py-2 !text-xl !text-budget-muted"
+                        aria-label="Tutup"
+                        @click="showTransactionModal = false"
+                    >×</ButtonPrimary>
                 </div>
                 <template v-if="transactionStep === 1">
-                    <div class="mt-5 grid grid-cols-2 rounded-xl bg-[#F5F7FA] p-1"><button
-                            v-for="type in ['expense', 'income']" :key="type" type="button"
-                            class="rounded-lg py-3 text-sm font-semibold capitalize"
-                            :class="transactionForm.type === type ? 'bg-white text-[#2457DA] shadow-sm' : 'text-[#637083]'"
-                            @click="transactionForm.type = type">{{ type }}</button></div>
-                    <button type="button" class="mt-6 h-[53px] w-full rounded-xl bg-[#2457DA] text-white"
-                        @click="transactionStep = 2">Continue</button>
+                    <div class="mt-5 grid grid-cols-2 gap-1 rounded-full bg-budget-control-surface p-1">
+                        <ButtonPrimary
+                            v-for="type in ['expense', 'income']"
+                            :key="type"
+                            type="button"
+                            variant="secondary"
+                            class="!min-h-[46px] !w-full !rounded-full !px-3 !py-2 !text-sm !font-semibold !capitalize !shadow-none"
+                            :class="transactionForm.type === type
+                                ? '!border-transparent !bg-white !text-budget-link'
+                                : '!border-transparent !bg-transparent !text-budget-muted'"
+                            @click="transactionForm.type = type"
+                        >{{ type }}</ButtonPrimary>
+                    </div>
+                    <ButtonPrimary
+                        type="button"
+                        class="mt-6 !h-[53px] !w-full !rounded-[16px]"
+                        @click="transactionStep = 2"
+                    >Continue</ButtonPrimary>
                 </template>
                 <template v-else-if="transactionStep === 2">
                     <label class="mt-5 block">Account
@@ -631,11 +650,19 @@ const shortcuts = [
                             :options="accounts.map((account) => ({ label: account.name, value: account.id }))"
                             placeholder="Select account" required />
                     </label>
-                    <div class="mt-6 grid grid-cols-2 gap-3"><button type="button"
-                            class="h-[53px] rounded-xl border border-[#2457DA] text-[#2457DA]"
-                            @click="transactionStep = 1">Back</button><button type="button"
-                            class="h-[53px] rounded-xl bg-[#2457DA] text-white"
-                            @click="transactionStep = 3">Continue</button></div>
+                    <div class="mt-6 grid grid-cols-2 gap-3">
+                        <ButtonPrimary
+                            type="button"
+                            variant="secondary"
+                            class="!h-[53px] !rounded-[16px]"
+                            @click="transactionStep = 1"
+                        >Back</ButtonPrimary>
+                        <ButtonPrimary
+                            type="button"
+                            class="!h-[53px] !rounded-[16px]"
+                            @click="transactionStep = 3"
+                        >Continue</ButtonPrimary>
+                    </div>
                 </template>
                 <template v-else>
                     <label v-if="transactionForm.type === 'expense'" class="mt-5 block text-sm">Sumber dana
@@ -671,14 +698,14 @@ const shortcuts = [
                             </option>
                         </select>
                     </label>
-                    <label class="mt-5 block text-sm text-[#637083]">Amount
+                    <label class="mt-5 block text-sm text-budget-muted">Amount
                         <FormInput v-model="transactionForm.amount" type="number" min="0.01" step="0.01" required
                             placeholder="Rp 0" variant="amount" />
                     </label>
                     <label class="mt-5 block">Title
                         <FormInput v-model="transactionForm.title" placeholder="What was this transaction for?"
                             required />
-                        <p v-if="transactionForm.meal_record_id" class="mt-1 text-xs text-[#637083]">Harga aktual dan akun pembayaran ditentukan di sini.</p>
+                        <p v-if="transactionForm.meal_record_id" class="mt-1 text-xs text-budget-muted">Harga aktual dan akun pembayaran ditentukan di sini.</p>
                     </label>
                     <label class="mt-5 block">Category
                         <SelectInput v-model="transactionForm.category_id"
@@ -690,18 +717,26 @@ const shortcuts = [
                         </label><label>Note
                             <FormInput v-model="transactionForm.note" placeholder="Optional note" />
                         </label></div>
-                    <div class="mt-6 grid grid-cols-2 gap-3"><button type="button"
-                            class="h-[53px] rounded-xl border border-[#2457DA] text-[#2457DA]"
-                            @click="transactionStep = 2">Back</button><button type="submit"
+                    <div class="mt-6 grid grid-cols-2 gap-3">
+                        <ButtonPrimary
+                            type="button"
+                            variant="secondary"
+                            class="!h-[53px] !rounded-[16px]"
+                            @click="transactionStep = 2"
+                        >Back</ButtonPrimary>
+                        <ButtonPrimary
+                            type="submit"
                             :disabled="transactionForm.processing"
-                            class="h-[53px] rounded-xl bg-[#2457DA] text-white disabled:cursor-not-allowed disabled:opacity-60"><span
-                                v-if="transactionForm.processing">Saving...</span><span v-else>Create
-                                transaction</span></button></div>
-                    <p class="mt-3 text-center text-xs text-[#637083]">You can edit this transaction anytime.</p>
+                            class="!h-[53px] !rounded-[16px]"
+                        >
+                            {{ transactionForm.processing ? 'Saving...' : 'Create transaction' }}
+                        </ButtonPrimary>
+                    </div>
+                    <p class="mt-3 text-center text-xs text-budget-muted">You can edit this transaction anytime.</p>
                 </template>
             </form>
         </div>
-        <MobileBottomNav @add="openTransactionModal" />
+        <MobileBottomNav :show-labels="true" @add="openTransactionModal" />
     </div>
 </template>
 
@@ -721,8 +756,19 @@ const shortcuts = [
 }
 
 .account-card {
-    background: linear-gradient(135deg, #2457da 0%, #1686dc 55%, #25b8dc 100%);
     isolation: isolate;
+}
+
+.account-card--1 {
+    background: linear-gradient(135deg, #a92346 0%, #dc3b4f 55%, #f27b69 100%);
+}
+
+.account-card--2 {
+    background: linear-gradient(135deg, #a96312 0%, #d99724 55%, #efc35d 100%);
+}
+
+.account-card--3 {
+    background: linear-gradient(135deg, #11664d 0%, #16966c 55%, #54c995 100%);
 }
 
 .account-card::before,
@@ -755,18 +801,6 @@ const shortcuts = [
     transform: rotate(-24deg);
 }
 
-.account-card--1 {
-    background: linear-gradient(135deg, #a92346 0%, #dc3b4f 55%, #f27b69 100%);
-}
-
-.account-card--2 {
-    background: linear-gradient(135deg, #a96312 0%, #d99724 55%, #efc35d 100%);
-}
-
-.account-card--3 {
-    background: linear-gradient(135deg, #11664d 0%, #16966c 55%, #54c995 100%);
-}
-
 .mini-header-enter-active,
 .mini-header-leave-active {
     transition: opacity 180ms ease, transform 180ms ease;
@@ -785,4 +819,5 @@ section.mt-7.px-6 {
 main {
     order: 2;
 }
+
 </style>

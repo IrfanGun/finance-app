@@ -101,7 +101,12 @@ class FundBalanceService
         $totals = [];
 
         foreach ($user->financialAccounts()->get() as $account) {
-            $currency = $account->currency;
+            $currency = $account->currencyCode();
+
+            if ($currency === null) {
+                continue;
+            }
+
             $totals[$currency] ??= [
                 'actual' => '0.00',
                 'budget' => '0.00',

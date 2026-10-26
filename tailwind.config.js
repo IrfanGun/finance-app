@@ -45,6 +45,32 @@ export default {
                     'success-surface': '#DDF6E8',
                     goal: '#7046B8',
                     'goal-surface': '#F0EAFE',
+                    shortcut: {
+                        savings: {
+                            start: '#EEE5FF',
+                            end: '#FAF7FF',
+                        },
+                        scan: {
+                            start: '#D8FBF8',
+                            end: '#F4FFFE',
+                        },
+                        chat: {
+                            start: '#EAE2FF',
+                            end: '#FAF7FF',
+                        },
+                        meals: {
+                            start: '#FFE5CF',
+                            end: '#FFF8F1',
+                        },
+                        reminder: {
+                            start: '#FFF0B8',
+                            end: '#FFFCF0',
+                        },
+                        plan: {
+                            start: '#DDF6E8',
+                            end: '#F4FCF7',
+                        },
+                    },
                 },
                 income: '#16815B',
                 expense: '#B34735',
