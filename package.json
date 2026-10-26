@@ -30,6 +30,7 @@
         "@lucide/vue": "^1.48.0",
         "apexcharts": "^8.0.0",
         "countries-list": "^3.4.1",
-        "lucide-vue-next": "^1.0.0"
+        "lucide-vue-next": "^1.0.0",
+        "vue-i18n": "^11.4.16"
     }
 }

@@ -10,6 +10,7 @@ import {
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ArrowDown, ArrowUp, ArrowUpRight, Banknote, ChevronRight } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import SpendingCategoryChart from '@/Components/SpendingCategoryChart.vue';
 import FormInput from '@/Components/FormInput.vue';
 import SelectInput from '@/Components/SelectInput.vue';
@@ -26,8 +27,10 @@ import { index as mealsIndex } from '@/routes/meals';
 import { index as remindersIndex } from '@/routes/recurring-reminders';
 import { chat as chatIndex } from '@/routes';
 import { store as transactionStore } from '@/actions/App/Http/Controllers/TransactionController';
+import { useTranslation } from '@/Composables/useTranslation';
 
 const page = usePage();
+const { t, locale } = useTranslation();
 const props = defineProps({
     categories: { type: Array, default: () => [] },
     spendingCategories: { type: Array, default: () => [] },
@@ -74,10 +77,10 @@ const updateActiveFundCurrency = (event) => {
     const currencyIndex = slideIndex % fundCurrencies.length;
     activeFundCurrency.value = fundCurrencies[Math.min(currencyIndex, fundCurrencies.length - 1)] ?? 'IDR';
 };
-const formatCurrency = (amount) => new Intl.NumberFormat('id-ID').format(Number(amount ?? 0));
+const formatCurrency = (amount) => new Intl.NumberFormat(locale.value === 'id' ? 'id-ID' : 'en-US').format(Number(amount ?? 0));
 const wealthChartOptions = computed(() => ({
     series: [{
-        name: 'Kekayaan bersih',
+        name: t('Kekayaan bersih'),
         data: props.wealthTrend.series.map((point) => ({
             x: new Date(`${point.date}T00:00:00Z`).getTime(),
             y: Number(point.value),
@@ -145,7 +148,7 @@ const renderWealthChart = async () => {
     );
     await wealthChart.render();
 };
-const formatAccountBalance = (account) => new Intl.NumberFormat('id-ID', {
+const formatAccountBalance = (account) => new Intl.NumberFormat(locale.value === 'id' ? 'id-ID' : 'en-US', {
     style: 'currency',
     currency: account.currency || 'IDR',
     maximumFractionDigits: 2,
@@ -273,30 +276,35 @@ const shortcuts = [
 
 <template>
 
-    <Head title="Dashboard" />
+    <Head :title="t('Dashboard')" />
 
     <Transition name="mini-header">
         <div v-if="isScrolled"
             class="fixed inset-x-0 top-0 z-20 mx-auto flex h-16 w-full max-w-lg items-center justify-between bg-[#1F4AC2] px-6 text-white shadow-md">
             <div>
-                <p class="text-xs text-blue-100">Good morning,</p>
+                <p class="text-xs text-blue-100">{{ t('Good morning,') }}</p>
                 <h1 class="text-lg font-semibold">{{ userName }}</h1>
             </div>
-            <div
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA]">
-                {{ userName.slice(0, 2).toUpperCase() }}</div>
+            <div class="flex items-center gap-2">
+                <LanguageSwitcher :floating="false" />
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA]">
+                    {{ userName.slice(0, 2).toUpperCase() }}
+                </div>
+            </div>
         </div>
     </Transition>
 
     <div class="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-app pb-24 text-app-heading">
         <div class="mx-6 mt-5 flex items-center justify-between">
             <div>
-                <p class="text-sm text-[#637083]">Good morning,</p>
+                <p class="text-sm text-[#637083]">{{ t('Good morning,') }}</p>
                 <h1 class="text-2xl font-semibold">{{ userName }}</h1>
             </div>
-            <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA] shadow-sm">
-                {{ userName.slice(0, 2).toUpperCase() }}
+            <div class="flex items-center gap-2">
+                <LanguageSwitcher :floating="false" />
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#2457DA] shadow-sm">
+                    {{ userName.slice(0, 2).toUpperCase() }}
+                </div>
             </div>
         </div>
 
@@ -308,17 +316,17 @@ const shortcuts = [
                 aria-hidden="true"
             ></div>
             <div class="relative">
-                <p class="text-sm text-blue-100">Estimasi kekayaan bersih</p>
+                <p class="text-sm text-blue-100">{{ t('Estimasi kekayaan bersih') }}</p>
                 <p class="mt-1 text-[32px] font-semibold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
                 <p
                     class="mt-1 text-xs font-medium"
                     :class="wealthTrend.change_percentage >= 0 ? 'text-emerald-200' : 'text-red-200'"
                 >
                     {{ wealthTrend.change_percentage >= 0 ? '+' : '' }}{{ wealthTrend.change_percentage }}%
-                    dibanding 1 bulan lalu
+                    {{ t('dibanding 1 bulan lalu') }}
                 </p>
                 <p class="mt-1 text-xs text-blue-100">
-                    Includes IDR {{ formatCurrency(summary.asset_value) }} in assets
+                    {{ t('Includes IDR') }} {{ formatCurrency(summary.asset_value) }} {{ t('in assets') }}
                 </p>
             </div>
         </header>
@@ -336,7 +344,7 @@ const shortcuts = [
                             class="h-8 w-8 object-contain"
                         />
                     </span>
-                    <span class="mt-2 block">{{ item.label }}</span>
+                    <span class="mt-2 block">{{ t(item.label) }}</span>
                 </Link>
                 <template v-else>
                     <span
@@ -349,7 +357,7 @@ const shortcuts = [
                             class="h-8 w-8 object-contain"
                         />
                     </span>
-                    <span class="mt-2 block">{{ item.label }}</span>
+                    <span class="mt-2 block">{{ t(item.label) }}</span>
                 </template>
             </div>
         </nav>
@@ -357,10 +365,10 @@ const shortcuts = [
         <main class="space-y-7 px-6 pt-6">
             <section>
                 <div class="flex items-center justify-between px-1">
-                    <h2 class="font-semibold">Dana tersedia</h2>
+                    <h2 class="font-semibold">{{ t('Dana tersedia') }}</h2>
                     <div class="flex gap-3 text-sm text-[#2457DA]">
-                        <Link :href="budgetIndex.url()">Budget</Link>
-                        <Link :href="savingsIndex.url()">Savings</Link>
+                        <Link :href="budgetIndex.url()">{{ t('Budget') }}</Link>
+                        <Link :href="savingsIndex.url()">{{ t('Savings') }}</Link>
                     </div>
                 </div>
                 <article
@@ -369,7 +377,7 @@ const shortcuts = [
                 >
                     <div class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl bg-[#F5F7FA] p-3 text-center">
                         <Banknote class="mb-2 text-[#2457DA]" :size="19" />
-                        <span class="text-xs text-[#637083]">Saldo {{ activeFundCurrency }}</span>
+                        <span class="text-xs text-[#637083]">{{ t('Saldo') }} {{ activeFundCurrency }}</span>
                         <strong class="mt-1 text-base font-semibold tracking-tight">
                             {{ formatCurrency(funds[activeFundCurrency]?.free) }}
                         </strong>
@@ -385,7 +393,7 @@ const shortcuts = [
                                 class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
                             >
                                 <Banknote class="text-[#2457DA]" :size="19" />
-                                <span class="text-xs text-[#637083]">Saldo aktual</span>
+                                <span class="text-xs text-[#637083]">{{ t('Saldo aktual') }}</span>
                                 <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].actual) }}</strong>
                                 <ArrowUpDown :size="12" class="text-[#2457DA]" />
                             </div>
@@ -395,7 +403,7 @@ const shortcuts = [
                                 class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
                             >
                                 <Banknote class="text-[#2457DA]" :size="19" />
-                                <span class="text-xs text-[#637083]">Budget dicadangkan</span>
+                                <span class="text-xs text-[#637083]">{{ t('Budget dicadangkan') }}</span>
                                 <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].budget) }}</strong>
                                 <ArrowUpDown :size="12" class="text-[#2457DA]" />
                             </div>
@@ -405,7 +413,7 @@ const shortcuts = [
                                 class="flex h-[88px] snap-start flex-col items-center justify-center gap-1"
                             >
                                 <Banknote class="text-[#2457DA]" :size="19" />
-                                <span class="text-xs text-[#637083]">Dana savings</span>
+                                <span class="text-xs text-[#637083]">{{ t('Dana savings') }}</span>
                                 <strong class="text-sm font-semibold">{{ formatCurrency(funds[currency].savings) }}</strong>
                                 <ArrowUpDown :size="12" class="text-[#2457DA]" />
                             </div>
@@ -415,19 +423,19 @@ const shortcuts = [
             </section>
             <section>
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">This month</h2><span class="text-sm text-[#637083]">{{ new
-                        Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) }}</span>
+                    <h2 class="text-lg font-semibold">{{ t('This month') }}</h2><span class="text-sm text-[#637083]">{{ new
+                        Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { month: 'short', year: 'numeric' }) }}</span>
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <div class="rounded-xl bg-[#F5F7FA] p-4">
                         <p class="flex items-center gap-1 text-sm text-[#16815B]">
-                            <ArrowDown :size="15" />Income
+                            <ArrowDown :size="15" />{{ t('Income') }}
                         </p>
                         <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.income) }}</p>
                     </div>
                     <div class="rounded-xl bg-[#F5F7FA] p-4">
                         <p class="flex items-center gap-1 text-sm text-[#B34735]">
-                            <ArrowUp :size="15" />Expense
+                            <ArrowUp :size="15" />{{ t('Expense') }}
                         </p>
                         <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.expense) }}</p>
                     </div>
@@ -435,17 +443,17 @@ const shortcuts = [
             </section>
             <section>
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">Spending this week</h2>
+                    <h2 class="text-lg font-semibold">{{ t('Spending this week') }}</h2>
                     <button class="text-sm text-[#2457DA]" @click="router.visit(categoriesIndex.url())">
-                        Details
+                        {{ t('Details') }}
                     </button>
                 </div>
                 <SpendingCategoryChart :days="weeklySpending" />
             </section>
             <section>
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold">Recent transactions</h2>
-                    <Link :href="transactionsIndex.url()" class="text-sm text-[#2457DA]">See all</Link>
+                    <h2 class="text-lg font-semibold">{{ t('Recent transactions') }}</h2>
+                    <Link :href="transactionsIndex.url()" class="text-sm text-[#2457DA]">{{ t('See all') }}</Link>
                 </div>
                 <div v-if="transactions.length" class="mt-4 space-y-4">
                     <div v-for="transaction in transactions" :key="transaction.id" class="flex items-center gap-4"><span
@@ -454,7 +462,7 @@ const shortcuts = [
                             <component :is="transaction.type === 'income' ? ArrowDown : ArrowUpRight" :size="20" />
                         </span>
                         <div class="flex-1">
-                            <p class="text-sm font-medium">{{ transaction.note || 'Transaction' }}</p>
+                            <p class="text-sm font-medium">{{ transaction.note || t('Transaction') }}</p>
                             <p class="text-xs text-[#637083]">{{ transactionCategory(transaction) }} · {{
                                 transaction.date }}
                             </p>
@@ -462,14 +470,14 @@ const shortcuts = [
                             transactionAmount(transaction) }}</strong>
                     </div>
                 </div>
-                <p v-else class="mt-4 text-sm text-[#637083]">No transactions yet.</p>
+                <p v-else class="mt-4 text-sm text-[#637083]">{{ t('No transactions yet.') }}</p>
             </section>
         </main>
 
         <section class="mt-7 px-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Accounts</h2>
-                <Link :href="accountsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">See all
+                <h2 class="text-lg font-semibold">{{ t('Accounts') }}</h2>
+                <Link :href="accountsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">{{ t('See all') }}
                     <ChevronRight :size="16" />
                 </Link>
             </div>
@@ -498,13 +506,13 @@ const shortcuts = [
                     </div>
                 </article>
             </div>
-            <p v-else class="mt-4 text-sm text-[#637083]">No accounts yet.</p>
+            <p v-else class="mt-4 text-sm text-[#637083]">{{ t('No accounts yet.') }}</p>
         </section>
         <section class="mt-7 px-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Assets</h2>
+                <h2 class="text-lg font-semibold">{{ t('Assets') }}</h2>
                 <Link :href="assetsIndex.url()" class="flex items-center text-sm font-medium text-[#2457DA]">
-                    See all <ChevronRight :size="16" />
+                    {{ t('See all') }} <ChevronRight :size="16" />
                 </Link>
             </div>
             <div v-if="assets.length" class="mt-4 space-y-3">
@@ -518,7 +526,7 @@ const shortcuts = [
                     <span class="text-sm font-semibold">{{ asset.currency }} {{ formatCurrency(asset.current_value) }}</span>
                 </Link>
             </div>
-            <p v-else class="mt-4 text-sm text-[#637083]">No assets yet.</p>
+            <p v-else class="mt-4 text-sm text-[#637083]">{{ t('No assets yet.') }}</p>
         </section>
         <div v-if="showTransactionModal" class="fixed inset-0 z-30 flex items-end bg-black/30"
             @click.self="showTransactionModal = false">

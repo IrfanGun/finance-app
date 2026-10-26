@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { index as recurringRemindersIndex } from '@/routes/cms/recurring';
+import { useTranslation } from '@/Composables/useTranslation';
 import {
     ChartNoAxesCombined,
     Bell,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-vue-next';
 
 const page = usePage();
+const { t } = useTranslation();
 const user = computed(() => page.props.auth?.user);
 const currentPath = computed(() => page.url.split('?')[0]);
 const isSidebarCollapsed = ref(false);
@@ -66,13 +68,13 @@ const navigation = [
                 <button
                     type="button"
                     class="absolute right-4 top-7 flex h-10 w-10 items-center justify-center rounded-xl text-[#637083] hover:bg-[#F1F4F9] hover:text-[#2457DA] lg:hidden"
-                    aria-label="Close navigation"
+                    :aria-label="t('Close navigation')"
                     @click="closeMobileSidebar"
                 >
                     <X :size="20" />
                 </button>
 
-                <p v-if="!isSidebarCollapsed" class="mb-3 mt-10 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#98A2B3]">Workspace</p>
+                <p v-if="!isSidebarCollapsed" class="mb-3 mt-10 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#98A2B3]">{{ t('Workspace') }}</p>
                 <div v-else class="mb-3 mt-10 hidden h-3 lg:block" />
                 <nav class="flex flex-col gap-1">
                     <Link
@@ -86,12 +88,12 @@ const navigation = [
                                 : 'text-[#637083] hover:bg-[#F5F7FA] hover:text-[#152338]',
                             isSidebarCollapsed ? 'lg:justify-center lg:px-0' : '',
                         ]"
-                        :aria-label="isSidebarCollapsed ? item.label : undefined"
-                        :title="isSidebarCollapsed ? item.label : undefined"
+                        :aria-label="isSidebarCollapsed ? t(item.label) : undefined"
+                        :title="isSidebarCollapsed ? t(item.label) : undefined"
                         @click="closeMobileSidebar"
                     >
                         <component :is="item.icon" :size="19" />
-                        <span v-if="!isSidebarCollapsed">{{ item.label }}</span>
+                        <span v-if="!isSidebarCollapsed">{{ t(item.label) }}</span>
                     </Link>
                 </nav>
 
@@ -100,11 +102,11 @@ const navigation = [
                         href="/cms/profile"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-[#637083] hover:bg-[#F5F7FA]"
                         :class="isSidebarCollapsed ? 'lg:justify-center lg:px-0' : ''"
-                        :aria-label="isSidebarCollapsed ? 'Settings' : undefined"
-                        :title="isSidebarCollapsed ? 'Settings' : undefined"
+                        :aria-label="isSidebarCollapsed ? t('Settings') : undefined"
+                        :title="isSidebarCollapsed ? t('Settings') : undefined"
                     >
                         <Settings :size="19" />
-                        <span v-if="!isSidebarCollapsed">Settings</span>
+                        <span v-if="!isSidebarCollapsed">{{ t('Settings') }}</span>
                     </Link>
                     <Link
                         href="/cms/logout"
@@ -112,11 +114,11 @@ const navigation = [
                         as="button"
                         class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-[#637083] hover:bg-[#FFF2F0] hover:text-[#B34735]"
                         :class="isSidebarCollapsed ? 'lg:justify-center lg:px-0' : ''"
-                        :aria-label="isSidebarCollapsed ? 'Log out' : undefined"
-                        :title="isSidebarCollapsed ? 'Log out' : undefined"
+                        :aria-label="isSidebarCollapsed ? t('Log Out') : undefined"
+                        :title="isSidebarCollapsed ? t('Log Out') : undefined"
                     >
                         <LogOut :size="19" />
-                        <span v-if="!isSidebarCollapsed">Log out</span>
+                        <span v-if="!isSidebarCollapsed">{{ t('Log Out') }}</span>
                     </Link>
                 </div>
             </aside>
@@ -144,7 +146,7 @@ const navigation = [
                             type="button"
                             class="flex h-10 w-10 items-center justify-center rounded-xl text-[#637083] transition hover:bg-[#F1F4F9] hover:text-[#2457DA] lg:hidden"
                             :aria-expanded="isMobileSidebarOpen"
-                            aria-label="Toggle navigation"
+                            :aria-label="t('Toggle navigation')"
                             @click="isMobileSidebarOpen = !isMobileSidebarOpen"
                         >
                             <X v-if="isMobileSidebarOpen" :size="20" />
@@ -154,14 +156,14 @@ const navigation = [
                             type="button"
                             class="hidden h-10 w-10 items-center justify-center rounded-xl text-[#637083] transition hover:bg-[#F1F4F9] hover:text-[#2457DA] lg:flex"
                             :aria-expanded="!isSidebarCollapsed"
-                            :aria-label="isSidebarCollapsed ? 'Show navigation' : 'Hide navigation'"
+                            :aria-label="t(isSidebarCollapsed ? 'Show navigation' : 'Hide navigation')"
                             @click="isSidebarCollapsed = !isSidebarCollapsed"
                         >
                             <PanelLeftOpen v-if="isSidebarCollapsed" :size="20" />
                             <PanelLeftClose v-else :size="20" />
                         </button>
                         <div>
-                            <p class="text-xs text-[#98A2B3]">Personal finance workspace</p>
+                            <p class="text-xs text-[#98A2B3]">{{ t('Personal finance workspace') }}</p>
                             <p class="mt-1 text-sm font-semibold">{{ user.name }}</p>
                         </div>
                     </div>

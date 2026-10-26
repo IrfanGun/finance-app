@@ -2,6 +2,7 @@ import AiTransactionController from './AiTransactionController'
 import AiFinanceController from './AiFinanceController'
 import AiMemoryController from './AiMemoryController'
 import AiWorkflowController from './AiWorkflowController'
+import LocaleController from './LocaleController'
 import DashboardController from './DashboardController'
 import AiChatController from './AiChatController'
 import AiChatTransactionController from './AiChatTransactionController'
@@ -24,6 +25,7 @@ const Controllers = {
 AiFinanceController: Object.assign(AiFinanceController, AiFinanceController),
 AiMemoryController: Object.assign(AiMemoryController, AiMemoryController),
 AiWorkflowController: Object.assign(AiWorkflowController, AiWorkflowController),
+LocaleController: Object.assign(LocaleController, LocaleController),
 DashboardController: Object.assign(DashboardController, DashboardController),
 AiChatController: Object.assign(AiChatController, AiChatController),
 AiChatTransactionController: Object.assign(AiChatTransactionController, AiChatTransactionController),
