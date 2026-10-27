@@ -47,7 +47,10 @@ const navigation = [
 </script>
 
 <template>
-    <div class="cms-layout min-h-screen bg-[#F5F7FB] text-[#152338]">
+    <div
+        class="cms-layout min-h-screen text-[#152338]"
+        :class="currentPath.startsWith('/cms/budget-plans') ? 'bg-[#F7FAFF]' : 'bg-[#F5F7FB]'"
+    >
         <Head>
             <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>

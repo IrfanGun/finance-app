@@ -38,6 +38,7 @@ import BudgetPlanWizard from '@/Components/BudgetPlanWizard.vue';
 import BudgetPlanSummaryCard from '@/Components/BudgetPlans/BudgetPlanSummaryCard.vue';
 import BudgetPlanDetail from '@/Components/BudgetPlans/BudgetPlanDetail.vue';
 import BudgetPlanTransactionModal from '@/Components/BudgetPlans/BudgetPlanTransactionModal.vue';
+import CmsBudgetPlansBoard from '@/Components/BudgetPlans/CmsBudgetPlansBoard.vue';
 import SuccessModal from '@/Components/SuccessModal.vue';
 
 const props = defineProps({
@@ -379,13 +380,34 @@ const actOnPeriod = (route, period, data = {}) => {
 
 <template>
     <div
-        class="mx-auto min-h-screen w-full max-w-lg bg-budget-page pb-28 text-budget-heading"
+        class="mx-auto min-h-screen w-full max-w-lg text-budget-heading"
+        :class="cmsMode ? 'bg-[#F7FAFF] pb-0' : 'bg-budget-page pb-28'"
     >
         <Head
             :title="showCreate
                 ? (editingId ? 'Ubah Budget Plan' : 'Budget Plan baru')
                 : (isDetailPage ? selectedPlan?.name ?? 'Detail Budget Plan' : 'Budget Plan')"
         />
+        <CmsBudgetPlansBoard
+            v-if="cmsMode && !showCreate && !isDetailPage"
+            :plans="plans"
+            :totals="totals"
+            :available-currencies="availableCurrencies"
+            v-model:selected-currency="selectedCurrency"
+            :secondary-currency="secondaryCurrency"
+            :month-label="monthLabel"
+            :active-plan-count="activePlanCount"
+            :create-plan-url="createPlanUrl"
+            :show-plan-url="showPlanUrl"
+            :current-period-for-plan="currentPeriodForPlan"
+            :period-usage-percentage="periodUsagePercentage"
+            :format-currency="formatCurrency"
+            :plan-status-label="planStatusLabel"
+            :plan-icon="planIcon"
+            :plan-icon-style="planIconStyle"
+            @edit="editPlan"
+        />
+        <template v-else>
         <header
             v-if="!showCreate && !isDetailPage"
             class="grid grid-cols-[52px_1fr_104px] items-center gap-3 px-5 pb-2 pt-6"
@@ -648,5 +670,6 @@ const actOnPeriod = (route, period, data = {}) => {
             :show-labels="!showCreate && !isDetailPage"
             @add="router.visit(dashboardUrl + '?add=1')"
         />
+        </template>
     </div>
 </template>

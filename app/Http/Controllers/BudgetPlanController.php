@@ -98,6 +98,7 @@ class BudgetPlanController extends Controller
         abort_if($selectedPlanId !== null && $plans->isEmpty(), 404);
 
         return Inertia::render('BudgetPlans/Index', [
+            'cmsMode' => $request->is('cms/*'),
             'createMode' => $createMode,
             'selectedPlanId' => $selectedPlanId,
             'appearanceOptions' => [
@@ -147,7 +148,12 @@ class BudgetPlanController extends Controller
     {
         $funds->createPlan($request->user(), $request->validated());
 
-        return redirect()->route('budget-plans.index');
+        $refererPath = parse_url($request->header('referer', ''), PHP_URL_PATH);
+        $routeName = is_string($refererPath) && str_starts_with($refererPath, '/cms/')
+            ? 'cms.budget-plans.index'
+            : 'budget-plans.index';
+
+        return redirect()->route($routeName);
     }
 
     public function update(
