@@ -3,6 +3,9 @@ import { computed, ref, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { dashboard } from '@/routes';
+import { dashboard as cmsDashboard } from '@/routes/cms';
+import { create as cmsCreateSavingPage, index as cmsSavingsIndex, manage as cmsManageSaving, show as cmsShowSaving } from '@/routes/cms/savings';
+import { index as cmsBudgetIndex } from '@/routes/cms/budget-plans';
 import { index as budgetIndex } from '@/routes/budget-plans';
 import { store as storeReminder } from '@/routes/recurring-reminders';
 import { reverse as reverseAllocation } from '@/routes/saving-logs';
@@ -11,6 +14,7 @@ import {
     archive as archiveSaving,
     create as createSavingPage,
     index as savingsIndex,
+    manage as manageSaving,
     show as showSaving,
     release as releaseSaving,
     store as storeSaving,
@@ -34,6 +38,7 @@ import {
 } from '@/Features/Savings/lib/saving';
 
 const props = defineProps({
+    cmsMode: { type: Boolean, default: false },
     savings: { type: Array, default: () => [] },
     accounts: { type: Array, default: () => [] },
     totals: { type: Object, default: () => ({}) },
@@ -43,6 +48,13 @@ const props = defineProps({
     manageMode: { type: Boolean, default: false },
     managedSavingId: { type: Number, default: null },
 });
+
+const dashboardUrl = computed(() => props.cmsMode ? cmsDashboard.url() : dashboard.url());
+const budgetIndexUrl = computed(() => props.cmsMode ? cmsBudgetIndex.url() : budgetIndex.url());
+const savingsIndexUrl = computed(() => props.cmsMode ? cmsSavingsIndex.url() : savingsIndex.url());
+const createSavingUrl = computed(() => props.cmsMode ? cmsCreateSavingPage.url() : createSavingPage.url());
+const showSavingUrl = (savingId) => props.cmsMode ? cmsShowSaving.url(savingId) : showSaving.url(savingId);
+const manageSavingUrl = (savingId) => props.cmsMode ? cmsManageSaving.url(savingId) : manageSaving.url(savingId);
 
 const selectedId = ref(getInitialSavingId(props.managedSavingId));
 const selectedPeriodId = ref(getInitialPeriodId());
@@ -183,7 +195,7 @@ const reverseLog = (log) => {
 };
 const applyHistoryFilters = () => {
     router.get(
-        savingsIndex.url(),
+        savingsIndexUrl.value,
         {
             saving: selectedId.value ?? undefined,
             source: sourceFilter.value || undefined,
@@ -205,15 +217,15 @@ const applyHistoryFilters = () => {
     <div class="mx-auto min-h-screen w-full max-w-lg bg-[#F7F9FC] pb-28 text-[#152338]">
         <Head :title="showCreateSaving ? 'Buat kantong savings' : 'Savings'" />
         <header v-if="!showCreateSaving && !manageMode" class="flex items-center justify-between bg-white px-6 py-5">
-            <Link :href="dashboard.url()" class="text-sm font-semibold text-[#2457DA]">{{ $t("Back") }}</Link>
+            <Link :href="dashboardUrl" class="text-sm font-semibold text-[#2457DA]">{{ $t("Back") }}</Link>
             <h1 class="text-lg font-semibold">{{ $t("Savings") }}</h1>
-            <Link :href="budgetIndex.url()" class="text-sm font-semibold text-[#2457DA]">{{ $t("Budget") }}</Link>
+            <Link :href="budgetIndexUrl" class="text-sm font-semibold text-[#2457DA]">{{ $t("Budget") }}</Link>
         </header>
 
         <main class="flex flex-col gap-5 px-6 pt-6">
             <header v-if="manageMode && selected" class="flex items-center gap-4">
                 <Link
-                    :href="showSaving.url(selected.id)"
+                    :href="showSavingUrl(selected.id)"
                     class="rounded-full p-2 text-[#2457DA] hover:bg-[#F5F7FA]"
                     :aria-label="`Kembali ke detail ${selected.name}`"
                 >
@@ -226,7 +238,7 @@ const applyHistoryFilters = () => {
             </header>
             <header v-if="showCreateSaving" class="flex items-center gap-4">
                 <Link
-                    :href="savingsIndex.url()"
+                    :href="savingsIndexUrl"
                     class="rounded-full p-2 text-[#2457DA] hover:bg-[#F5F7FA]"
                     aria-label="Kembali ke Savings"
                 >
@@ -241,7 +253,7 @@ const applyHistoryFilters = () => {
             <p v-if="!showCreateSaving && !manageMode" class="rounded-2xl bg-[#EAF0FF] p-4 text-sm"> {{ $t("Dana savings adalah bagian dari saldo aktual. Alokasi hanya mengurangi uang bebas.") }} </p>
             <Link
                 v-if="!showCreateSaving && !manageMode"
-                :href="createSavingPage.url()"
+                :href="createSavingUrl"
                 class="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#2457DA] px-5 py-3 font-semibold text-white shadow-sm"
             > {{ $t("Buat kantong savings") }} </Link>
             <SavingCreateForm
@@ -256,6 +268,8 @@ const applyHistoryFilters = () => {
                 v-if="!showCreateSaving && !manageMode"
                 :savings="savings"
                 :format-money="formatMoney"
+                :show-saving-url="showSavingUrl"
+                :manage-saving-url="manageSavingUrl"
             />
 
             <SavingManagePanel
@@ -293,6 +307,6 @@ const applyHistoryFilters = () => {
                 @reverse="reverseLog"
             />
         </main>
-        <MobileBottomNav @add="router.visit(dashboard.url({ query: { add: 1 } }))" />
+        <MobileBottomNav v-if="!cmsMode" @add="router.visit(dashboard.url({ query: { add: 1 } }))" />
     </div>
 </template>

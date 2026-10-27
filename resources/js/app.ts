@@ -5,6 +5,7 @@ import { createApp, h } from 'vue'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import type { DefineComponent } from 'vue'
 import ButtonPrimary from './Components/ButtonPrimary.vue'
+import AmountInput from './Components/AmountInput.vue'
 import { wayfinderRoute } from './wayfinder/route'
 import CmsLayout from './Layouts/CmsLayout.vue'
 import LanguageSwitcher from './Components/LanguageSwitcher.vue'
@@ -39,6 +40,7 @@ createInertiaApp({
         vueApp.config.globalProperties.route = wayfinderRoute
         vueApp
             .component('ButtonPrimary', ButtonPrimary)
+            .component('AmountInput', AmountInput)
             .use(plugin)
             .use(appI18n)
             .mount(el)

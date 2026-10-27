@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssetDepreciationController;
+use App\Http\Controllers\BudgetPlanController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Cms\AuthenticatedSessionController as CmsAuthenticatedSessionController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\FinancialAccountController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RecurringReminderController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\TransactionController;
 use App\Models\Category;
 use App\Services\AiConversationService;
@@ -46,6 +48,30 @@ Route::prefix('cms')
             ) {
                 return $controller($request, $dashboard);
             })->name('dashboard');
+
+            Route::get('budget-plans/create', [BudgetPlanController::class, 'create'])
+                ->name('budget-plans.create');
+
+            Route::get('budget-plans', [BudgetPlanController::class, 'index'])
+                ->name('budget-plans.index');
+
+            Route::get('budget-plans/{plan}', [BudgetPlanController::class, 'show'])
+                ->whereNumber('plan')
+                ->name('budget-plans.show');
+
+            Route::get('savings/create', [SavingController::class, 'create'])
+                ->name('savings.create');
+
+            Route::get('savings', [SavingController::class, 'index'])
+                ->name('savings.index');
+
+            Route::get('savings/{saving}/manage', [SavingController::class, 'manage'])
+                ->whereNumber('saving')
+                ->name('savings.manage');
+
+            Route::get('savings/{saving}', [SavingController::class, 'show'])
+                ->whereNumber('saving')
+                ->name('savings.show');
 
             Route::get('transactions', function (Request $request, TransactionController $controller) {
                 return $controller->index($request);

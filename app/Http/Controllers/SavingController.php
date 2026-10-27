@@ -57,6 +57,7 @@ class SavingController extends Controller
             ->findOrFail($saving);
 
         return Inertia::render('Savings/Show', [
+            'cmsMode' => $request->is('cms/*'),
             'saving' => [
                 ...$record->toArray(),
                 'balance' => $balances->savingBalance($record),
@@ -124,6 +125,7 @@ class SavingController extends Controller
             });
 
         return Inertia::render('Savings/Index', [
+            'cmsMode' => $request->is('cms/*'),
             'createMode' => $createMode,
             'manageMode' => $manageMode,
             'managedSavingId' => $managedSavingId,
@@ -146,7 +148,12 @@ class SavingController extends Controller
     {
         $funds->createSaving($request->user(), $request->validated());
 
-        return redirect()->route('savings.index');
+        $refererPath = parse_url($request->header('referer', ''), PHP_URL_PATH);
+        $routeName = is_string($refererPath) && str_starts_with($refererPath, '/cms/')
+            ? 'cms.savings.index'
+            : 'savings.index';
+
+        return redirect()->route($routeName);
     }
 
     public function update(

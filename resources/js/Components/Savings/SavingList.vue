@@ -1,10 +1,10 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { show as showSaving, manage as manageSaving } from '@/routes/savings';
-
 defineProps({
     savings: { type: Array, default: () => [] },
     formatMoney: { type: Function, required: true },
+    showSavingUrl: { type: Function, required: true },
+    manageSavingUrl: { type: Function, required: true },
 });
 </script>
 
@@ -30,11 +30,11 @@ defineProps({
             </p>
             <div class="mt-3 flex gap-2">
                 <Link
-                    :href="showSaving.url(saving.id)"
+                    :href="showSavingUrl(saving.id)"
                     class="flex min-h-10 flex-1 items-center justify-center rounded-lg border border-[#DCE3EE] px-3 text-sm font-semibold text-[#2457DA]"
                 >{{ $t("Details") }}</Link>
                 <Link
-                    :href="manageSaving.url(saving.id)"
+                    :href="manageSavingUrl(saving.id)"
                     class="flex min-h-10 flex-1 items-center justify-center rounded-lg bg-[#2457DA] px-3 text-sm font-semibold text-white"
                 >{{ $t("Manage") }}</Link>
             </div>

@@ -12,8 +12,11 @@ import {
     Wallet,
 } from 'lucide-vue-next';
 import { dashboard } from '@/routes';
+import { dashboard as cmsDashboard } from '@/routes/cms';
 import { useBudgetPlanDisplay } from '@/Features/BudgetPlans/useBudgetPlanDisplay.js';
+import { create as cmsCreateSavingPage, index as cmsSavingsIndex } from '@/routes/cms/savings';
 import { create as createSavingPage, index as savingsIndex } from '@/routes/savings';
+import { create as cmsCreatePlanPage, index as cmsBudgetPlansIndex, show as cmsShowPlanPage } from '@/routes/cms/budget-plans';
 import { reverse as reverseClaim } from '@/routes/budget-claims';
 import {
     index as budgetPlansIndex,
@@ -38,6 +41,7 @@ import BudgetPlanTransactionModal from '@/Components/BudgetPlans/BudgetPlanTrans
 import SuccessModal from '@/Components/SuccessModal.vue';
 
 const props = defineProps({
+    cmsMode: { type: Boolean, default: false },
     plans: { type: Array, default: () => [] },
     legacyBudgets: { type: Array, default: () => [] },
     accounts: { type: Array, default: () => [] },
@@ -52,6 +56,16 @@ const props = defineProps({
         default: () => ({ icons: {}, colors: {} }),
     },
 });
+
+const dashboardUrl = computed(() => props.cmsMode ? cmsDashboard.url() : dashboard.url());
+const budgetPlansIndexUrl = computed(() => props.cmsMode ? cmsBudgetPlansIndex.url() : budgetPlansIndex.url());
+const savingsIndexUrl = computed(() => props.cmsMode ? cmsSavingsIndex.url() : savingsIndex.url());
+const createSavingUrl = computed(() => props.cmsMode ? cmsCreateSavingPage.url() : createSavingPage.url());
+const createPlanUrl = computed(() => props.cmsMode ? cmsCreatePlanPage.url() : createPlanPage.url());
+const showPlanUrl = (planId) => props.cmsMode ? cmsShowPlanPage.url(planId) : showPlanPage.url(planId);
+const savingsFilterUrl = (options) => props.cmsMode
+    ? cmsSavingsIndex(options).url
+    : savingsIndex(options).url;
 
 const {
     activePlanCount,
@@ -188,7 +202,7 @@ const submitPlan = () => {
 };
 const closeForm = () => {
     if (props.createMode) {
-        router.visit(budgetPlansIndex.url());
+        router.visit(budgetPlansIndexUrl.value);
         return;
     }
 
@@ -377,7 +391,7 @@ const actOnPeriod = (route, period, data = {}) => {
             class="grid grid-cols-[52px_1fr_104px] items-center gap-3 px-5 pb-2 pt-6"
         >
             <Link
-                :href="dashboard.url()"
+                :href="dashboardUrl"
                 aria-label="Kembali ke dashboard"
                 class="flex h-[52px] w-[52px] items-center justify-center rounded-[20px] bg-budget-surface text-budget-ink"
             >
@@ -385,17 +399,17 @@ const actOnPeriod = (route, period, data = {}) => {
             </Link>
             <h1 class="text-center text-xl font-bold tracking-tight sm:text-2xl"> {{ $t("Budget Planner") }} </h1>
             <Link
-                :href="savingsIndex.url()"
+                :href="savingsIndexUrl"
                 class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-budget-primary bg-budget-surface px-3 text-sm font-semibold text-budget-link sm:px-4"
             >
                 <PiggyBank :size="20" /> {{ $t("Savings") }} </Link>
         </header>
         <header v-else-if="!showCreate" class="flex items-center justify-between bg-white px-6 py-5">
-            <Link :href="budgetPlansIndex.url()" class="text-sm font-semibold text-[#2457DA]">
+            <Link :href="budgetPlansIndexUrl" class="text-sm font-semibold text-[#2457DA]">
                 â† Semua plan
             </Link>
             <h1 class="text-lg font-semibold">{{ $t("Detail plan") }}</h1>
-            <Link :href="savingsIndex.url()" class="text-sm font-semibold text-[#2457DA]">{{ $t("Savings") }}</Link>
+            <Link :href="savingsIndexUrl" class="text-sm font-semibold text-[#2457DA]">{{ $t("Savings") }}</Link>
         </header>
 
         <main
@@ -475,7 +489,7 @@ const actOnPeriod = (route, period, data = {}) => {
 
             <Link
                 v-if="!showCreate && !isDetailPage && secondaryCurrency && totals[secondaryCurrency]"
-                :href="savingsIndex.url()"
+                :href="savingsIndexUrl"
                 class="flex items-center gap-4 rounded-[24px] bg-white p-4"
             >
                 <span class="flex h-14 w-14 items-center justify-center rounded-[20px] bg-budget-icon-surface text-budget-primary">
@@ -540,7 +554,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 :back-step="goBackFromForm"
                 :change-step="changeStep"
                 :add-item="addItem"
-                :savings-url="createSavingPage.url()"
+                :savings-url="createSavingUrl"
                 @submit="submitPlan"
             />
 
@@ -565,12 +579,12 @@ const actOnPeriod = (route, period, data = {}) => {
                 :goal-progress-percentage="goalProgressPercentage"
                 :format-currency="formatCurrency"
                 :format-date="formatDate"
-                :show-plan-url="showPlanPage.url"
+                :show-plan-url="showPlanUrl"
             />
 
             <ButtonPrimary
                 v-if="!showCreate && !isDetailPage"
-                :href="createPlanPage.url()"
+                :href="createPlanUrl"
                 class="!inline-flex !min-h-[58px] !w-full !items-center !justify-center !gap-3 !rounded-[20px] !bg-budget-primary !px-5 !py-3 !text-lg !font-semibold !text-white !shadow-none transition hover:!bg-budget-primary-hover"
             >
                 <Plus :size="25" /> {{ $t("Buat budget baru") }} </ButtonPrimary>
@@ -595,6 +609,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 :fund-period="fundPeriod"
                 :close-period="closePeriod"
                 :release-period="releasePeriod"
+                :savings-url="savingsFilterUrl"
                 @edit="editPlan"
                 @change-status="changeStatus"
                 @period-action="actOnPeriod"
@@ -631,7 +646,7 @@ const actOnPeriod = (route, period, data = {}) => {
         />
         <MobileBottomNav
             :show-labels="!showCreate && !isDetailPage"
-            @add="router.visit(dashboard.url({ query: { add: 1 } }))"
+            @add="router.visit(dashboardUrl + '?add=1')"
         />
     </div>
 </template>

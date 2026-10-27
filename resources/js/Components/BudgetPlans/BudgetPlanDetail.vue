@@ -1,6 +1,5 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { index as savingsIndex } from '@/routes/savings';
 
 const props = defineProps({
     plan: { type: Object, required: true },
@@ -20,6 +19,7 @@ const props = defineProps({
     fundPeriod: { type: Function, required: true },
     closePeriod: { type: Function, required: true },
     releasePeriod: { type: Function, required: true },
+    savingsUrl: { type: Function, required: true },
 });
 
 defineEmits([
@@ -196,7 +196,7 @@ defineEmits([
                         >{{ $t("Klaim sisa") }}</ButtonPrimary>
                         <Link
                             v-if="plan.type === 'goal'"
-                            :href="savingsIndex({ query: { saving: plan.saving_id, period: period.id } }).url"
+                            :href="savingsUrl({ query: { saving: plan.saving_id, period: period.id } })"
                             class="text-sm font-semibold text-[#2457DA]"
                         >{{ $t("Sisihkan Dana") }}</Link>
                         <ButtonPrimary

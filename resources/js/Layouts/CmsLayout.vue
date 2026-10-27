@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { index as recurringRemindersIndex } from '@/routes/cms/recurring';
+import { index as budgetPlansIndex } from '@/routes/cms/budget-plans';
+import { index as savingsIndex } from '@/routes/cms/savings';
 import { useTranslation } from '@/Composables/useTranslation';
 import {
     ChartNoAxesCombined,
@@ -11,6 +13,7 @@ import {
     LogOut,
     MessageCircle,
     Package,
+    PiggyBank,
     PanelLeftClose,
     PanelLeftOpen,
     Settings,
@@ -35,6 +38,8 @@ const navigation = [
     { label: 'Transactions', href: '/cms/transactions', icon: ChartNoAxesCombined },
     { label: 'Accounts', href: '/cms/accounts', icon: Wallet },
     { label: 'Assets', href: '/cms/assets', icon: Package },
+    { label: 'Budget plans', href: budgetPlansIndex.url(), icon: ChartNoAxesCombined },
+    { label: 'Savings', href: savingsIndex.url(), icon: PiggyBank },
     { label: 'Categories', href: '/cms/categories', icon: Tags },
     { label: 'Recurring reminders', href: recurringRemindersIndex.url(), icon: Bell },
     { label: 'AI Assistant', href: '/cms/chat', icon: MessageCircle },

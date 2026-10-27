@@ -3,11 +3,18 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowUpRight, Wallet } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import { dashboard } from '@/routes';
+import { dashboard as cmsDashboard } from '@/routes/cms';
+import { index as cmsSavingsIndex, manage as cmsManage } from '@/routes/cms/savings';
 import { index as savingsIndex, manage } from '@/routes/savings';
 
 const props = defineProps({
+    cmsMode: { type: Boolean, default: false },
     saving: { type: Object, required: true },
 });
+
+const savingsIndexUrl = props.cmsMode ? cmsSavingsIndex.url() : savingsIndex.url();
+const manageUrl = (savingId) => props.cmsMode ? cmsManage.url(savingId) : manage.url(savingId);
+const dashboardUrl = props.cmsMode ? cmsDashboard.url() : dashboard.url();
 
 const formatMoney = (amount) => new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -32,12 +39,12 @@ const formatDate = (value) => {
 
     <div class="mx-auto min-h-screen w-full max-w-lg bg-white pb-28 text-app-heading">
         <header class="flex items-center justify-between px-6 py-5">
-            <Link :href="savingsIndex.url()" aria-label="Kembali ke daftar Savings">
+            <Link :href="savingsIndexUrl" aria-label="Kembali ke daftar Savings">
                 <ArrowLeft :size="22" class="text-[#2457DA]" />
             </Link>
             <h1 class="max-w-[70%] truncate text-lg font-semibold">{{ $t("Detail Savings") }}</h1>
             <Link
-                :href="manage.url(saving.id)"
+                :href="manageUrl(saving.id)"
                 class="text-sm font-semibold text-[#2457DA]"
             >{{ $t("Manage") }}</Link>
         </header>
@@ -94,12 +101,12 @@ const formatDate = (value) => {
             </section>
 
             <Link
-                :href="manage.url(saving.id)"
+                :href="manageUrl(saving.id)"
                 class="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#2457DA] px-5 py-3 font-semibold text-white"
             > {{ $t("Kelola Savings") }} <ArrowUpRight :size="18" />
             </Link>
             <Link
-                :href="dashboard.url({ query: { add: 1, saving_id: saving.id } })"
+                :href="`${dashboardUrl}?add=1&saving_id=${saving.id}`"
                 class="flex min-h-12 items-center justify-center rounded-xl border border-[#DCE3EE] px-5 py-3 text-center font-semibold text-[#2457DA]"
             >{{ $t("Catat belanja dari Savings") }}</Link>
 
@@ -122,6 +129,6 @@ const formatDate = (value) => {
             </section>
         </main>
 
-        <MobileBottomNav />
+        <MobileBottomNav v-if="!cmsMode" />
     </div>
 </template>
