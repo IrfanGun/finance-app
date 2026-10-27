@@ -106,23 +106,19 @@ const removeRateStep = (index) => {
                 <ArrowLeft :size="22" class="text-[#2457DA]" />
             </Link>
             <div class="min-w-0">
-                <p class="text-xs font-medium text-[#637083]">Aset</p>
-                <h1 class="truncate text-lg font-semibold">Edit {{ asset.name }}</h1>
+                <p class="text-xs font-medium text-[#637083]">{{ $t("Assets") }}</p>
+                <h1 class="truncate text-lg font-semibold">{{ $t("Edit") }} {{ asset.name }}</h1>
             </div>
         </header>
 
         <main class="space-y-5 px-6 pt-3">
             <form class="space-y-4 rounded-2xl border border-slate-200 p-4" @submit.prevent="save">
                 <div>
-                    <h2 class="font-semibold">Detail aset</h2>
-                    <p class="mt-1 text-xs leading-5 text-[#637083]">
-                        Detail pembelian dan perubahan nilai terkunci setelah ada riwayat.
-                    </p>
+                    <h2 class="font-semibold">{{ $t("Asset details") }}</h2>
+                    <p class="mt-1 text-xs leading-5 text-[#637083]"> {{ $t("Detail pembelian dan perubahan nilai terkunci setelah ada riwayat.") }} </p>
                 </div>
 
-                <label class="block text-sm font-medium">
-                    Nama aset
-                    <input
+                <label class="block text-sm font-medium"> {{ $t("Asset name") }} <input
                         v-model="form.name"
                         required
                         maxlength="255"
@@ -133,9 +129,7 @@ const removeRateStep = (index) => {
                     </p>
                 </label>
 
-                <label class="block text-sm font-medium">
-                    Deskripsi
-                    <textarea
+                <label class="block text-sm font-medium"> {{ $t("Description") }} <textarea
                         v-model="form.description"
                         rows="2"
                         class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3"
@@ -146,9 +140,7 @@ const removeRateStep = (index) => {
                 </label>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <label class="block text-sm font-medium">
-                        Mata uang
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Currency") }} <select
                             v-model="form.currency"
                             required
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
@@ -161,13 +153,8 @@ const removeRateStep = (index) => {
                             {{ form.errors.currency }}
                         </p>
                     </label>
-                    <label class="block text-sm font-medium">
-                        Harga beli
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Purchase price") }} <AmountInput
                             v-model="form.purchase_price"
-                            type="number"
-                            min="0.01"
-                            step="0.01"
                             required
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
                         />
@@ -177,9 +164,7 @@ const removeRateStep = (index) => {
                     </label>
                 </div>
 
-                <label class="block text-sm font-medium">
-                    Tanggal beli
-                    <input
+                <label class="block text-sm font-medium"> {{ $t("Purchase date") }} <input
                         v-model="form.purchase_date"
                         type="date"
                         required
@@ -192,7 +177,7 @@ const removeRateStep = (index) => {
 
                 <section class="space-y-3 rounded-xl border border-[#DCE3EE] bg-[#F8FAFF] p-4">
                     <div>
-                        <h2 class="font-semibold">Depresiasi dan apresiasi</h2>
+                        <h2 class="font-semibold">{{ $t("Depreciation and appreciation") }}</h2>
                     </div>
                     <label class="flex cursor-pointer items-start gap-3 rounded-lg bg-white p-3 text-sm font-medium">
                         <input
@@ -213,15 +198,13 @@ const removeRateStep = (index) => {
                 </section>
 
                 <div v-if="form.depreciation" class="space-y-4">
-                    <label class="block text-sm font-medium">
-                        Arah perubahan nilai
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Arah perubahan nilai") }} <select
                             v-model="form.depreciation.value_direction"
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
                             @change="setValueDirection($event.target.value)"
                         >
-                            <option value="decrease">Turun (depresiasi)</option>
-                            <option value="increase">Naik (apresiasi)</option>
+                            <option value="decrease">{{ $t("Turun (depresiasi)") }}</option>
+                            <option value="increase">{{ $t("Naik (apresiasi)") }}</option>
                         </select>
                         <p v-if="form.errors['depreciation.value_direction']" class="mt-1 text-xs text-red-600">
                             {{ form.errors['depreciation.value_direction'] }}
@@ -229,22 +212,18 @@ const removeRateStep = (index) => {
                     </label>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="block text-sm font-medium">
-                            Metode perubahan nilai
-                            <select
+                        <label class="block text-sm font-medium"> {{ $t("Metode perubahan nilai") }} <select
                                 v-model="form.depreciation.depreciation_type"
                                 class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
                             >
-                                <option value="fixed">Nominal tetap</option>
-                                <option value="percentage">Persentase harga beli</option>
+                                <option value="fixed">{{ $t("Nominal tetap") }}</option>
+                                <option value="percentage">{{ $t("Persentase harga beli") }}</option>
                             </select>
                         </label>
                         <label v-if="!form.depreciation.is_tiered" class="block text-sm font-medium">
                             {{ form.depreciation.depreciation_type === 'fixed' ? `Nominal (${form.currency})` : 'Persentase harga beli (%)' }}
-                            <input
+                            <AmountInput
                                 v-model="form.depreciation.depreciation_value"
-                                type="number"
-                                min="0.0001"
                                 :max="form.depreciation.depreciation_type === 'percentage' ? 100 : undefined"
                                 :step="form.depreciation.depreciation_type === 'fixed' ? 0.01 : 0.0001"
                                 required
@@ -262,9 +241,7 @@ const removeRateStep = (index) => {
                             type="checkbox"
                             class="rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]"
                             @change="setTieredDepreciation($event.target.checked)"
-                        />
-                        Bertingkat per tahun
-                    </label>
+                        /> {{ $t("Bertingkat per tahun") }} </label>
 
                     <div v-if="form.depreciation.is_tiered" class="space-y-3 rounded-xl bg-[#F5F7FA] p-3">
                         <div
@@ -272,9 +249,7 @@ const removeRateStep = (index) => {
                             :key="index"
                             class="grid grid-cols-[1fr_1fr_auto] items-end gap-2"
                         >
-                            <label class="block text-sm font-medium">
-                                Tahun ke-
-                                <input
+                            <label class="block text-sm font-medium"> {{ $t("Tahun ke-") }} <input
                                     v-model.number="step.year_number"
                                     type="number"
                                     min="1"
@@ -289,10 +264,8 @@ const removeRateStep = (index) => {
                             </label>
                             <label class="block text-sm font-medium">
                                 {{ form.depreciation.depreciation_type === 'fixed' ? `Nominal (${form.currency})` : 'Persentase harga beli (%)' }}
-                                <input
+                                <AmountInput
                                     v-model="step.depreciation_value"
-                                    type="number"
-                                    min="0.0001"
                                     :max="form.depreciation.depreciation_type === 'percentage' ? 100 : undefined"
                                     :step="form.depreciation.depreciation_type === 'fixed' ? 0.01 : 0.0001"
                                     required
@@ -323,35 +296,25 @@ const removeRateStep = (index) => {
                             class="inline-flex items-center gap-2 text-sm font-semibold text-[#2457DA]"
                             @click="addRateStep"
                         >
-                            <Plus :size="16" /> Tambah tahun perubahan tarif
-                        </button>
+                            <Plus :size="16" /> {{ $t("Tambah tahun perubahan tarif") }} </button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="block text-sm font-medium">
-                            Periode
-                            <select
+                        <label class="block text-sm font-medium"> {{ $t("Period") }} <select
                                 v-if="!form.depreciation.is_tiered && form.depreciation.value_direction === 'decrease'"
                                 v-model="form.depreciation.depreciation_period"
                                 class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
                             >
-                                <option value="monthly">Bulanan</option>
-                                <option value="yearly">Tahunan</option>
+                                <option value="monthly">{{ $t("Monthly") }}</option>
+                                <option value="yearly">{{ $t("Yearly") }}</option>
                             </select>
                             <div
                                 v-else
                                 class="mt-2 flex h-11 items-center rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-[#637083]"
-                            >
-                                Tahunan
-                            </div>
+                            > {{ $t("Yearly") }} </div>
                         </label>
-                        <label v-if="form.depreciation.value_direction === 'decrease'" class="block text-sm font-medium">
-                            Nilai minimum
-                            <input
+                        <label v-if="form.depreciation.value_direction === 'decrease'" class="block text-sm font-medium"> {{ $t("Nilai minimum") }} <AmountInput
                                 v-model="form.depreciation.residual_value"
-                                type="number"
-                                min="0"
-                                step="0.01"
                                 required
                                 class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
                             />
@@ -361,9 +324,7 @@ const removeRateStep = (index) => {
                         </label>
                     </div>
 
-                    <label class="block text-sm font-medium">
-                        Tanggal acuan
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Tanggal acuan") }} <input
                             v-model="form.depreciation.depreciation_start_date"
                             type="date"
                             :min="form.purchase_date"

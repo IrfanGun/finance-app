@@ -1,5 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue';
+import { useTranslation } from '@/Composables/useTranslation';
+
+const { locale, t } = useTranslation();
 
 defineProps({
     placeholder: { type: String, default: 'Select date' },
@@ -11,7 +14,18 @@ const open = ref(false);
 const draft = ref(model.value);
 const visibleMonth = ref(new Date());
 
-const monthLabel = computed(() => visibleMonth.value.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
+const monthLabel = computed(() => visibleMonth.value.toLocaleDateString(
+    locale.value === 'id' ? 'id-ID' : 'en-US',
+    { month: 'long', year: 'numeric' },
+));
+const weekdayLabels = computed(() => Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(2023, 0, index + 1);
+
+    return new Intl.DateTimeFormat(
+        locale.value === 'id' ? 'id-ID' : 'en-US',
+        { weekday: 'short' },
+    ).format(date);
+}));
 const calendarDays = computed(() => {
     const year = visibleMonth.value.getFullYear();
     const month = visibleMonth.value.getMonth();
@@ -49,11 +63,11 @@ const changeMonth = (offset) => {
     <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4" @click.self="open = false">
         <div class="mx-auto w-full max-w-sm rounded-2xl bg-white px-6 pb-6 pt-5 text-[#152338] shadow-xl">
             <div class="mx-auto mb-5 h-1 w-9 rounded-full bg-[#D5DBE5]"></div>
-            <div class="flex items-center justify-between"><h2 class="text-xl font-semibold">Select date</h2><button type="button" class="text-2xl text-[#637083]" @click="open = false">×</button></div>
+            <div class="flex items-center justify-between"><h2 class="text-xl font-semibold">{{ t('Select date') }}</h2><button type="button" class="text-2xl text-[#637083]" :aria-label="t('Close')" @click="open = false">×</button></div>
             <div class="mt-6 flex items-center justify-between"><button type="button" class="rounded-lg px-3 py-1 text-xl text-[#637083] hover:bg-[#F5F7FA]" @click="changeMonth(-1)">‹</button><strong class="text-base">{{ monthLabel }}</strong><button type="button" class="rounded-lg px-3 py-1 text-xl text-[#637083] hover:bg-[#F5F7FA]" @click="changeMonth(1)">›</button></div>
-            <div class="mt-4 grid grid-cols-7 text-center text-xs font-medium text-[#637083]"><span v-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" :key="day">{{ day }}</span></div>
+            <div class="mt-4 grid grid-cols-7 text-center text-xs font-medium text-[#637083]"><span v-for="day in weekdayLabels" :key="day">{{ day }}</span></div>
             <div class="mt-2 grid grid-cols-7 gap-y-2 text-center"><button v-for="(day, index) in calendarDays" :key="`${day}-${index}`" type="button" class="mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm" :class="day === draft ? 'bg-[#2457DA] text-white' : 'hover:bg-[#EEF3FF]'" :disabled="!day" @click="draft = day">{{ day ? Number(day.slice(-2)) : '' }}</button></div>
-            <button type="button" class="mt-6 h-[53px] w-full rounded-xl bg-[#2457DA] text-white" @click="confirm">Use this date</button>
+            <button type="button" class="mt-6 h-[53px] w-full rounded-xl bg-[#2457DA] text-white" @click="confirm">{{ t('Use this date') }}</button>
         </div>
     </div>
 </template>

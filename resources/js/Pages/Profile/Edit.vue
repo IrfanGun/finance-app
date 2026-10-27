@@ -123,13 +123,13 @@ const closePanel = () => {
                 </span>
                 <span class="min-w-0 flex-1">
                     <strong class="block truncate text-sm font-semibold">{{ user.name }}</strong>
-                    <span class="mt-1 block text-xs text-app-muted">View profile</span>
+                    <span class="mt-1 block text-xs text-app-muted">{{ $t("View profile") }}</span>
                 </span>
                 <ChevronRight :size="18" class="shrink-0 text-app-muted" />
             </button>
 
             <section class="space-y-3">
-                <h2 class="text-base font-semibold">Account</h2>
+                <h2 class="text-base font-semibold">{{ $t("Account") }}</h2>
 
                 <div class="divide-y divide-white/80 overflow-hidden rounded-xl bg-app-card">
                     <button
@@ -152,7 +152,7 @@ const closePanel = () => {
             </section>
 
             <section class="space-y-3">
-                <h2 class="text-base font-semibold">General</h2>
+                <h2 class="text-base font-semibold">{{ $t("General") }}</h2>
 
                 <div class="divide-y divide-white/80 overflow-hidden rounded-xl bg-app-card">
                     <div
@@ -185,9 +185,7 @@ const closePanel = () => {
                 as="button"
                 class="flex w-full items-center justify-center gap-2 rounded-xl border border-app-divider py-3 text-lg font-semibold text-app-muted transition hover:border-red-200 hover:text-red-600"
             >
-                <LogOut :size="18" />
-                Log out
-            </Link>
+                <LogOut :size="18" /> {{ $t("Log out") }} </Link>
         </main>
 
         <main

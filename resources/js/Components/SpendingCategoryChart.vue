@@ -48,8 +48,8 @@ const selectDay = (day) => {
         <div v-if="chartDays.length">
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <p class="text-xs text-budget-muted">Total minggu ini</p>
-                    <p class="mt-1 text-lg font-semibold">Rp {{ formatCurrency(weeklyTotal) }}</p>
+                    <p class="text-xs text-budget-muted">{{ $t("Total minggu ini") }}</p>
+                    <p class="mt-1 text-lg font-semibold">{{ $t("Rp") }} {{ formatCurrency(weeklyTotal) }}</p>
                 </div>
                 <p class="pt-1 text-xs text-budget-muted">Senin – Minggu</p>
             </div>
@@ -70,8 +70,7 @@ const selectDay = (day) => {
                         <span
                             v-if="selectedDay?.date === day.date && day.total > 0"
                             class="absolute top-0 z-20 whitespace-nowrap rounded-md bg-budget-heading px-2 py-1 text-[10px] font-medium text-white shadow-sm"
-                        >
-                            Rp {{ formatCurrency(day.total) }}
+                        > {{ $t("Rp") }} {{ formatCurrency(day.total) }}
                         </span>
                         <span class="flex w-full flex-1 items-end justify-center">
                             <span
@@ -94,9 +93,9 @@ const selectDay = (day) => {
                 <div class="flex items-center justify-between gap-3">
                     <div>
                         <p class="text-sm font-semibold">{{ selectedDay.label }}, {{ formatDayDate(selectedDay.date) }}</p>
-                        <p class="mt-0.5 text-xs text-budget-muted">{{ selectedDay.transactions.length }} transaksi</p>
+                        <p class="mt-0.5 text-xs text-budget-muted">{{ selectedDay.transactions.length }} {{ $t("transaksi") }}</p>
                     </div>
-                    <strong class="shrink-0 text-sm">Rp {{ formatCurrency(selectedDay.total) }}</strong>
+                    <strong class="shrink-0 text-sm">{{ $t("Rp") }} {{ formatCurrency(selectedDay.total) }}</strong>
                 </div>
 
                 <ul v-if="selectedDay.transactions.length" class="mt-3 divide-y divide-budget-border">
@@ -109,14 +108,12 @@ const selectDay = (day) => {
                             <p class="truncate text-sm font-medium">{{ transaction.title }}</p>
                             <p class="mt-0.5 truncate text-xs text-budget-muted">{{ transaction.category }}</p>
                         </div>
-                        <strong class="shrink-0 text-sm">Rp {{ formatCurrency(transaction.amount) }}</strong>
+                        <strong class="shrink-0 text-sm">{{ $t("Rp") }} {{ formatCurrency(transaction.amount) }}</strong>
                     </li>
                 </ul>
-                <p v-else class="mt-3 rounded-xl bg-budget-control-surface px-3 py-3 text-sm text-budget-muted">
-                    Belum ada pengeluaran pada hari ini.
-                </p>
+                <p v-else class="mt-3 rounded-xl bg-budget-control-surface px-3 py-3 text-sm text-budget-muted"> {{ $t("Belum ada pengeluaran pada hari ini.") }} </p>
             </section>
         </div>
-        <p v-else class="mt-4 text-sm text-budget-muted">Belum ada pengeluaran minggu ini.</p>
+        <p v-else class="mt-4 text-sm text-budget-muted">{{ $t("Belum ada pengeluaran minggu ini.") }}</p>
     </div>
 </template>

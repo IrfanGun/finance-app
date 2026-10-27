@@ -205,9 +205,9 @@ const applyHistoryFilters = () => {
     <div class="mx-auto min-h-screen w-full max-w-lg bg-[#F7F9FC] pb-28 text-[#152338]">
         <Head :title="showCreateSaving ? 'Buat kantong savings' : 'Savings'" />
         <header v-if="!showCreateSaving && !manageMode" class="flex items-center justify-between bg-white px-6 py-5">
-            <Link :href="dashboard.url()" class="text-sm font-semibold text-[#2457DA]">Kembali</Link>
-            <h1 class="text-lg font-semibold">Savings</h1>
-            <Link :href="budgetIndex.url()" class="text-sm font-semibold text-[#2457DA]">Budget</Link>
+            <Link :href="dashboard.url()" class="text-sm font-semibold text-[#2457DA]">{{ $t("Back") }}</Link>
+            <h1 class="text-lg font-semibold">{{ $t("Savings") }}</h1>
+            <Link :href="budgetIndex.url()" class="text-sm font-semibold text-[#2457DA]">{{ $t("Budget") }}</Link>
         </header>
 
         <main class="flex flex-col gap-5 px-6 pt-6">
@@ -220,8 +220,8 @@ const applyHistoryFilters = () => {
                     <ArrowLeft :size="22" />
                 </Link>
                 <div class="min-w-0 flex-1">
-                    <p class="text-xs font-medium text-[#637083]">Savings</p>
-                    <h1 class="truncate text-xl font-semibold">Kelola {{ selected.name }}</h1>
+                    <p class="text-xs font-medium text-[#637083]">{{ $t("Savings") }}</p>
+                    <h1 class="truncate text-xl font-semibold">{{ $t("Manage") }} {{ selected.name }}</h1>
                 </div>
             </header>
             <header v-if="showCreateSaving" class="flex items-center gap-4">
@@ -233,21 +233,17 @@ const applyHistoryFilters = () => {
                     <ArrowLeft :size="22" />
                 </Link>
                 <div class="min-w-0 flex-1">
-                    <p class="text-xs font-medium text-[#637083]">Savings</p>
-                    <h1 class="text-xl font-semibold">Buat kantong savings</h1>
+                    <p class="text-xs font-medium text-[#637083]">{{ $t("Savings") }}</p>
+                    <h1 class="text-xl font-semibold">{{ $t("Buat kantong savings") }}</h1>
                 </div>
-                <span class="shrink-0 text-sm font-medium text-[#637083]">Langkah {{ createStep }} dari 2</span>
+                <span class="shrink-0 text-sm font-medium text-[#637083]">{{ $t("Step") }} {{ createStep }} {{ $t("dari 2") }}</span>
             </header>
-            <p v-if="!showCreateSaving && !manageMode" class="rounded-2xl bg-[#EAF0FF] p-4 text-sm">
-                Dana savings adalah bagian dari saldo aktual. Alokasi hanya mengurangi uang bebas.
-            </p>
+            <p v-if="!showCreateSaving && !manageMode" class="rounded-2xl bg-[#EAF0FF] p-4 text-sm"> {{ $t("Dana savings adalah bagian dari saldo aktual. Alokasi hanya mengurangi uang bebas.") }} </p>
             <Link
                 v-if="!showCreateSaving && !manageMode"
                 :href="createSavingPage.url()"
                 class="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#2457DA] px-5 py-3 font-semibold text-white shadow-sm"
-            >
-                Buat kantong savings
-            </Link>
+            > {{ $t("Buat kantong savings") }} </Link>
             <SavingCreateForm
                 v-if="showCreateSaving"
                 v-model:step="createStep"

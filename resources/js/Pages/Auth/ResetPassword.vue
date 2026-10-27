@@ -92,9 +92,7 @@ const submit = () => {
                 <PrimaryButton
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
-                >
-                    Reset Password
-                </PrimaryButton>
+                > {{ $t("Reset Password") }} </PrimaryButton>
             </div>
         </form>
     </GuestLayout>

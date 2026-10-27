@@ -53,30 +53,26 @@ const submit = () => form.post('/cms/login', {
             </Link>
 
             <div class="flex items-center gap-4 text-xs font-medium text-white/90 sm:gap-6 sm:text-sm">
-                <span class="hidden sm:inline">Personal finance</span>
+                <span class="hidden sm:inline">{{ $t("Personal finance") }}</span>
                 <span class="hidden text-white/50 sm:inline">|</span>
-                <Link href="/login" class="transition hover:text-[#FFB28C]">Mobile app</Link>
+                <Link href="/login" class="transition hover:text-[#FFB28C]">{{ $t("Mobile app") }}</Link>
             </div>
         </header>
 
         <main class="relative z-10 mx-auto grid min-h-0 w-full max-w-[1440px] flex-1 grid-cols-1 items-center px-5 py-2 sm:px-10 lg:grid-cols-[minmax(0,1fr)_360px_minmax(0,1fr)] lg:px-14">
             <section class="hidden max-w-[340px] py-6 lg:block">
-                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200">Your money, in focus</p>
-                <h1 class="mt-5 font-serif text-4xl leading-[1.12] tracking-tight xl:text-[46px]">
-                    A more meaningful tomorrow,
-                    <span class="block italic text-blue-300">together.</span>
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200">{{ $t("Your money, in focus") }}</p>
+                <h1 class="mt-5 font-serif text-4xl leading-[1.12] tracking-tight xl:text-[46px]"> {{ $t("A more meaningful tomorrow,") }} <span class="block italic text-blue-300">{{ $t("together.") }}</span>
                 </h1>
                 <div class="mt-6 h-1 w-12 rounded-full bg-[#2457DA]" />
-                <p class="mt-5 max-w-[270px] font-serif text-base leading-7 text-white/90">
-                    A clearer view of your finances, at every stage of life.
-                </p>
+                <p class="mt-5 max-w-[270px] font-serif text-base leading-7 text-white/90"> {{ $t("A clearer view of your finances, at every stage of life.") }} </p>
             </section>
 
             <section class="flex w-full items-center justify-center lg:col-start-2">
                 <div class="cms-login-card flex min-h-[500px] w-full max-w-[350px] flex-col justify-center rounded-[24px] border border-white/70 bg-[#FBF8F3]/95 px-6 py-8 text-[#24242C] shadow-[0_24px_80px_rgba(17,15,13,0.35)] backdrop-blur-xl sm:px-7 sm:py-8">
                     <div class="text-center">
-                        <h2 class="font-serif text-[30px] leading-tight tracking-tight">Welcome back</h2>
-                        <p class="mt-1.5 text-[9px] font-medium uppercase tracking-[0.25em] text-[#78777A]">Log in to your account</p>
+                        <h2 class="font-serif text-[30px] leading-tight tracking-tight">{{ $t("Welcome back") }}</h2>
+                        <p class="mt-1.5 text-[9px] font-medium uppercase tracking-[0.25em] text-[#78777A]">{{ $t("Log in to your account") }}</p>
                     </div>
 
                     <div v-if="status" class="mt-4 rounded-lg bg-green-50 px-3 py-2.5 text-xs font-medium text-green-700">
@@ -85,7 +81,7 @@ const submit = () => form.post('/cms/login', {
 
                     <form class="mt-4 flex flex-col gap-3" @submit.prevent="submit">
                         <div>
-                            <label for="email" class="sr-only">Email address</label>
+                            <label for="email" class="sr-only">{{ $t("Email address") }}</label>
                             <div class="relative">
                                 <UserRound class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64646B]" :size="17" />
                                 <input
@@ -104,7 +100,7 @@ const submit = () => form.post('/cms/login', {
                         </div>
 
                         <div>
-                            <label for="password" class="sr-only">Password</label>
+                            <label for="password" class="sr-only">{{ $t("Password") }}</label>
                             <div class="relative">
                                 <LockKeyhole class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#64646B]" :size="17" />
                                 <input
@@ -132,12 +128,8 @@ const submit = () => form.post('/cms/login', {
 
                         <div class="flex items-center justify-between gap-3 pt-0.5">
                             <label class="flex items-center gap-2 text-xs text-[#68676D]">
-                                <input v-model="form.remember" type="checkbox" name="remember" class="rounded border-[#C9C4BD] text-[#2457DA] focus:ring-blue-200" />
-                                Remember me
-                            </label>
-                            <Link v-if="canResetPassword" href="/forgot-password" class="text-[11px] font-medium text-[#55545A] underline decoration-[#B9B4AD] underline-offset-2 transition hover:text-[#2457DA]">
-                                Forgot password?
-                            </Link>
+                                <input v-model="form.remember" type="checkbox" name="remember" class="rounded border-[#C9C4BD] text-[#2457DA] focus:ring-blue-200" /> {{ $t("Remember me") }} </label>
+                            <Link v-if="canResetPassword" href="/forgot-password" class="text-[11px] font-medium text-[#55545A] underline decoration-[#B9B4AD] underline-offset-2 transition hover:text-[#2457DA]"> {{ $t("Forgot password?") }} </Link>
                         </div>
 
                         <PrimaryButton
@@ -150,14 +142,12 @@ const submit = () => form.post('/cms/login', {
                         </PrimaryButton>
                     </form>
 
-                    <p class="mt-4 text-center text-[11px] text-[#68676D]">
-                        New to Clarity?
-                        <Link href="/register" class="ml-1 font-semibold text-[#2457DA] underline decoration-blue-200 underline-offset-2 hover:text-[#1D4FC9]">Create an account</Link>
+                    <p class="mt-4 text-center text-[11px] text-[#68676D]"> {{ $t("New to Clarity?") }} <Link href="/register" class="ml-1 font-semibold text-[#2457DA] underline decoration-blue-200 underline-offset-2 hover:text-[#1D4FC9]">{{ $t("Create an account") }}</Link>
                     </p>
 
                     <div class="mt-4 flex items-center justify-center gap-2 border-t border-[#E7E1D9] pt-3 text-[10px] text-[#858188]">
                         <LockKeyhole :size="13" />
-                        <span>Your sign-in is encrypted and secure</span>
+                        <span>{{ $t("Your sign-in is encrypted and secure") }}</span>
                     </div>
                 </div>
             </section>
@@ -168,11 +158,11 @@ const submit = () => form.post('/cms/login', {
         <footer class="cms-login-footer relative z-10 mx-auto flex w-full max-w-[1440px] shrink-0 flex-col items-center justify-between gap-2 px-6 pb-3 text-[10px] text-white/80 sm:flex-row sm:px-10 lg:px-14">
             <span>Clarity Finance · Personal money management</span>
             <div class="flex items-center gap-4">
-                <span>Privacy</span>
+                <span>{{ $t("Privacy") }}</span>
                 <span class="text-white/40">|</span>
-                <span>Security</span>
+                <span>{{ $t("Security") }}</span>
                 <span class="text-white/40">|</span>
-                <Link href="/login" class="transition hover:text-white">Open mobile version</Link>
+                <Link href="/login" class="transition hover:text-white">{{ $t("Open mobile version") }}</Link>
             </div>
         </footer>
     </div>

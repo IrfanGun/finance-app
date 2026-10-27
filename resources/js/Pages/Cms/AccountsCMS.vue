@@ -51,22 +51,21 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
     <div class="space-y-7">
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-sm font-medium text-[#8792A2]">Your money</p>
-                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">Accounts</h1>
+                <p class="text-sm font-medium text-[#8792A2]">{{ $t("Your money") }}</p>
+                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">{{ $t("Accounts") }}</h1>
             </div>
             <button
                 class="inline-flex h-11 items-center gap-2 rounded-xl bg-[#2457DA] px-4 text-sm font-semibold text-white shadow-sm shadow-blue-200 hover:bg-[#1947BE]"
                 @click="create">
-                <Plus :size="17" /> Add account
-            </button>
+                <Plus :size="17" /> {{ $t("Add account") }} </button>
         </header>
         <section class="grid gap-4 sm:grid-cols-3">
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Total accounts</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Total accounts") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#17243A]">{{ accounts.length }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Combined balance</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Combined balance") }}</p>
                 <p class="mt-3 text-xl font-semibold text-[#17243A]">{{new Intl.NumberFormat('id-ID', {
                     style:
                         'currency', currency: 'IDR', maximumFractionDigits: 0
@@ -74,7 +73,7 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
                     total + Number(account.current_balance ?? 0), 0)) }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Bank accounts</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Bank accounts") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#17243A]">{{accounts.filter((account) => account.type ===
                     'bank').length }}</p>
             </article>
@@ -83,7 +82,7 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
             class="overflow-hidden rounded-2xl border border-[#E9EDF3] bg-white shadow-[0_4px_18px_rgba(23,36,58,0.03)]">
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#EEF1F5] px-6 py-4">
                 <div>
-                    <h2 class="font-semibold text-[#17243A]">All accounts</h2>
+                    <h2 class="font-semibold text-[#17243A]">{{ $t("All accounts") }}</h2>
                 </div><label
                     class="flex h-10 w-full items-center gap-2 rounded-lg border border-[#E7EBF2] px-3 sm:w-64">
                     <Search :size="16" class="text-[#98A2B3]" /><input v-model="search"
@@ -94,10 +93,10 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
                 <table class="w-full min-w-[680px] text-left">
                     <thead class="bg-[#FAFBFC] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#98A2B3]">
                         <tr>
-                            <th class="px-6 py-3">Account</th>
-                            <th class="px-5 py-3">Type</th>
-                            <th class="px-5 py-3">Activity</th>
-                            <th class="px-5 py-3 text-right">Current balance</th>
+                            <th class="px-6 py-3">{{ $t("Account") }}</th>
+                            <th class="px-5 py-3">{{ $t("Type") }}</th>
+                            <th class="px-5 py-3">{{ $t("Activity") }}</th>
+                            <th class="px-5 py-3 text-right">{{ $t("Current balance") }}</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>
@@ -114,8 +113,7 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
                             <td class="px-5 py-4"><span
                                     class="rounded-full bg-[#F3F5F8] px-3 py-1 text-xs font-medium capitalize text-[#637083]">{{
                                     account.type }}</span></td>
-                            <td class="px-5 py-4 text-sm text-[#637083]">{{ account.transactions_count }} transactions
-                            </td>
+                            <td class="px-5 py-4 text-sm text-[#637083]">{{ account.transactions_count }} {{ $t("transaksi") }} </td>
                             <td class="px-5 py-4 text-right text-sm font-semibold text-[#26354C]">{{
                                 money(account.current_balance, account) }}</td>
                             <td class="px-6 py-4">
@@ -133,8 +131,7 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
                     </tbody>
                 </table>
             </div>
-            <p v-if="!visibleAccounts.length" class="px-6 py-12 text-center text-sm text-[#8792A2]">No accounts found.
-            </p>
+            <p v-if="!visibleAccounts.length" class="px-6 py-12 text-center text-sm text-[#8792A2]">{{ $t("No accounts found.") }} </p>
         </section>
 
         <CmsModal :show="open" :label="form.id ? 'Edit account' : 'Add account'" @close="open = false">
@@ -143,28 +140,28 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
                 @submit.prevent="save">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm text-[#8792A2]">Account details</p>
+                        <p class="text-sm text-[#8792A2]">{{ $t("Account details") }}</p>
                         <h2 class="mt-1 text-xl font-semibold text-[#17243A]">{{ form.id ? 'Edit' : 'Add' }} account</h2>
                     </div><button type="button" class="rounded-lg p-2 text-[#7B8798] hover:bg-[#F5F7FA]"
                         aria-label="Close" @click="open = false">
                         <X :size="19" />
                     </button>
                 </div>
-                <label class="block text-sm font-medium text-[#435065]">Account name<input v-model="form.name" required
+                <label class="block text-sm font-medium text-[#435065]">{{ $t("Account name") }}<input v-model="form.name" required
                         maxlength="100" class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm"
                         placeholder="e.g. Everyday account" /></label>
                 <div class="grid gap-4 sm:grid-cols-2"><label
-                        class="block text-sm font-medium text-[#435065]">Type<select v-model="form.type"
+                        class="block text-sm font-medium text-[#435065]">{{ $t("Type") }}<select v-model="form.type"
                             class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm">
-                            <option value="cash">Cash</option>
-                            <option value="bank">Bank</option>
-                            <option value="other">Other</option>
+                            <option value="cash">{{ $t("Cash") }}</option>
+                            <option value="bank">{{ $t("Bank") }}</option>
+                            <option value="other">{{ $t("Other") }}</option>
                         </select></label><label v-if="['cash', 'bank'].includes(form.type)"
-                        class="block text-sm font-medium text-[#435065]">Currency<input v-model="form.currency" required
+                        class="block text-sm font-medium text-[#435065]">{{ $t("Currency") }}<input v-model="form.currency" required
                             maxlength="3"
                             class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm uppercase" /></label>
-                </div><label class="block text-sm font-medium text-[#435065]">Opening balance<input
-                        v-model="form.opening_balance" type="number" min="0" step="0.01" required
+                </div><label class="block text-sm font-medium text-[#435065]">{{ $t("Opening balance") }}<AmountInput
+                        v-model="form.opening_balance" required
                         class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm" /></label>
                 <p v-if="form.errors.name || form.errors.currency || form.errors.opening_balance"
                     class="text-sm text-red-600">{{ form.errors.name || form.errors.currency ||
@@ -176,14 +173,14 @@ const remove = (deleteTransactions) => useForm({ delete_transactions: deleteTran
         <div v-if="deleting" class="fixed inset-0 z-40 flex items-center justify-center bg-[#17243A]/30 p-5">
             <section class="w-full max-w-md space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
                 <div>
-                    <p class="text-sm text-[#8792A2]">Remove account</p>
-                    <h2 class="mt-1 text-xl font-semibold text-[#17243A]">Delete {{ deleting.name }}?</h2>
-                    <p class="mt-2 text-sm text-[#637083]">Choose what to do with its transactions.</p>
+                    <p class="text-sm text-[#8792A2]">{{ $t("Remove account") }}</p>
+                    <h2 class="mt-1 text-xl font-semibold text-[#17243A]">{{ $t("Delete") }} {{ deleting.name }}?</h2>
+                    <p class="mt-2 text-sm text-[#637083]">{{ $t("Choose what to do with its transactions.") }}</p>
                 </div><button class="w-full rounded-xl bg-[#C8493A] py-3 text-sm font-semibold text-white"
-                    @click="remove(true)">Delete account and transactions</button><button
+                    @click="remove(true)">{{ $t("Delete account and transactions") }}</button><button
                     class="w-full rounded-xl border border-[#DDE3EC] py-3 text-sm font-semibold text-[#435065]"
-                    @click="remove(false)">Delete account only</button><button
-                    class="w-full py-2 text-sm text-[#7B8798]" @click="deleting = null">Cancel</button>
+                    @click="remove(false)">{{ $t("Delete account only") }}</button><button
+                    class="w-full py-2 text-sm text-[#7B8798]" @click="deleting = null">{{ $t("Cancel") }}</button>
             </section>
         </div>
     </div>

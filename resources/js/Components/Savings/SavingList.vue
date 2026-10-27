@@ -10,8 +10,8 @@ defineProps({
 
 <template>
     <section class="flex flex-col gap-3">
-        <h2 class="font-semibold">Kantong saya</h2>
-        <p v-if="!savings.length" class="text-sm text-[#637083]">Belum ada savings.</p>
+        <h2 class="font-semibold">{{ $t("Kantong saya") }}</h2>
+        <p v-if="!savings.length" class="text-sm text-[#637083]">{{ $t("Belum ada savings.") }}</p>
         <article
             v-for="saving in savings"
             :key="saving.id"
@@ -22,23 +22,21 @@ defineProps({
                     <h3 class="font-semibold">{{ saving.name }}</h3>
                     <p class="text-xs text-[#637083]">{{ saving.currency }} · {{ saving.status }}</p>
                 </div>
-                <strong>Rp {{ formatMoney(saving.balance) }}</strong>
+                <strong>{{ $t("Rp") }} {{ formatMoney(saving.balance) }}</strong>
             </div>
-            <p v-if="saving.goal_plan" class="mt-2 text-xs text-[#637083]">
-                Terkait goal {{ saving.goal_plan.name }} · target Rp {{ formatMoney(saving.goal_plan.target_amount) }}
+            <p v-if="saving.goal_plan" class="mt-2 text-xs text-[#637083]"> {{ $t("Terkait goal") }} {{ saving.goal_plan.name }} · target Rp {{ formatMoney(saving.goal_plan.target_amount) }}
             </p>
-            <p v-else-if="saving.target_amount" class="mt-2 text-xs text-[#637083]">
-                Target Rp {{ formatMoney(saving.target_amount) }}
+            <p v-else-if="saving.target_amount" class="mt-2 text-xs text-[#637083]"> {{ $t("Target Rp") }} {{ formatMoney(saving.target_amount) }}
             </p>
             <div class="mt-3 flex gap-2">
                 <Link
                     :href="showSaving.url(saving.id)"
                     class="flex min-h-10 flex-1 items-center justify-center rounded-lg border border-[#DCE3EE] px-3 text-sm font-semibold text-[#2457DA]"
-                >Detail</Link>
+                >{{ $t("Details") }}</Link>
                 <Link
                     :href="manageSaving.url(saving.id)"
                     class="flex min-h-10 flex-1 items-center justify-center rounded-lg bg-[#2457DA] px-3 text-sm font-semibold text-white"
-                >Kelola</Link>
+                >{{ $t("Manage") }}</Link>
             </div>
         </article>
     </section>

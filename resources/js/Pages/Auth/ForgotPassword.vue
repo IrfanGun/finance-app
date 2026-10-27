@@ -59,9 +59,7 @@ const submit = () => {
                 <PrimaryButton
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
-                >
-                    Email Password Reset Link
-                </PrimaryButton>
+                > {{ $t("Email Password Reset Link") }} </PrimaryButton>
             </div>
         </form>
     </GuestLayout>

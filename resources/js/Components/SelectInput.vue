@@ -41,7 +41,7 @@ onUnmounted(() => document.removeEventListener('click', closeOnOutsideClick));
             <input v-if="searchable" v-model="search" type="search" placeholder="Search..." class="mx-2 mb-1 h-9 w-[calc(100%-1rem)] rounded-md border border-slate-200 px-3 text-sm outline-none focus:border-[#2457DA]" @click.stop />
             <button v-for="option in filteredOptions()" :key="option[optionValue]" type="button" class="block w-full px-4 py-2 text-left text-sm hover:bg-[#F5F7FA]" @click="selectOption(option)">{{ option[optionLabel] }}</button>
             <button v-if="creatable && search.trim()" type="button" class="block w-full border-t border-slate-100 px-4 py-2 text-left text-sm font-medium text-[#2457DA] hover:bg-[#F5F7FA]" @click="createOption">+ {{ createLabel }} "{{ search }}"</button>
-            <p v-if="!filteredOptions().length && !(creatable && search.trim())" class="px-4 py-2 text-sm text-[#637083]">No options available.</p>
+            <p v-if="!filteredOptions().length && !(creatable && search.trim())" class="px-4 py-2 text-sm text-[#637083]">{{ $t("No options available.") }}</p>
         </div>
         <input v-if="required" :value="model" required tabindex="-1" class="pointer-events-none absolute h-0 w-0 opacity-0" aria-hidden="true" />
     </div>

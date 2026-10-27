@@ -17,13 +17,12 @@ defineProps({
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500">
                 <ShieldAlert :size="32" />
             </div>
-            <p class="mt-5 text-sm font-semibold text-red-500">Error {{ status }}</p>
-            <h1 class="mt-2 text-2xl font-semibold">Akses ditolak</h1>
+            <p class="mt-5 text-sm font-semibold text-red-500">{{ $t("Error") }} {{ status }}</p>
+            <h1 class="mt-2 text-2xl font-semibold">{{ $t("Akses ditolak") }}</h1>
             <p class="mt-3 text-sm leading-6 text-[#637083]">{{ message }}</p>
             <Link :href="dashboard.url()"
                 class="mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-[#2457DA] font-semibold text-white">
-                <ArrowLeft :size="18" /> Kembali ke Dashboard
-            </Link>
+                <ArrowLeft :size="18" /> {{ $t("Kembali ke Dashboard") }} </Link>
         </section>
     </main>
 </template>

@@ -383,23 +383,19 @@ const actOnPeriod = (route, period, data = {}) => {
             >
                 <ArrowLeft :size="23" />
             </Link>
-            <h1 class="text-center text-xl font-bold tracking-tight sm:text-2xl">
-                Budget Planner
-            </h1>
+            <h1 class="text-center text-xl font-bold tracking-tight sm:text-2xl"> {{ $t("Budget Planner") }} </h1>
             <Link
                 :href="savingsIndex.url()"
                 class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-budget-primary bg-budget-surface px-3 text-sm font-semibold text-budget-link sm:px-4"
             >
-                <PiggyBank :size="20" />
-                Savings
-            </Link>
+                <PiggyBank :size="20" /> {{ $t("Savings") }} </Link>
         </header>
         <header v-else-if="!showCreate" class="flex items-center justify-between bg-white px-6 py-5">
             <Link :href="budgetPlansIndex.url()" class="text-sm font-semibold text-[#2457DA]">
                 â† Semua plan
             </Link>
-            <h1 class="text-lg font-semibold">Detail plan</h1>
-            <Link :href="savingsIndex.url()" class="text-sm font-semibold text-[#2457DA]">Savings</Link>
+            <h1 class="text-lg font-semibold">{{ $t("Detail plan") }}</h1>
+            <Link :href="savingsIndex.url()" class="text-sm font-semibold text-[#2457DA]">{{ $t("Savings") }}</Link>
         </header>
 
         <main
@@ -409,7 +405,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 : (!isDetailPage ? 'pb-4' : 'sm:px-6 sm:pt-6')"
         >
             <section v-if="!showCreate && !isDetailPage && fundingNotices.length" class="rounded-2xl bg-[#FFF3DE] p-4 text-sm">
-                <h2 class="font-semibold">Budget perlu didanai</h2>
+                <h2 class="font-semibold">{{ $t("Budget perlu didanai") }}</h2>
                 <Link
                     v-for="notice in fundingNotices"
                     :key="notice.id"
@@ -432,9 +428,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 <div class="pointer-events-none absolute -right-10 -top-16 -z-10 h-56 w-56 rounded-full bg-white/10"></div>
                 <div class="pointer-events-none absolute -right-16 top-28 -z-10 h-48 w-48 rounded-full bg-budget-header-middle/25"></div>
                 <div class="relative">
-                    <p class="flex items-center gap-3 pr-32 text-base font-medium text-white/90 sm:text-lg">
-                        Uang tersedia
-                        <Eye :size="20" />
+                    <p class="flex items-center gap-3 pr-32 text-base font-medium text-white/90 sm:text-lg"> {{ $t("Uang tersedia") }} <Eye :size="20" />
                     </p>
                     <div
                         v-if="availableCurrencies.length > 1"
@@ -455,23 +449,23 @@ const actOnPeriod = (route, period, data = {}) => {
                     <p class="mt-3 text-[clamp(2.3rem,10vw,3.6rem)] font-bold leading-none tracking-tight">
                         {{ formatCurrency(totals[selectedCurrency].free, selectedCurrency) }}
                     </p>
-                    <p class="mt-2 text-base text-white/75 sm:text-lg">Siap dialokasikan</p>
+                    <p class="mt-2 text-base text-white/75 sm:text-lg">{{ $t("Siap dialokasikan") }}</p>
                 </div>
                 <div class="mt-7 grid grid-cols-3 border-t border-white/25 pt-5">
                     <div class="pr-2">
-                        <p class="text-xs text-white/75 sm:text-sm">Saldo aktual</p>
+                        <p class="text-xs text-white/75 sm:text-sm">{{ $t("Saldo aktual") }}</p>
                         <p class="mt-1 text-sm font-bold sm:text-lg">
                             {{ formatCurrency(totals[selectedCurrency].actual, selectedCurrency) }}
                         </p>
                     </div>
                     <div class="border-l border-white/25 px-3 sm:px-5">
-                        <p class="text-xs text-white/75 sm:text-sm">Budget tersisa</p>
+                        <p class="text-xs text-white/75 sm:text-sm">{{ $t("Budget tersisa") }}</p>
                         <p class="mt-1 text-sm font-bold sm:text-lg">
                             {{ formatCurrency(totals[selectedCurrency].budget, selectedCurrency) }}
                         </p>
                     </div>
                     <div class="border-l border-white/25 pl-3 sm:pl-5">
-                        <p class="text-xs text-white/75 sm:text-sm">Savings</p>
+                        <p class="text-xs text-white/75 sm:text-sm">{{ $t("Savings") }}</p>
                         <p class="mt-1 text-sm font-bold sm:text-lg">
                             {{ formatCurrency(totals[selectedCurrency].savings, selectedCurrency) }}
                         </p>
@@ -488,7 +482,7 @@ const actOnPeriod = (route, period, data = {}) => {
                     <Wallet :size="25" />
                 </span>
                 <span class="min-w-0 flex-1">
-                    <span class="block text-sm text-budget-muted">Saldo {{ secondaryCurrency || 'IDR' }}</span>
+                    <span class="block text-sm text-budget-muted">{{ $t("Balance") }} {{ secondaryCurrency || 'IDR' }}</span>
                     <strong class="block text-xl font-bold text-budget-heading">
                         {{ formatCurrency(totals[secondaryCurrency].actual, secondaryCurrency) }}
                     </strong>
@@ -500,7 +494,7 @@ const actOnPeriod = (route, period, data = {}) => {
 
             <section v-if="!showCreate && !isDetailPage" class="flex flex-col gap-4 pt-1">
                 <div class="flex items-center gap-3">
-                    <h2 class="text-2xl font-bold tracking-tight sm:text-[28px]">Budget saya</h2>
+                    <h2 class="text-2xl font-bold tracking-tight sm:text-[28px]">{{ $t("Budget saya") }}</h2>
                     <span class="rounded-full bg-budget-success-surface px-3 py-1.5 text-sm font-semibold text-budget-success">
                         {{ activePlanCount }} aktif
                     </span>
@@ -579,9 +573,7 @@ const actOnPeriod = (route, period, data = {}) => {
                 :href="createPlanPage.url()"
                 class="!inline-flex !min-h-[58px] !w-full !items-center !justify-center !gap-3 !rounded-[20px] !bg-budget-primary !px-5 !py-3 !text-lg !font-semibold !text-white !shadow-none transition hover:!bg-budget-primary-hover"
             >
-                <Plus :size="25" />
-                Buat budget baru
-            </ButtonPrimary>
+                <Plus :size="25" /> {{ $t("Buat budget baru") }} </ButtonPrimary>
             <BudgetPlanDetail
                 v-for="plan in plans"
                 v-show="!showCreate && isDetailPage"
@@ -613,13 +605,11 @@ const actOnPeriod = (route, period, data = {}) => {
             />
             <p v-if="actionError" class="text-sm text-red-600">{{ actionError }}</p>
             <section v-if="!showCreate && !isDetailPage && legacyBudgets.length" class="rounded-2xl bg-white p-5 text-sm">
-                <h2 class="font-semibold">Anggaran lama</h2>
-                <p class="mt-1 text-xs text-[#637083]">
-                    Anggaran ini dipakai laporan lama dan belum mencadangkan dana karena akun sumbernya tidak tercatat.
-                </p>
+                <h2 class="font-semibold">{{ $t("Anggaran lama") }}</h2>
+                <p class="mt-1 text-xs text-[#637083]"> {{ $t("Anggaran ini dipakai laporan lama dan belum mencadangkan dana karena akun sumbernya tidak tercatat.") }} </p>
                 <p v-for="budget in legacyBudgets" :key="budget.id" class="mt-2 flex justify-between gap-3">
                     <span>{{ budget.name }} Â· {{ budget.period_start }} â€“ {{ budget.period_end }}</span>
-                    <strong>Rp {{ formatMoney(budget.amount) }}</strong>
+                    <strong>{{ $t("Rp") }} {{ formatMoney(budget.amount) }}</strong>
                 </p>
             </section>
         </main>

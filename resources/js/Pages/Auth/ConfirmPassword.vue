@@ -21,10 +21,7 @@ const submit = () => {
     <GuestLayout>
         <Head title="Confirm Password" />
 
-        <div class="mb-4 text-sm text-gray-600">
-            This is a secure area of the application. Please confirm your
-            password before continuing.
-        </div>
+        <div class="mb-4 text-sm text-gray-600"> {{ $t("This is a secure area of the application. Please confirm your password before continuing.") }} </div>
 
         <form @submit.prevent="submit">
             <div>
@@ -46,9 +43,7 @@ const submit = () => {
                     class="ms-4"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
-                >
-                    Confirm
-                </PrimaryButton>
+                > {{ $t("Confirm") }} </PrimaryButton>
             </div>
         </form>
     </GuestLayout>

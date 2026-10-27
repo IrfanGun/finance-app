@@ -90,34 +90,32 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
     <div class="space-y-7">
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-sm font-medium text-[#8792A2]">Activity</p>
-                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">Transactions</h1>
+                <p class="text-sm font-medium text-[#8792A2]">{{ $t("Activity") }}</p>
+                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">{{ $t("Transactions") }}</h1>
             </div>
             <div class="flex flex-wrap gap-3">
                 <button type="button"
                     class="inline-flex h-11 items-center gap-2 rounded-xl border border-[#E4E9F0] bg-white px-4 text-sm font-semibold text-[#435065] shadow-sm hover:border-[#C9D4E4]"
                     @click="showFilters = true">
-                    <Filter :size="17" /> Filters
-                </button>
+                    <Filter :size="17" /> {{ $t("Filters") }} </button>
                 <ButtonPrimary type="button" class="inline-flex h-11 items-center gap-2 !px-4 !py-2 !text-sm"
                     @click="openCreateForm">
-                    <Plus :size="17" /> Create transaction
-                </ButtonPrimary>
+                    <Plus :size="17" /> {{ $t("Create transaction") }} </ButtonPrimary>
             </div>
         </header>
 
         <section class="grid gap-4 sm:grid-cols-3">
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Transactions shown</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Transactions shown") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#17243A]">{{ filteredTransactions.length }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Income shown</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Income shown") }}</p>
                 <p class="mt-3 text-xl font-semibold text-[#16815B]">{{money(filteredTransactions.filter((item) =>
                     item.type === 'income').reduce((sum, item) => sum + Number(item.amount), 0)) }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Expenses shown</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Expenses shown") }}</p>
                 <p class="mt-3 text-xl font-semibold text-[#C45B4B]">{{money(filteredTransactions.filter((item) =>
                     item.type === 'expense').reduce((sum, item) => sum + Number(item.amount), 0)) }}</p>
             </article>
@@ -143,11 +141,11 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
                 <table class="w-full min-w-[720px] text-left">
                     <thead class="bg-[#FAFBFC] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#98A2B3]">
                         <tr>
-                            <th class="px-6 py-3">Transaction</th>
-                            <th class="px-5 py-3">Category</th>
-                            <th class="px-5 py-3">Account</th>
-                            <th class="px-5 py-3">Date</th>
-                            <th class="px-6 py-3 text-right">Amount</th>
+                            <th class="px-6 py-3">{{ $t("Transaction") }}</th>
+                            <th class="px-5 py-3">{{ $t("Category") }}</th>
+                            <th class="px-5 py-3">{{ $t("Account") }}</th>
+                            <th class="px-5 py-3">{{ $t("Date") }}</th>
+                            <th class="px-6 py-3 text-right">{{ $t("Amount") }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#F0F2F6]">
@@ -178,8 +176,7 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
                     </tbody>
                 </table>
             </div>
-            <p v-if="!filteredTransactions.length" class="px-6 py-12 text-center text-sm text-[#8792A2]">No transactions
-                match these filters.</p>
+            <p v-if="!filteredTransactions.length" class="px-6 py-12 text-center text-sm text-[#8792A2]">{{ $t("No transactions match these filters.") }}</p>
         </section>
 
         <Teleport to="body">
@@ -192,9 +189,8 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
                     @submit.prevent="saveTransaction">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-sm text-[#8792A2]">Add to your activity</p>
-                            <h2 id="create-transaction-title" class="mt-1 text-xl font-semibold text-[#17243A]">Create
-                                transaction</h2>
+                            <p class="text-sm text-[#8792A2]">{{ $t("Add to your activity") }}</p>
+                            <h2 id="create-transaction-title" class="mt-1 text-xl font-semibold text-[#17243A]">{{ $t("Create transaction") }}</h2>
                         </div>
                         <button type="button" class="rounded-lg p-2 text-[#7B8798] hover:bg-[#F5F7FA]"
                             aria-label="Close form" @click="closeCreateForm">
@@ -213,53 +209,43 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
                     </div>
 
                     <div class="grid gap-4 sm:grid-cols-2">
-                        <label class="text-sm font-medium text-[#435065] sm:col-span-2">
-                            Title
-                            <input v-model="createForm.title" required maxlength="255"
+                        <label class="text-sm font-medium text-[#435065] sm:col-span-2"> {{ $t("Title") }} <input v-model="createForm.title" required maxlength="255"
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm"
                                 placeholder="e.g. Lunch with the team" />
                             <span v-if="createForm.errors.title" class="mt-1 block text-xs text-red-600">{{
                                 createForm.errors.title }}</span>
                         </label>
-                        <label class="text-sm font-medium text-[#435065]">
-                            Amount
-                            <input v-model="createForm.amount" type="number" min="0.01" step="0.01" required
+                        <label class="text-sm font-medium text-[#435065]"> {{ $t("Amount") }} <AmountInput v-model="createForm.amount" required
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm"
                                 placeholder="0.00" />
                             <span v-if="createForm.errors.amount" class="mt-1 block text-xs text-red-600">{{
                                 createForm.errors.amount }}</span>
                         </label>
-                        <label class="text-sm font-medium text-[#435065]">
-                            Date
-                            <input v-model="createForm.date" type="date" required
+                        <label class="text-sm font-medium text-[#435065]"> {{ $t("Date") }} <input v-model="createForm.date" type="date" required
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm" />
                             <span v-if="createForm.errors.date" class="mt-1 block text-xs text-red-600">{{
                                 createForm.errors.date }}</span>
                         </label>
-                        <label class="text-sm font-medium text-[#435065]">
-                            Account
-                            <select v-model="createForm.account_id" required
+                        <label class="text-sm font-medium text-[#435065]"> {{ $t("Account") }} <select v-model="createForm.account_id" required
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] bg-white px-3 text-sm">
-                                <option value="" disabled>Select an account</option>
+                                <option value="" disabled>{{ $t("Select an account") }}</option>
                                 <option v-for="account in assets" :key="account.id" :value="account.id">{{ account.name
                                     }}</option>
                             </select>
                             <span v-if="createForm.errors.account_id" class="mt-1 block text-xs text-red-600">{{
                                 createForm.errors.account_id }}</span>
                         </label>
-                        <label class="text-sm font-medium text-[#435065]">
-                            Category <span class="font-normal text-[#98A2B3]">(optional)</span>
+                        <label class="text-sm font-medium text-[#435065]"> {{ $t("Category") }} <span class="font-normal text-[#98A2B3]">(optional)</span>
                             <select v-model="createForm.category_id"
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] bg-white px-3 text-sm">
-                                <option value="">Uncategorized</option>
+                                <option value="">{{ $t("Uncategorized") }}</option>
                                 <option v-for="category in availableCategories" :key="category.id" :value="category.id">
                                     {{ category.name }}</option>
                             </select>
                             <span v-if="createForm.errors.category_id" class="mt-1 block text-xs text-red-600">{{
                                 createForm.errors.category_id }}</span>
                         </label>
-                        <label class="text-sm font-medium text-[#435065] sm:col-span-2">
-                            Note <span class="font-normal text-[#98A2B3]">(optional)</span>
+                        <label class="text-sm font-medium text-[#435065] sm:col-span-2"> {{ $t("Note") }} <span class="font-normal text-[#98A2B3]">(optional)</span>
                             <textarea v-model="createForm.note" rows="3" maxlength="1000"
                                 class="mt-2 w-full rounded-lg border border-[#DDE3EC] px-3 py-2 text-sm"
                                 placeholder="Add any useful details" />
@@ -268,15 +254,13 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
                         </label>
                     </div>
 
-                    <p v-if="!assets.length" class="rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-                        Add an account before creating a transaction.
-                        <Link :href="accountsIndex.url()" class="ml-1 font-semibold underline">Go to accounts</Link>
+                    <p v-if="!assets.length" class="rounded-xl bg-amber-50 p-3 text-sm text-amber-800"> {{ $t("Add an account before creating a transaction.") }} <Link :href="accountsIndex.url()" class="ml-1 font-semibold underline">{{ $t("Go to accounts") }}</Link>
                     </p>
 
                     <div class="flex justify-end gap-3 border-t border-[#EEF1F5] pt-4">
                         <button type="button"
                             class="rounded-xl border border-[#DDE3EC] px-4 py-2.5 text-sm font-semibold text-[#637083]"
-                            @click="closeCreateForm">Cancel</button>
+                            @click="closeCreateForm">{{ $t("Cancel") }}</button>
                         <ButtonPrimary type="submit" class="!px-5 !py-2.5 !text-sm"
                             :disabled="createForm.processing || !assets.length">
                             {{ createForm.processing ? 'Saving…' : 'Save transaction' }}
@@ -292,34 +276,33 @@ const saveTransaction = () => createForm.post(transactionStore.url(), {
                     aria-modal="true" aria-labelledby="transaction-filters-title" @submit.prevent="applyFilters">
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-sm text-[#8792A2]">Narrow your activity</p>
-                            <h2 id="transaction-filters-title" class="mt-1 text-xl font-semibold text-[#17243A]">
-                                Transaction filters</h2>
+                            <p class="text-sm text-[#8792A2]">{{ $t("Narrow your activity") }}</p>
+                            <h2 id="transaction-filters-title" class="mt-1 text-xl font-semibold text-[#17243A]"> {{ $t("Transaction filters") }}</h2>
                         </div><button type="button" class="rounded-lg p-2 text-[#7B8798] hover:bg-[#F5F7FA]"
                             aria-label="Close filters" @click="showFilters = false">
                             <X :size="19" />
                         </button>
                     </div>
-                    <div class="grid gap-4 sm:grid-cols-2"><label class="text-sm font-medium text-[#435065]">From<input
+                    <div class="grid gap-4 sm:grid-cols-2"><label class="text-sm font-medium text-[#435065]">{{ $t("From") }}<input
                                 v-model="from" type="date"
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm" /></label><label
-                            class="text-sm font-medium text-[#435065]">To<input v-model="to" type="date"
+                            class="text-sm font-medium text-[#435065]">{{ $t("To") }}<input v-model="to" type="date"
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm" /></label><label
-                            class="text-sm font-medium text-[#435065]">Account<select v-model="accountFilter"
+                            class="text-sm font-medium text-[#435065]">{{ $t("Account") }}<select v-model="accountFilter"
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm">
-                                <option value="">All accounts</option>
+                                <option value="">{{ $t("All accounts") }}</option>
                                 <option v-for="account in assets" :key="account.id" :value="String(account.id)">{{
                                     account.name }}</option>
-                            </select></label><label class="text-sm font-medium text-[#435065]">Category<select
+                            </select></label><label class="text-sm font-medium text-[#435065]">{{ $t("Category") }}<select
                                 v-model="categoryFilter"
                                 class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm">
-                                <option value="">All categories</option>
+                                <option value="">{{ $t("All categories") }}</option>
                                 <option v-for="category in categories" :key="category.id" :value="String(category.id)">
                                     {{ category.name }}</option>
                             </select></label></div>
                     <div class="flex justify-between border-t border-[#EEF1F5] pt-4"><button type="button"
-                            class="text-sm font-semibold text-[#637083]" @click="clearFilters">Clear filters</button>
-                        <ButtonPrimary type="submit" class="!px-5 !py-2.5 !text-sm">Apply filters</ButtonPrimary>
+                            class="text-sm font-semibold text-[#637083]" @click="clearFilters">{{ $t("Clear filters") }}</button>
+                        <ButtonPrimary type="submit" class="!px-5 !py-2.5 !text-sm">{{ $t("Apply filters") }}</ButtonPrimary>
                     </div>
                 </form>
             </div>

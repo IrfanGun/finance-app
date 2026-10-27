@@ -180,7 +180,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
             <Link :href="dashboard.url()" aria-label="Back to dashboard">
                 <ArrowLeft :size="22" class="text-[#2457DA]" />
             </Link>
-            <h1 class="text-lg font-semibold">Assets</h1>
+            <h1 class="text-lg font-semibold">{{ $t("Assets") }}</h1>
             <button
                 type="button"
                 class="rounded-full bg-app-primary p-2 text-white"
@@ -192,9 +192,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
         </header>
 
         <main v-if="!creating" class="space-y-3 px-6 pt-5">
-            <p v-if="!assets.data.length" class="rounded-2xl bg-[#F5F7FA] px-5 py-10 text-center text-sm text-[#637083]">
-                Belum ada aset. Catat harga beli dan atur perubahan nilainya saat membuat aset.
-            </p>
+            <p v-if="!assets.data.length" class="rounded-2xl bg-[#F5F7FA] px-5 py-10 text-center text-sm text-[#637083]"> {{ $t("Belum ada aset. Catat harga beli dan atur perubahan nilainya saat membuat aset.") }} </p>
 
             <Link
                 v-for="asset in assets.data"
@@ -213,16 +211,15 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <div>
-                        <p class="text-xs text-[#637083]">Estimasi nilai sekarang</p>
+                        <p class="text-xs text-[#637083]">{{ $t("Estimasi nilai sekarang") }}</p>
                         <p class="mt-1 font-semibold">{{ formatMoney(asset.current_value, asset.currency) }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-[#637083]">Harga beli</p>
+                        <p class="text-xs text-[#637083]">{{ $t("Purchase price") }}</p>
                         <p class="mt-1 font-medium">{{ formatMoney(asset.purchase_price, asset.currency) }}</p>
                     </div>
                 </div>
-                <p v-if="asset.depreciation" class="mt-3 text-xs capitalize text-[#637083]">
-                    Nilai {{ asset.depreciation.value_direction === 'increase' ? 'naik' : 'turun' }}
+                <p v-if="asset.depreciation" class="mt-3 text-xs capitalize text-[#637083]"> {{ $t("Nilai") }} {{ asset.depreciation.value_direction === 'increase' ? 'naik' : 'turun' }}
                     · {{ asset.depreciation.depreciation_type === 'fixed' ? 'nominal tetap' : 'persentase harga beli' }}
                     · {{ asset.depreciation.status }}
                 </p>
@@ -254,13 +251,12 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                     <ArrowLeft :size="22" />
                 </button>
                 <div class="min-w-0 flex-1">
-                    <p class="text-xs font-medium text-[#637083]">Aset nonlikuid</p>
+                    <p class="text-xs font-medium text-[#637083]">{{ $t("Aset nonlikuid") }}</p>
                     <h1 class="text-xl font-semibold">
                         {{ currentStep === 1 ? 'Aset baru' : 'Atur perubahan nilai' }}
                     </h1>
                 </div>
-                <span class="shrink-0 text-sm font-medium text-[#637083]">
-                    Langkah {{ currentStep }} dari {{ form.depreciation ? 2 : 1 }}
+                <span class="shrink-0 text-sm font-medium text-[#637083]"> {{ $t("Step") }} {{ currentStep }} {{ $t("dari") }} {{ form.depreciation ? 2 : 1 }}
                 </span>
             </header>
 
@@ -293,15 +289,11 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                 </div>
                 <div v-if="currentStep === 1" class="space-y-4">
                     <div>
-                        <h2 class="text-lg font-semibold">Detail aset</h2>
-                        <p class="mt-1 text-sm leading-5 text-[#637083]">
-                            Catat informasi dasar dan nilai saat aset dibeli.
-                        </p>
+                        <h2 class="text-lg font-semibold">{{ $t("Asset details") }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-[#637083]"> {{ $t("Catat informasi dasar dan nilai saat aset dibeli.") }} </p>
                     </div>
 
-                    <label class="block text-sm font-medium">
-                        Nama aset
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Asset name") }} <input
                             v-model="form.name"
                             required
                             maxlength="255"
@@ -313,9 +305,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Deskripsi
-                        <textarea
+                    <label class="block text-sm font-medium"> {{ $t("Description") }} <textarea
                             v-model="form.description"
                             rows="2"
                             class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3"
@@ -327,9 +317,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                     </label>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="block text-sm font-medium">
-                            Mata uang
-                            <select
+                        <label class="block text-sm font-medium"> {{ $t("Currency") }} <select
                                 v-model="form.currency"
                                 required
                                 class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
@@ -342,13 +330,8 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                                 {{ form.errors.currency }}
                             </p>
                         </label>
-                        <label class="block text-sm font-medium">
-                            Harga beli
-                            <input
+                        <label class="block text-sm font-medium"> {{ $t("Purchase price") }} <AmountInput
                                 v-model="form.purchase_price"
-                                type="number"
-                                min="0.01"
-                                step="0.01"
                                 required
                                 class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
                             />
@@ -358,9 +341,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                         </label>
                     </div>
 
-                    <label class="block text-sm font-medium">
-                        Tanggal beli
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Purchase date") }} <input
                             v-model="form.purchase_date"
                             type="date"
                             :max="businessToday()"
@@ -376,52 +357,44 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                         <input type="checkbox" :checked="form.depreciation !== null" class="rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]" @change="toggleDepreciation($event.target.checked)" />
                         <span>
                             <span class="block">Aktifkan perubahan nilai otomatis</span>
-                            <span class="mt-1 block text-xs font-normal leading-5 text-[#637083]">
-                                Atur depresiasi atau apresiasi aset pada langkah berikutnya.
-                            </span>
+                            <span class="mt-1 block text-xs font-normal leading-5 text-[#637083]"> {{ $t("Atur depresiasi atau apresiasi aset pada langkah berikutnya.") }} </span>
                         </span>
                     </label>
                 </div>
 
                 <div v-if="currentStep === 2 && form.depreciation" class="space-y-4">
                     <div>
-                        <h2 class="text-lg font-semibold">Formulir depresiasi</h2>
+                        <h2 class="text-lg font-semibold">{{ $t("Formulir depresiasi") }}</h2>
                       
                     </div>
 
                     <div class="space-y-4 rounded-xl border border-slate-200 p-4">
-                    <label class="block text-sm font-medium">
-                        Arah perubahan nilai
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Arah perubahan nilai") }} <select
                             v-model="form.depreciation.value_direction"
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
                             @change="setValueDirection(form.depreciation, $event.target.value)"
                         >
-                            <option value="decrease">Turun (depresiasi)</option>
-                            <option value="increase">Naik (apresiasi)</option>
+                            <option value="decrease">{{ $t("Turun (depresiasi)") }}</option>
+                            <option value="increase">{{ $t("Naik (apresiasi)") }}</option>
                         </select>
                         <p v-if="form.errors['depreciation.value_direction']" class="mt-1 text-xs text-red-600">
                             {{ form.errors['depreciation.value_direction'] }}
                         </p>
                     </label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="block text-sm font-medium">
-                            Metode perubahan nilai
-                            <select
+                        <label class="block text-sm font-medium"> {{ $t("Metode perubahan nilai") }} <select
                                 v-model="form.depreciation.depreciation_type"
                                 class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3"
                                 @change="setDepreciationType(form.depreciation, $event.target.value)"
                             >
-                                <option value="fixed">Nominal tetap</option>
-                                <option value="percentage">Persentase harga beli</option>
+                                <option value="fixed">{{ $t("Nominal tetap") }}</option>
+                                <option value="percentage">{{ $t("Persentase harga beli") }}</option>
                             </select>
                         </label>
                         <label v-if="!form.depreciation.is_tiered" class="block text-sm font-medium">
                             {{ form.depreciation.depreciation_type === 'fixed' ? `Nominal (${form.currency})` : 'Persentase harga beli (%)' }}
-                            <input
+                            <AmountInput
                                 v-model="form.depreciation.depreciation_value"
-                                type="number"
-                                min="0.0001"
                                 :max="form.depreciation.depreciation_type === 'percentage' ? 100 : undefined"
                                 :step="form.depreciation.depreciation_type === 'fixed' ? 0.01 : 0.0001"
                                 required
@@ -439,9 +412,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                             type="checkbox"
                             class="rounded border-slate-300 text-[#2457DA] focus:ring-[#2457DA]"
                             @change="setTieredDepreciation(form.depreciation, $event.target.checked)"
-                        />
-                        Bertingkat per tahun
-                    </label>
+                        /> {{ $t("Bertingkat per tahun") }} </label>
 
                     <div v-if="form.depreciation.is_tiered" class="space-y-3">
                         <div class="space-y-3">
@@ -450,9 +421,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                                 :key="index"
                                 class="grid grid-cols-[1fr_1fr_auto] items-end gap-2"
                             >
-                                <label class="block text-sm font-medium">
-                                    Mulai tahun ke-
-                                    <input
+                                <label class="block text-sm font-medium"> {{ $t("Mulai tahun ke-") }} <input
                                         v-model.number="step.year_number"
                                         type="number"
                                         min="1"
@@ -470,10 +439,8 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                                 </label>
                                 <label class="block text-sm font-medium">
                                     {{ form.depreciation.depreciation_type === 'fixed' ? `Nominal (${form.currency})` : 'Persentase harga beli (%)' }}
-                                    <input
+                                    <AmountInput
                                         v-model="step.depreciation_value"
-                                        type="number"
-                                        min="0.0001"
                                         :max="form.depreciation.depreciation_type === 'percentage' ? 100 : undefined"
                                         :step="form.depreciation.depreciation_type === 'fixed' ? 0.01 : 0.0001"
                                         required
@@ -501,9 +468,7 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                             type="button"
                             class="text-sm font-medium text-[#2457DA]"
                             @click="addRateStep(form.depreciation)"
-                        >
-                            + Tambah tingkat tarif
-                        </button>
+                        > {{ $t("+ Tambah tingkat tarif") }} </button>
                         <p v-if="form.errors['depreciation.rate_steps']" class="text-xs text-red-600">
                             {{ form.errors['depreciation.rate_steps'] }}
                         </p>
@@ -513,28 +478,18 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <div v-if="form.depreciation.is_tiered || form.depreciation.value_direction === 'increase'" class="text-sm font-medium">
-                            Periode
-                            <p class="mt-2 flex h-11 items-center rounded-lg border border-slate-300 bg-slate-50 px-3">
-                                Tahunan
-                            </p>
+                        <div v-if="form.depreciation.is_tiered || form.depreciation.value_direction === 'increase'" class="text-sm font-medium"> {{ $t("Period") }} <p class="mt-2 flex h-11 items-center rounded-lg border border-slate-300 bg-slate-50 px-3"> {{ $t("Yearly") }} </p>
                         </div>
-                        <label v-else class="block text-sm font-medium">
-                            Periode
-                            <select v-model="form.depreciation.depreciation_period" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3">
-                                <option value="monthly">Bulanan</option>
-                                <option value="yearly">Tahunan</option>
+                        <label v-else class="block text-sm font-medium"> {{ $t("Period") }} <select v-model="form.depreciation.depreciation_period" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3">
+                                <option value="monthly">{{ $t("Monthly") }}</option>
+                                <option value="yearly">{{ $t("Yearly") }}</option>
                             </select>
                         </label>
-                        <label v-if="form.depreciation.value_direction === 'decrease'" class="block text-sm font-medium">
-                            Nilai minimum
-                            <input v-model="form.depreciation.residual_value" type="number" min="0" step="0.01" required class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3" />
+                        <label v-if="form.depreciation.value_direction === 'decrease'" class="block text-sm font-medium"> {{ $t("Nilai minimum") }} <AmountInput v-model="form.depreciation.residual_value" required class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3" />
                             <p v-if="form.errors['depreciation.residual_value']" class="mt-1 text-xs text-red-600">{{ form.errors['depreciation.residual_value'] }}</p>
                         </label>
                     </div>
-                    <label class="block text-sm font-medium">
-                        Mulai hitung dari
-                        <input v-model="form.depreciation.depreciation_start_date" type="date" :min="form.purchase_date" :max="businessToday()" required class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4" />
+                    <label class="block text-sm font-medium"> {{ $t("Mulai hitung dari") }} <input v-model="form.depreciation.depreciation_start_date" type="date" :min="form.purchase_date" :max="businessToday()" required class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4" />
                         <p v-if="form.errors['depreciation.depreciation_start_date']" class="mt-1 text-xs text-red-600">{{ form.errors['depreciation.depreciation_start_date'] }}</p>
                     </label>
                     <p class="text-xs leading-5 text-[#637083]">
@@ -550,17 +505,13 @@ const formatMoney = (amount, currency = 'IDR') => new Intl.NumberFormat('id-ID',
                         variant="secondary"
                         class="w-full"
                         @click="currentStep = 1"
-                    >
-                        Kembali
-                    </ButtonPrimary>
+                    > {{ $t("Back") }} </ButtonPrimary>
                     <ButtonPrimary
                         v-if="currentStep === 1 && form.depreciation"
                         type="button"
                         class="col-span-2 w-full"
                         @click="continueToDepreciation"
-                    >
-                        Lanjut ke depresiasi
-                    </ButtonPrimary>
+                    > {{ $t("Lanjut ke depresiasi") }} </ButtonPrimary>
                     <ButtonPrimary
                         v-else
                         type="submit"

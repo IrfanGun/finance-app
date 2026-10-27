@@ -26,8 +26,8 @@ defineEmits(['close', 'submit']);
                 <form class="flex flex-col gap-4" @submit.prevent="$emit('submit')">
                     <header class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-xs font-medium text-[#637083]">Pengeluaran dari budget</p>
-                            <h2 id="transaction-modal-title" class="text-[22px] font-semibold">Catat belanja</h2>
+                            <p class="text-xs font-medium text-[#637083]">{{ $t("Pengeluaran dari budget") }}</p>
+                            <h2 id="transaction-modal-title" class="text-[22px] font-semibold">{{ $t("Catat belanja") }}</h2>
                         </div>
                         <ButtonPrimary
                             type="button"
@@ -40,19 +40,13 @@ defineEmits(['close', 'submit']);
 
                     <div class="rounded-xl bg-[#F1F5FF] px-4 py-3 text-xs text-[#637083]">
                         <p class="font-semibold text-[#2457DA]">{{ selectedPlan?.name }}</p>
-                        <p v-if="selectedTransactionPeriod">
-                            Periode {{ selectedTransactionPeriod.starts_on }} – {{ selectedTransactionPeriod.ends_on }}
+                        <p v-if="selectedTransactionPeriod"> {{ $t("Period") }} {{ selectedTransactionPeriod.starts_on }} – {{ selectedTransactionPeriod.ends_on }}
                         </p>
                     </div>
 
-                    <label class="text-sm font-medium">
-                        Nominal
-                        <input
+                    <label class="text-sm font-medium"> {{ $t("Amount") }} <AmountInput
                             v-model="transactionForm.amount"
                             class="field"
-                            type="number"
-                            min="0.01"
-                            step="0.01"
                             required
                             placeholder="Contoh: 50000"
                         />
@@ -61,9 +55,7 @@ defineEmits(['close', 'submit']);
                         </span>
                     </label>
 
-                    <label class="text-sm font-medium">
-                        Nama belanja
-                        <input
+                    <label class="text-sm font-medium"> {{ $t("Expense name") }} <input
                             v-model="transactionForm.title"
                             class="field"
                             type="text"
@@ -76,10 +68,8 @@ defineEmits(['close', 'submit']);
                         </span>
                     </label>
 
-                    <label class="text-sm font-medium">
-                        Kategori
-                        <select v-model="transactionForm.category_id" class="field">
-                            <option value="">Pilih kategori</option>
+                    <label class="text-sm font-medium"> {{ $t("Category") }} <select v-model="transactionForm.category_id" class="field">
+                            <option value="">{{ $t("Pilih kategori") }}</option>
                             <option
                                 v-for="category in availableCategories"
                                 :key="category.id"
@@ -91,9 +81,7 @@ defineEmits(['close', 'submit']);
                         </span>
                     </label>
 
-                    <label class="text-sm font-medium">
-                        Tanggal
-                        <input
+                    <label class="text-sm font-medium"> {{ $t("Date") }} <input
                             v-model="transactionForm.date"
                             class="field"
                             type="date"
@@ -106,8 +94,7 @@ defineEmits(['close', 'submit']);
                         </span>
                     </label>
 
-                    <label class="text-sm font-medium">
-                        Catatan <span class="font-normal text-[#637083]">(opsional)</span>
+                    <label class="text-sm font-medium"> {{ $t("Note") }} <span class="font-normal text-[#637083]">(opsional)</span>
                         <textarea
                             v-model="transactionForm.note"
                             class="field min-h-20 resize-y"
@@ -128,7 +115,7 @@ defineEmits(['close', 'submit']);
                             variant="secondary"
                             class="flex-1"
                             @click="$emit('close')"
-                        >Batal</ButtonPrimary>
+                        >{{ $t("Cancel") }}</ButtonPrimary>
                         <ButtonPrimary
                             type="submit"
                             class="flex-1"

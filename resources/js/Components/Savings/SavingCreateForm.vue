@@ -35,11 +35,8 @@ const goToGoalDetails = () => {
             />
         </div>
         <template v-if="step === 1">
-            <p class="text-sm text-[#637083]">
-                Buat kantong untuk memberi nama pada tujuan dana. Dana belum akan dipindahkan.
-            </p>
-            <label class="text-sm">Nama kantong
-                <input
+            <p class="text-sm text-[#637083]"> {{ $t("Buat kantong untuk memberi nama pada tujuan dana. Dana belum akan dipindahkan.") }} </p>
+            <label class="text-sm">{{ $t("Nama kantong") }} <input
                     v-model="form.name"
                     class="field"
                     maxlength="255"
@@ -47,8 +44,7 @@ const goToGoalDetails = () => {
                     placeholder="Contoh: Dana darurat"
                 />
             </label>
-            <label class="text-sm">Mata uang
-                <select v-model="form.currency" class="field">
+            <label class="text-sm">{{ $t("Currency") }} <select v-model="form.currency" class="field">
                     <option
                         v-for="currency in getSavingCurrencies(accounts)"
                         :key="currency"
@@ -61,29 +57,19 @@ const goToGoalDetails = () => {
             <p v-if="form.errors.name || form.errors.currency" class="text-sm text-red-600">
                 {{ form.errors.name || form.errors.currency }}
             </p>
-            <ButtonPrimary type="button" @click="goToGoalDetails">
-                Lanjut
-            </ButtonPrimary>
+            <ButtonPrimary type="button" @click="goToGoalDetails"> {{ $t("Lanjut") }} </ButtonPrimary>
         </template>
         <template v-else>
-            <p class="text-sm text-[#637083]">
-                Target hanya sebagai pengingat progres. Kamu bisa melewati bagian ini.
-            </p>
-            <label class="text-sm">Target nominal (opsional)
-                <input
+            <p class="text-sm text-[#637083]"> {{ $t("Target hanya sebagai pengingat progres. Kamu bisa melewati bagian ini.") }} </p>
+            <label class="text-sm">{{ $t("Target nominal (opsional)") }} <AmountInput
                     v-model="form.target_amount"
                     class="field"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
                     placeholder="Contoh: 1000000"
                 />
             </label>
-            <label class="text-sm">Target tanggal (opsional)
-                <input v-model="form.target_date" class="field" type="date" />
+            <label class="text-sm">{{ $t("Target tanggal (opsional)") }} <input v-model="form.target_date" class="field" type="date" />
             </label>
-            <label class="text-sm">Catatan (opsional)
-                <textarea
+            <label class="text-sm">{{ $t("Catatan (opsional)") }} <textarea
                     v-model="form.notes"
                     class="field"
                     rows="2"
@@ -99,16 +85,12 @@ const goToGoalDetails = () => {
                     variant="secondary"
                     class="flex-1 justify-center"
                     @click="emit('update:step', 1)"
-                >
-                    Kembali
-                </ButtonPrimary>
+                > {{ $t("Back") }} </ButtonPrimary>
                 <ButtonPrimary
                     type="submit"
                     class="flex-1 justify-center"
                     :disabled="form.processing"
-                >
-                    Buat kantong
-                </ButtonPrimary>
+                > {{ $t("Buat kantong") }} </ButtonPrimary>
             </div>
         </template>
     </form>

@@ -70,24 +70,18 @@ const form = useForm({
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
-                    Your email address is unverified.
-                    <Link
+                <p class="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800"> {{ $t("Your email address is unverified.") }} <Link
                         :href="verificationSend.url()"
                         method="post"
                         as="button"
                         class="font-semibold underline hover:text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-                    >
-                        Resend verification email
-                    </Link>
+                    > {{ $t("Resend verification email") }} </Link>
                 </p>
 
                 <div
                     v-show="status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600"
-                >
-                    A new verification link has been sent to your email address.
-                </div>
+                > {{ $t("A new verification link has been sent to your email address.") }} </div>
             </div>
 
             <div class="flex flex-col items-stretch gap-2">
@@ -107,9 +101,7 @@ const form = useForm({
                     <p
                         v-if="form.recentlySuccessful"
                         class="text-sm text-green-600"
-                    >
-                        Saved.
-                    </p>
+                    > {{ $t("Saved.") }} </p>
                 </Transition>
             </div>
         </form>

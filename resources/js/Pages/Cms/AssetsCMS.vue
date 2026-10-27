@@ -26,27 +26,26 @@ const save = () => form.post(store.url(), { onSuccess: () => { open.value = fals
     <div class="space-y-7">
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-sm font-medium text-[#8792A2]">Long-term value</p>
-                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">Assets</h1>
+                <p class="text-sm font-medium text-[#8792A2]">{{ $t("Long-term value") }}</p>
+                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">{{ $t("Assets") }}</h1>
             </div>
             <button
                 class="inline-flex h-11 items-center gap-2 rounded-xl bg-[#2457DA] px-4 text-sm font-semibold text-white shadow-sm shadow-blue-200 hover:bg-[#1947BE]"
                 @click="create">
-                <Plus :size="17" /> Add asset
-            </button>
+                <Plus :size="17" /> {{ $t("Add asset") }} </button>
         </header>
         <section class="grid gap-4 sm:grid-cols-3">
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Assets on this page</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Assets on this page") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#17243A]">{{ assets.data.length }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Estimated value</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Estimated value") }}</p>
                 <p class="mt-3 text-xl font-semibold text-[#17243A]">{{money(assets.data.reduce((total, asset) => total
                     + Number(asset.current_value ?? 0), 0))}}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Purchase value</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Purchase value") }}</p>
                 <p class="mt-3 text-xl font-semibold text-[#17243A]">{{money(assets.data.reduce((total, asset) => total
                     + Number(asset.purchase_price ?? 0), 0))}}</p>
             </article>
@@ -55,7 +54,7 @@ const save = () => form.post(store.url(), { onSuccess: () => { open.value = fals
             class="overflow-hidden rounded-2xl border border-[#E9EDF3] bg-white shadow-[0_4px_18px_rgba(23,36,58,0.03)]">
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#EEF1F5] px-6 py-4">
                 <div>
-                    <h2 class="font-semibold text-[#17243A]">Asset portfolio</h2>
+                    <h2 class="font-semibold text-[#17243A]">{{ $t("Asset portfolio") }}</h2>
                 </div><label
                     class="flex h-10 w-full items-center gap-2 rounded-lg border border-[#E7EBF2] px-3 sm:w-64">
                     <Search :size="16" class="text-[#98A2B3]" /><input v-model="search"
@@ -66,10 +65,10 @@ const save = () => form.post(store.url(), { onSuccess: () => { open.value = fals
                 <table class="w-full min-w-[720px] text-left">
                     <thead class="bg-[#FAFBFC] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#98A2B3]">
                         <tr>
-                            <th class="px-6 py-3">Asset</th>
-                            <th class="px-5 py-3">Purchase date</th>
-                            <th class="px-5 py-3 text-right">Purchase price</th>
-                            <th class="px-5 py-3 text-right">Estimated value</th>
+                            <th class="px-6 py-3">{{ $t("Asset") }}</th>
+                            <th class="px-5 py-3">{{ $t("Purchase date") }}</th>
+                            <th class="px-5 py-3 text-right">{{ $t("Purchase price") }}</th>
+                            <th class="px-5 py-3 text-right">{{ $t("Estimated value") }}</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>
@@ -96,9 +95,7 @@ const save = () => form.post(store.url(), { onSuccess: () => { open.value = fals
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <Link :href="show.url(asset.id)"
-                                    class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-[#2457DA] hover:bg-[#EEF3FF]">
-                                    Details
-                                    <ChevronRight :size="16" />
+                                    class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-[#2457DA] hover:bg-[#EEF3FF]"> {{ $t("Details") }} <ChevronRight :size="16" />
                                 </Link>
                             </td>
                         </tr>
@@ -123,27 +120,25 @@ const save = () => form.post(store.url(), { onSuccess: () => { open.value = fals
             <form class="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-xl space-y-5 overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:max-h-[calc(100dvh-3rem)]"
                 @submit.prevent="save">
                 <div>
-                    <p class="text-sm text-[#8792A2]">Asset details</p>
-                    <h2 class="mt-1 text-xl font-semibold text-[#17243A]">Add an asset</h2>
-                    <p class="mt-2 text-sm text-[#637083]">You can configure value changes from the asset detail page
-                        after
-                        saving.</p>
+                    <p class="text-sm text-[#8792A2]">{{ $t("Asset details") }}</p>
+                    <h2 class="mt-1 text-xl font-semibold text-[#17243A]">{{ $t("Add an asset") }}</h2>
+                    <p class="mt-2 text-sm text-[#637083]">{{ $t("You can configure value changes from the asset detail page after saving.") }}</p>
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2"><label
-                        class="text-sm font-medium text-[#435065] sm:col-span-2">Name<input v-model="form.name" required
+                        class="text-sm font-medium text-[#435065] sm:col-span-2">{{ $t("Name") }}<input v-model="form.name" required
                             maxlength="255" class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm"
                             placeholder="e.g. Laptop" /></label><label
-                        class="text-sm font-medium text-[#435065]">Currency<select v-model="form.currency"
+                        class="text-sm font-medium text-[#435065]">{{ $t("Currency") }}<select v-model="form.currency"
                             class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] bg-white px-3 text-sm">
                             <option v-for="currency in currencyOptions" :key="currency" :value="currency">{{ currency }}
                             </option>
-                        </select></label><label class="text-sm font-medium text-[#435065]">Purchase price<input
-                            v-model="form.purchase_price" type="number" min="0.01" step="0.01" required
+                        </select></label><label class="text-sm font-medium text-[#435065]">{{ $t("Purchase price") }}<AmountInput
+                            v-model="form.purchase_price" required
                             class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm" /></label><label
-                        class="text-sm font-medium text-[#435065] sm:col-span-2">Purchase date<input
+                        class="text-sm font-medium text-[#435065] sm:col-span-2">{{ $t("Purchase date") }}<input
                             v-model="form.purchase_date" type="date" :max="today" required
                             class="mt-2 h-11 w-full rounded-lg border border-[#DDE3EC] px-3 text-sm" /></label><label
-                        class="text-sm font-medium text-[#435065] sm:col-span-2">Description<textarea
+                        class="text-sm font-medium text-[#435065] sm:col-span-2">{{ $t("Description") }}<textarea
                             v-model="form.description" rows="3"
                             class="mt-2 w-full rounded-lg border border-[#DDE3EC] px-3 py-2 text-sm"
                             placeholder="Optional details" /></label></div>
@@ -151,7 +146,7 @@ const save = () => form.post(store.url(), { onSuccess: () => { open.value = fals
                     }}</p>
                 <div class="flex justify-end gap-3"><button type="button"
                         class="rounded-xl border border-[#DDE3EC] px-4 py-2.5 text-sm font-semibold text-[#637083]"
-                        @click="open = false">Cancel</button><button
+                        @click="open = false">{{ $t("Cancel") }}</button><button
                         class="rounded-xl bg-[#2457DA] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
                         :disabled="form.processing">{{ form.processing ? 'Saving…' : 'Save asset' }}</button></div>
             </form>

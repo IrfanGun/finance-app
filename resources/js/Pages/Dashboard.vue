@@ -311,37 +311,31 @@ const shortcuts = [
         image: '/dashboard-icons/savings.png',
         label: 'Savings',
         href: savingsIndex.url(),
-        gradient: 'from-budget-shortcut-savings-start to-budget-shortcut-savings-end',
     },
     {
         image: '/dashboard-icons/scan.png',
         label: 'Scan',
         href: receiptScan.url(),
-        gradient: 'from-budget-shortcut-scan-start to-budget-shortcut-scan-end',
     },
     {
         image: '/dashboard-icons/chat.png',
         label: 'Chat',
         href: chatIndex.url(),
-        gradient: 'from-budget-shortcut-chat-start to-budget-shortcut-chat-end',
     },
     {
         image: '/dashboard-icons/meals.png',
         label: 'Meals',
         href: mealsIndex.url(),
-        gradient: 'from-budget-shortcut-meals-start to-budget-shortcut-meals-end',
     },
     {
         image: '/dashboard-icons/reminder.png',
         label: 'Reminder',
         href: remindersIndex.url(),
-        gradient: 'from-budget-shortcut-reminder-start to-budget-shortcut-reminder-end',
     },
     {
         image: '/dashboard-icons/plan.png',
         label: 'Plan',
         href: budgetIndex.url(),
-        gradient: 'from-budget-shortcut-plan-start to-budget-shortcut-plan-end',
     },
 ];
 </script>
@@ -392,7 +386,7 @@ const shortcuts = [
                     <Wallet :size="19" :stroke-width="2" aria-hidden="true" />
                     <p class="text-sm font-medium">{{ t('Total Worth') }}</p>
                 </div>
-                <p class="mt-2 text-[clamp(2rem,9vw,2.5rem)] font-bold tracking-tight">Rp {{ formatCurrency(summary.balance) }}</p>
+                <p class="mt-2 text-[clamp(2rem,9vw,2.5rem)] font-bold tracking-tight">{{ $t("Rp") }} {{ formatCurrency(summary.balance) }}</p>
                 <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
                     <div class="flex flex-wrap items-center gap-2">
                         <span
@@ -480,13 +474,12 @@ const shortcuts = [
             <div v-for="item in shortcuts" :key="item.label">
                 <Link :href="item.href" class="block">
                     <span
-                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br transition hover:-translate-y-0.5"
-                        :class="item.gradient"
+                        class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm transition hover:-translate-y-0.5"
                     >
                         <img
                             :src="item.image"
                             alt=""
-                            class="h-8 w-8 object-contain"
+                            class="h-11 w-11 object-contain"
                         />
                     </span>
                     <span class="mt-2 block">{{ t(item.label) }}</span>
@@ -505,13 +498,13 @@ const shortcuts = [
                         <p class="flex items-center gap-1 text-sm text-income">
                             <ArrowDown :size="15" />{{ t('Income') }}
                         </p>
-                        <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.income) }}</p>
+                        <p class="mt-2 text-lg font-semibold">{{ $t("Rp") }} {{ formatCurrency(summary.income) }}</p>
                     </div>
                     <div class="rounded-[20px] border border-budget-border bg-budget-surface p-4">
                         <p class="flex items-center gap-1 text-sm text-expense">
                             <ArrowUp :size="15" />{{ t('Expense') }}
                         </p>
-                        <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.expense) }}</p>
+                        <p class="mt-2 text-lg font-semibold">{{ $t("Rp") }} {{ formatCurrency(summary.expense) }}</p>
                     </div>
                 </div>
             </section>
@@ -613,7 +606,7 @@ const shortcuts = [
                 <div class="mx-auto mb-5 h-1 w-9 rounded-full bg-budget-progress-track"></div>
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-xs font-medium text-budget-muted">Step {{ transactionStep }} of 2</p>
+                        <p class="text-xs font-medium text-budget-muted">{{ $t("Step") }} {{ transactionStep }} {{ $t("dari 2") }}</p>
                         <h2 class="text-[22px] font-semibold">{{ transactionForm.meal_record_id ? 'Catat pengeluaran' : 'New transaction' }}</h2>
                     </div>
                     <ButtonPrimary
@@ -642,11 +635,10 @@ const shortcuts = [
                         type="button"
                         class="mt-6 !h-[53px] !w-full !rounded-[16px]"
                         @click="transactionStep = 2"
-                    >Continue</ButtonPrimary>
+                    >{{ $t("Continue") }}</ButtonPrimary>
                 </template>
                 <template v-else-if="transactionStep === 2">
-                    <label class="mt-5 block">Account
-                        <SelectInput v-model="transactionForm.account_id"
+                    <label class="mt-5 block">{{ $t("Account") }} <SelectInput v-model="transactionForm.account_id"
                             :options="accounts.map((account) => ({ label: account.name, value: account.id }))"
                             placeholder="Select account" required />
                     </label>
@@ -656,26 +648,23 @@ const shortcuts = [
                             variant="secondary"
                             class="!h-[53px] !rounded-[16px]"
                             @click="transactionStep = 1"
-                        >Back</ButtonPrimary>
+                        >{{ $t("Back") }}</ButtonPrimary>
                         <ButtonPrimary
                             type="button"
                             class="!h-[53px] !rounded-[16px]"
                             @click="transactionStep = 3"
-                        >Continue</ButtonPrimary>
+                        >{{ $t("Continue") }}</ButtonPrimary>
                     </div>
                 </template>
                 <template v-else>
-                    <label v-if="transactionForm.type === 'expense'" class="mt-5 block text-sm">Sumber dana
-                        <select v-model="sourceType" class="mt-1 w-full rounded-xl border border-slate-300 p-3">
-                            <option value="free">Uang bebas</option>
-                            <option value="budget">Cadangan budget</option>
-                            <option value="saving">Savings</option>
+                    <label v-if="transactionForm.type === 'expense'" class="mt-5 block text-sm">{{ $t("Sumber dana") }} <select v-model="sourceType" class="mt-1 w-full rounded-xl border border-slate-300 p-3">
+                            <option value="free">{{ $t("Uang bebas") }}</option>
+                            <option value="budget">{{ $t("Cadangan budget") }}</option>
+                            <option value="saving">{{ $t("Savings") }}</option>
                         </select>
                     </label>
-                    <label v-if="transactionForm.type === 'expense' && sourceType === 'budget'" class="mt-3 block text-sm">
-                        Periode budget
-                        <select v-model="transactionForm.budget_period_id" class="mt-1 w-full rounded-xl border border-slate-300 p-3" required>
-                            <option :value="null">Pilih periode</option>
+                    <label v-if="transactionForm.type === 'expense' && sourceType === 'budget'" class="mt-3 block text-sm"> {{ $t("Periode budget") }} <select v-model="transactionForm.budget_period_id" class="mt-1 w-full rounded-xl border border-slate-300 p-3" required>
+                            <option :value="null">{{ $t("Pilih periode") }}</option>
                             <option
                                 v-for="period in budgetPeriods.filter((item) => Number(item.account_id) === Number(transactionForm.account_id) && transactionForm.date >= item.starts_on && transactionForm.date <= item.ends_on)"
                                 :key="period.id"
@@ -685,10 +674,8 @@ const shortcuts = [
                             </option>
                         </select>
                     </label>
-                    <label v-if="transactionForm.type === 'expense' && sourceType === 'saving'" class="mt-3 block text-sm">
-                        Savings
-                        <select v-model="transactionForm.saving_id" class="mt-1 w-full rounded-xl border border-slate-300 p-3" required>
-                            <option :value="null">Pilih savings</option>
+                    <label v-if="transactionForm.type === 'expense' && sourceType === 'saving'" class="mt-3 block text-sm"> {{ $t("Savings") }} <select v-model="transactionForm.saving_id" class="mt-1 w-full rounded-xl border border-slate-300 p-3" required>
+                            <option :value="null">{{ $t("Pilih savings") }}</option>
                             <option
                                 v-for="saving in savingOptions.filter((item) => item.currency === accounts.find((account) => Number(account.id) === Number(transactionForm.account_id))?.currency)"
                                 :key="saving.id"
@@ -698,24 +685,23 @@ const shortcuts = [
                             </option>
                         </select>
                     </label>
-                    <label class="mt-5 block text-sm text-budget-muted">Amount
-                        <FormInput v-model="transactionForm.amount" type="number" min="0.01" step="0.01" required
-                            placeholder="Rp 0" variant="amount" />
+                    <label class="mt-5 block text-sm text-budget-muted">{{ $t("Amount") }} <AmountInput
+                            v-model="transactionForm.amount"
+                            required
+                            placeholder="Rp 0"
+                            class="mt-1 block w-full border-0 bg-transparent p-0 text-[32px] font-semibold text-[#637083] outline-none focus:ring-0"
+                        />
                     </label>
-                    <label class="mt-5 block">Title
-                        <FormInput v-model="transactionForm.title" placeholder="What was this transaction for?"
+                    <label class="mt-5 block">{{ $t("Title") }} <FormInput v-model="transactionForm.title" placeholder="What was this transaction for?"
                             required />
-                        <p v-if="transactionForm.meal_record_id" class="mt-1 text-xs text-budget-muted">Harga aktual dan akun pembayaran ditentukan di sini.</p>
+                        <p v-if="transactionForm.meal_record_id" class="mt-1 text-xs text-budget-muted">{{ $t("Harga aktual dan akun pembayaran ditentukan di sini.") }}</p>
                     </label>
-                    <label class="mt-5 block">Category
-                        <SelectInput v-model="transactionForm.category_id"
+                    <label class="mt-5 block">{{ $t("Category") }} <SelectInput v-model="transactionForm.category_id"
                             :options="categories.filter((item) => item.type === transactionForm.type && item.is_active).map((item) => ({ label: item.name, value: item.id }))"
                             placeholder="Select category" searchable />
                     </label>
-                    <div class="mt-5 grid grid-cols-2 gap-3"><label>Date
-                            <DatePicker v-model="transactionForm.date" required />
-                        </label><label>Note
-                            <FormInput v-model="transactionForm.note" placeholder="Optional note" />
+                    <div class="mt-5 grid grid-cols-2 gap-3"><label>{{ $t("Date") }} <DatePicker v-model="transactionForm.date" required />
+                        </label><label>{{ $t("Note") }} <FormInput v-model="transactionForm.note" placeholder="Optional note" />
                         </label></div>
                     <div class="mt-6 grid grid-cols-2 gap-3">
                         <ButtonPrimary
@@ -723,7 +709,7 @@ const shortcuts = [
                             variant="secondary"
                             class="!h-[53px] !rounded-[16px]"
                             @click="transactionStep = 2"
-                        >Back</ButtonPrimary>
+                        >{{ $t("Back") }}</ButtonPrimary>
                         <ButtonPrimary
                             type="submit"
                             :disabled="transactionForm.processing"
@@ -732,7 +718,7 @@ const shortcuts = [
                             {{ transactionForm.processing ? 'Saving...' : 'Create transaction' }}
                         </ButtonPrimary>
                     </div>
-                    <p class="mt-3 text-center text-xs text-budget-muted">You can edit this transaction anytime.</p>
+                    <p class="mt-3 text-center text-xs text-budget-muted">{{ $t("You can edit this transaction anytime.") }}</p>
                 </template>
             </form>
         </div>

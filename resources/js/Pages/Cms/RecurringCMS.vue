@@ -58,28 +58,26 @@ const priorityLabels = {
     <div class="space-y-7">
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
-                <p class="text-sm font-medium text-[#8792A2]">Scheduled activity</p>
-                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]">
-                    Recurring reminders
-                </h1>
+                <p class="text-sm font-medium text-[#8792A2]">{{ $t("Scheduled activity") }}</p>
+                <h1 class="mt-1 text-3xl font-semibold tracking-tight text-[#17243A]"> {{ $t("Recurring reminders") }} </h1>
             </div>
             <div class="flex items-center gap-2 text-sm text-[#637083]">
                 <CalendarClock :size="18" class="text-[#2457DA]" />
-                <span>{{ reminders.length }} total reminders</span>
+                <span>{{ reminders.length }} {{ $t("total reminders") }}</span>
             </div>
         </header>
 
         <section class="grid gap-4 sm:grid-cols-3">
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Total reminders</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Total reminders") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#17243A]">{{ reminders.length }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Active</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Active") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#16815B]">{{ activeReminders }}</p>
             </article>
             <article class="rounded-2xl border border-[#E9EDF3] bg-white p-5">
-                <p class="text-sm text-[#8792A2]">Paused</p>
+                <p class="text-sm text-[#8792A2]">{{ $t("Paused") }}</p>
                 <p class="mt-3 text-2xl font-semibold text-[#765723]">{{ pausedReminders }}</p>
             </article>
         </section>
@@ -87,8 +85,8 @@ const priorityLabels = {
         <section class="overflow-hidden rounded-2xl border border-[#E9EDF3] bg-white">
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#EEF1F5] px-6 py-4">
                 <div>
-                    <h2 class="font-semibold text-[#17243A]">All recurring reminders</h2>
-                    <p class="mt-1 text-sm text-[#8792A2]">Review schedules, estimated amounts, and priority.</p>
+                    <h2 class="font-semibold text-[#17243A]">{{ $t("All recurring reminders") }}</h2>
+                    <p class="mt-1 text-sm text-[#8792A2]">{{ $t("Review schedules, estimated amounts, and priority.") }}</p>
                 </div>
                 <div class="flex gap-2" role="group" aria-label="Filter reminders by type">
                     <ButtonPrimary
@@ -109,12 +107,12 @@ const priorityLabels = {
                 <table class="w-full min-w-[880px] text-left">
                     <thead class="bg-[#FAFBFC] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#98A2B3]">
                         <tr>
-                            <th class="px-6 py-3">Reminder</th>
-                            <th class="px-5 py-3">Type</th>
-                            <th class="px-5 py-3">Priority</th>
-                            <th class="px-5 py-3">Schedule</th>
-                            <th class="px-5 py-3 text-right">Estimated amount</th>
-                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3">{{ $t("Reminder") }}</th>
+                            <th class="px-5 py-3">{{ $t("Type") }}</th>
+                            <th class="px-5 py-3">{{ $t("Priority") }}</th>
+                            <th class="px-5 py-3">{{ $t("Schedule") }}</th>
+                            <th class="px-5 py-3 text-right">{{ $t("Estimated amount") }}</th>
+                            <th class="px-6 py-3">{{ $t("Status") }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#F0F2F6]">
@@ -149,8 +147,7 @@ const priorityLabels = {
                             </td>
                             <td class="px-5 py-4 text-sm text-[#637083]">
                                 <span class="block">{{ frequencyLabel(reminder) }}</span>
-                                <span class="mt-1 block text-xs text-[#8792A2]">
-                                    Next: {{ reminder.next_reminder_at || 'Not scheduled' }}
+                                <span class="mt-1 block text-xs text-[#8792A2]"> {{ $t("Next:") }} {{ reminder.next_reminder_at || 'Not scheduled' }}
                                 </span>
                             </td>
                             <td class="px-5 py-4 text-right text-sm font-medium text-[#17243A]">
@@ -175,8 +172,8 @@ const priorityLabels = {
 
             <div v-else class="px-6 py-14 text-center">
                 <Bell :size="30" class="mx-auto text-[#98A2B3]" />
-                <h3 class="mt-3 font-semibold text-[#17243A]">No recurring reminders found</h3>
-                <p class="mt-1 text-sm text-[#8792A2]">Try another type filter or create a reminder from the app.</p>
+                <h3 class="mt-3 font-semibold text-[#17243A]">{{ $t("No recurring reminders found") }}</h3>
+                <p class="mt-1 text-sm text-[#8792A2]">{{ $t("Try another type filter or create a reminder from the app.") }}</p>
             </div>
         </section>
     </div>

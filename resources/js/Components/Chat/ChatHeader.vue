@@ -21,11 +21,9 @@ defineProps({
         </Link>
 
         <div class="text-center">
-            <h1 class="text-lg font-semibold">Chat</h1>
+            <h1 class="text-lg font-semibold">{{ $t("Chat") }}</h1>
             <p class="mt-0.5 flex items-center justify-center gap-1 text-xs text-[#16815B]">
-                <span class="h-1.5 w-1.5 rounded-full bg-[#16815B]"></span>
-                Online now
-            </p>
+                <span class="h-1.5 w-1.5 rounded-full bg-[#16815B]"></span> {{ $t("Online now") }} </p>
         </div>
 
         <span class="flex h-10 w-10 items-center justify-center rounded-full bg-[#2457DA] text-white">

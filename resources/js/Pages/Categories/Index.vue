@@ -20,7 +20,7 @@ const categoriesByType = (type) => props.categories.filter((category) => categor
     <div class="mx-auto min-h-screen w-full max-w-lg pb-28 text-app-heading">
         <header class="flex items-center justify-between bg-white px-6 py-5">
             <Link :href="dashboard.url()"><Home :size="22" class="text-[#2457DA]" /></Link>
-            <h1 class="text-lg font-semibold">Categories</h1>
+            <h1 class="text-lg font-semibold">{{ $t("Categories") }}</h1>
             <button class="rounded-full bg-app-primary p-2 text-white" @click="create"><Plus :size="18" /></button>
         </header>
         <main class="space-y-5 px-6 pt-6">

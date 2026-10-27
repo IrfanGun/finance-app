@@ -106,7 +106,7 @@ const selectIconCategory = (category) => {
                     <h2 class="text-[22px] font-semibold">
                         {{ form.id ? 'Edit category' : 'New category' }}
                     </h2>
-                    <p class="text-sm text-[#637083]">Organize your money, your way.</p>
+                    <p class="text-sm text-[#637083]">{{ $t("Organize your money, your way.") }}</p>
                 </div>
                 <button
                     type="button"
@@ -131,7 +131,7 @@ const selectIconCategory = (category) => {
                 </button>
             </div>
 
-            <label class="mt-5 block" for="category-name">Category name</label>
+            <label class="mt-5 block" for="category-name">{{ $t("Category name") }}</label>
             <input
                 id="category-name"
                 v-model="form.name"
@@ -143,7 +143,7 @@ const selectIconCategory = (category) => {
                 {{ form.errors.name }}
             </p>
 
-            <p class="mt-5 text-sm">Icon</p>
+            <p class="mt-5 text-sm">{{ $t("Icon") }}</p>
             <div class="mt-2 grid grid-cols-7 gap-2 sm:grid-cols-8">
                 <button
                     v-for="[key, Icon] in visibleIcons"
@@ -170,15 +170,13 @@ const selectIconCategory = (category) => {
                 type="button"
                 class="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-[#2457DA] transition hover:bg-blue-50"
                 @click="loadMoreIcons"
-            >
-                Browse all icons
-            </button>
+            > {{ $t("Browse all icons") }} </button>
             <p v-if="form.errors.icon" class="mt-1 text-sm text-expense">
                 {{ form.errors.icon }}
             </p>
 
             <div class="mt-5 flex items-center justify-between">
-                <span class="text-sm font-medium">Category status</span>
+                <span class="text-sm font-medium">{{ $t("Category status") }}</span>
                 <button
                     type="button"
                     role="switch"
@@ -194,7 +192,7 @@ const selectIconCategory = (category) => {
                 </button>
             </div>
 
-            <p class="mt-5 text-sm">Color</p>
+            <p class="mt-5 text-sm">{{ $t("Color") }}</p>
             <div class="mt-2 flex flex-wrap gap-4">
                 <button
                     v-for="color in categoryColors"
@@ -261,7 +259,7 @@ const selectIconCategory = (category) => {
             <section class="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-t-[28px] bg-white shadow-2xl sm:rounded-3xl">
                 <header class="flex items-start justify-between border-b border-slate-100 px-5 py-4 sm:px-7">
                     <div>
-                        <h3 class="text-xl font-semibold">Choose an icon</h3>
+                        <h3 class="text-xl font-semibold">{{ $t("Choose an icon") }}</h3>
                         <p class="mt-1 text-sm text-[#637083]">
                             Browse {{ iconEntries.length.toLocaleString() }} Lucide icons by category.
                         </p>
@@ -307,9 +305,7 @@ const selectIconCategory = (category) => {
                 </div>
 
                 <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-7">
-                    <p class="mb-3 text-xs font-medium text-slate-500">
-                        Showing {{ visibleIconPickerEntries.length }} of
-                        {{ iconPickerEntries.length.toLocaleString() }} icons
+                    <p class="mb-3 text-xs font-medium text-slate-500"> {{ $t("Showing") }} {{ visibleIconPickerEntries.length }} {{ $t("dari") }} {{ iconPickerEntries.length.toLocaleString() }} icons
                         <span v-if="selectedIconCategory !== 'All'">
                             in {{ selectedIconCategory }}
                         </span>
@@ -342,9 +338,7 @@ const selectIconCategory = (category) => {
                         </button>
                     </div>
 
-                    <p v-else class="py-12 text-center text-sm text-slate-500">
-                        No icons found. Try another search or category.
-                    </p>
+                    <p v-else class="py-12 text-center text-sm text-slate-500"> {{ $t("No icons found. Try another search or category.") }} </p>
 
                     <button
                         v-if="hasMorePickerIcons"

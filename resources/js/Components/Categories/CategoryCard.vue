@@ -18,8 +18,7 @@ const isFallback = (category) => category.name.toLowerCase() === 'other';
             <span class="flex-1">
                 <span class="block font-medium">{{ category.name }}</span>
                 <span v-if="category.is_active" class="block text-sm" :class="category.type === 'income' ? 'text-income' : 'text-expense'">
-                    {{ category.type === 'income' ? '+ ' : '- ' }}Rp 2.000.000
-                </span>
+                    {{ category.type === 'income' ? '+ ' : '- ' }}{{ $t("Rp 2.000.000") }} </span>
             </span>
         </Link>
         <button v-if="!isFallback(category)" type="button" role="switch" :aria-checked="category.is_active" class="relative h-6 w-11 rounded-full transition" :class="category.is_active ? 'bg-app-primary' : 'bg-slate-300'" @click="emit('toggle', category)">

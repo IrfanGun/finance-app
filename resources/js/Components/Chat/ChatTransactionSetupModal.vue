@@ -64,23 +64,17 @@ const emit = defineEmits([
             class="max-h-[90dvh] w-full max-w-lg space-y-5 overflow-y-auto rounded-t-[28px] bg-white px-6 pb-8 pt-5 text-[#152338] shadow-xl sm:rounded-[28px]"
         >
             <div class="space-y-2">
-                <p class="text-xs font-semibold uppercase tracking-wide text-[#2457DA]">
-                    Konfirmasi transaksi
-                </p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-[#2457DA]"> {{ $t("Konfirmasi transaksi") }} </p>
                 <h2 id="setup-title" class="text-xl font-semibold">{{ setupTitle }}</h2>
-                <p v-if="accountSelectionRequired && accountOptions.length" class="text-sm leading-5 text-[#637083]">
-                    Transaksi belum dicatat. Pilih akun sumber dana yang akan dihubungkan ke transaksi ini.
-                </p>
-                <p v-else-if="accountSelectionRequired" class="text-sm leading-5 text-[#637083]">
-                    Belum ada asset yang tersedia. Buat asset baru untuk mencatat transaksi ini.
-                </p>
+                <p v-if="accountSelectionRequired && accountOptions.length" class="text-sm leading-5 text-[#637083]"> {{ $t("Transaksi belum dicatat. Pilih akun sumber dana yang akan dihubungkan ke transaksi ini.") }} </p>
+                <p v-else-if="accountSelectionRequired" class="text-sm leading-5 text-[#637083]"> {{ $t("Belum ada asset yang tersedia. Buat asset baru untuk mencatat transaksi ini.") }} </p>
                 <p v-else class="text-sm leading-5 text-[#637083]">
                     Transaksi belum dicatat. Lengkapi data yang diperlukan; transaksi akan dibuat setelah Anda konfirmasi.
                 </p>
             </div>
 
             <fieldset v-if="accountSelectionRequired && accountOptions.length" class="space-y-3">
-                <legend class="text-sm font-medium text-[#314158]">Pilih asset / akun</legend>
+                <legend class="text-sm font-medium text-[#314158]">{{ $t("Pilih asset / akun") }}</legend>
                 <label
                     v-for="account in accountOptions"
                     :key="account.id"
@@ -128,19 +122,14 @@ const emit = defineEmits([
                 </label>
 
                 <template v-if="resource.type === 'account'">
-                    <label class="block text-sm">
-                        Tipe akun
-                        <select v-model="resource.accountType" class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-3">
-                            <option value="cash">Cash</option>
-                            <option value="bank">Bank / e-wallet</option>
-                            <option value="other">Other</option>
+                    <label class="block text-sm"> {{ $t("Account type") }} <select v-model="resource.accountType" class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-3">
+                            <option value="cash">{{ $t("Cash") }}</option>
+                            <option value="bank">{{ $t("Bank / e-wallet") }}</option>
+                            <option value="other">{{ $t("Other") }}</option>
                         </select>
                     </label>
-                    <label class="block text-sm">
-                        Saldo awal
-                        <input
+                    <label class="block text-sm"> {{ $t("Opening balance") }} <AmountInput
                             v-model="resource.openingBalance"
-                            type="number"
                             min="0"
                             step="0.01"
                             required
@@ -149,8 +138,7 @@ const emit = defineEmits([
                     </label>
                 </template>
 
-                <p v-else class="text-sm text-[#637083]">
-                    Tipe kategori: <span class="font-medium capitalize">{{ resource.categoryType }}</span>
+                <p v-else class="text-sm text-[#637083]"> {{ $t("Tipe kategori:") }} <span class="font-medium capitalize">{{ resource.categoryType }}</span>
                 </p>
             </div>
 
@@ -168,17 +156,13 @@ const emit = defineEmits([
                     class="h-11 rounded-xl border border-[#DCE3ED] font-medium text-[#637083] disabled:opacity-60"
                     :disabled="isSavingSetup"
                     @click="emit('continue')"
-                >
-                    Lanjutkan lewat chat
-                </button>
+                > {{ $t("Lanjutkan lewat chat") }} </button>
                 <button
                     type="button"
                     class="h-11 rounded-xl border border-red-200 font-medium text-red-600 disabled:opacity-60"
                     :disabled="isSavingSetup"
                     @click="emit('cancel')"
-                >
-                    Batalkan transaksi
-                </button>
+                > {{ $t("Cancel transaction") }} </button>
             </div>
         </section>
     </div>

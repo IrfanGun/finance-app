@@ -77,18 +77,18 @@ const sendMessage = async (suggestion = null) => {
             <div class="flex items-center gap-3">
                 <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF3FF] text-[#2457DA]"><Sparkles :size="19" /></span>
                 <div>
-                    <h1 class="text-base font-semibold text-[#26354C]">AI Assistant</h1>
-                    <p class="mt-0.5 flex items-center gap-1.5 text-xs text-[#16815B]"><i class="h-1.5 w-1.5 rounded-full bg-[#2FA876]"></i>Ready to help with your finances</p>
+                    <h1 class="text-base font-semibold text-[#26354C]">{{ $t("AI Assistant") }}</h1>
+                    <p class="mt-0.5 flex items-center gap-1.5 text-xs text-[#16815B]"><i class="h-1.5 w-1.5 rounded-full bg-[#2FA876]"></i>{{ $t("Ready to help with your finances") }}</p>
                 </div>
             </div>
-            <span class="hidden items-center gap-1.5 text-xs font-medium text-[#8792A2] sm:inline-flex"><ShieldCheck :size="15" /> Private conversation</span>
+            <span class="hidden items-center gap-1.5 text-xs font-medium text-[#8792A2] sm:inline-flex"><ShieldCheck :size="15" /> {{ $t("Private conversation") }}</span>
         </header>
 
         <div ref="messagesContainer" class="min-h-0 flex-1 overflow-y-auto bg-[#FBFCFE] px-5 py-6 sm:px-10 lg:px-14">
             <div class="mx-auto max-w-5xl space-y-6">
                 <div v-if="showSuggestions" class="mb-8 flex flex-col items-center py-8 text-center sm:py-12">
                     <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2457DA] to-[#5884F2] text-white shadow-lg shadow-blue-200"><Bot :size="25" /></span>
-                    <h2 class="mt-5 text-xl font-semibold text-[#26354C]">What would you like to know?</h2>
+                    <h2 class="mt-5 text-xl font-semibold text-[#26354C]">{{ $t("What would you like to know?") }}</h2>
                     <p class="mt-2 max-w-xl text-sm leading-6 text-[#7B8798]">Ask about your spending, accounts, or saving goals. I’ll help you make sense of your financial activity.</p>
                     <div class="mt-6 flex flex-wrap justify-center gap-2">
                         <button v-for="suggestion in suggestions" :key="suggestion" type="button" class="rounded-full border border-[#E1E8F5] bg-white px-4 py-2.5 text-xs font-medium text-[#4564A6] transition hover:border-[#B7C9F2] hover:bg-[#EEF3FF] disabled:opacity-50" :disabled="isTyping || isSetupOpen" @click="sendMessage(suggestion)">{{ suggestion }}<ArrowUpRight :size="13" class="ml-1 inline" /></button>

@@ -136,7 +136,7 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
 
         <main class="space-y-5 px-6 pt-2">
             <section class="rounded-2xl bg-gradient-to-br from-[#173A9A] via-[#1F4AC2] to-[#2969E6] p-5 text-white">
-                <p class="text-sm text-blue-100">Estimasi nilai sekarang</p>
+                <p class="text-sm text-blue-100">{{ $t("Estimasi nilai sekarang") }}</p>
                 <p class="mt-2 text-3xl font-semibold">{{ formatMoney(asset.current_value) }}</p>
                 <p
                     class="mt-3 inline-flex rounded-full px-3 py-1 text-xs capitalize"
@@ -174,32 +174,32 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
             </section>
 
             <section class="space-y-4 rounded-2xl border border-slate-200 p-4">
-                <h2 class="font-semibold">Informasi aset</h2>
+                <h2 class="font-semibold">{{ $t("Informasi aset") }}</h2>
                 <dl class="space-y-4 text-base">
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Nama aset</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Asset name") }}</dt>
                         <dd class="text-right font-semibold">{{ asset.name }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Harga beli</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Purchase price") }}</dt>
                         <dd class="text-right font-semibold">{{ formatMoney(asset.purchase_price) }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Mata uang</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Currency") }}</dt>
                         <dd class="text-right font-semibold">{{ asset.currency }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Tanggal dibeli</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Tanggal dibeli") }}</dt>
                         <dd class="text-right font-semibold">{{ formatDate(asset.purchase_date) }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Total perubahan nilai</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Total perubahan nilai") }}</dt>
                         <dd class="text-right font-semibold" :class="valueChangeClass(asset.total_value_change)">
                             {{ formatValueChange(asset.total_value_change) }}
                         </dd>
                     </div>
                     <div v-if="asset.description" class="space-y-1 border-t border-slate-100 pt-3">
-                        <dt class="text-xs text-[#637083]">Deskripsi</dt>
+                        <dt class="text-xs text-[#637083]">{{ $t("Description") }}</dt>
                         <dd class="whitespace-pre-wrap text-sm">{{ asset.description }}</dd>
                     </div>
                 </dl>
@@ -208,7 +208,7 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
             <section class="space-y-4 rounded-2xl border border-slate-200 p-4">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="font-semibold">Pengaturan perubahan nilai</h2>
+                        <h2 class="font-semibold">{{ $t("Pengaturan perubahan nilai") }}</h2>
                         <p class="mt-1 text-sm capitalize text-[#637083]">
                             {{ asset.depreciation?.status ?? 'Belum diatur' }}
                         </p>
@@ -248,9 +248,7 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
                         </div>
                     </div>
                     <div v-if="!asset.depreciation.is_tiered" class="flex items-start justify-between gap-4">
-                        <p class="text-sm text-[#637083]">
-                            Nilai {{ asset.depreciation.value_direction === 'increase' ? 'apresiasi' : 'depresiasi' }} per periode
-                        </p>
+                        <p class="text-sm text-[#637083]"> {{ $t("Nilai") }} {{ asset.depreciation.value_direction === 'increase' ? 'apresiasi' : 'depresiasi' }} {{ $t("per periode") }} </p>
                         <p class="text-right font-medium">
                             {{ asset.depreciation.depreciation_type === 'percentage'
                                 ? `${asset.depreciation.depreciation_value}% dari harga beli`
@@ -259,14 +257,14 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
                         </p>
                     </div>
                     <div v-else class="space-y-2">
-                        <p class="text-sm text-[#637083]">Jadwal perubahan nilai tahunan</p>
+                        <p class="text-sm text-[#637083]">{{ $t("Annual value change schedule") }}</p>
                         <div class="space-y-2">
                             <p
                                 v-for="step in asset.depreciation.rate_steps"
                                 :key="step.id"
                                 class="flex items-center justify-between gap-4 border-slate-100 pb-2 last:border-0 last:pb-0"
                             >
-                                <span class="text-[#637083]">Tahun ke-{{ step.year_number }}</span>
+                                <span class="text-[#637083]">{{ $t("Tahun ke-") }}{{ step.year_number }}</span>
                                 <span class="text-right font-medium">
                                     {{ asset.depreciation.depreciation_type === 'percentage'
                                         ? `${step.depreciation_value}%`
@@ -276,23 +274,17 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
                            
                         </div>
                     </div>
-                    <p v-if="asset.depreciation.status === 'paused'" class="border-t border-slate-100 pt-3 text-xs leading-5 text-[#637083]">
-                        Saat diaktifkan kembali, periode yang sudah jatuh tempo akan diproses sekaligus.
-                    </p>
+                    <p v-if="asset.depreciation.status === 'paused'" class="border-t border-slate-100 pt-3 text-xs leading-5 text-[#637083]"> {{ $t("Saat diaktifkan kembali, periode yang sudah jatuh tempo akan diproses sekaligus.") }} </p>
                 </div>
-                <p v-else class="text-sm text-[#637083]">Aset ini belum memiliki pengaturan depresiasi.</p>
+                <p v-else class="text-sm text-[#637083]">{{ $t("Aset ini belum memiliki pengaturan depresiasi.") }}</p>
             </section>
 
             <section class="space-y-3">
                 <div class="flex items-center justify-between">
-                    <h2 class="font-semibold">Riwayat perubahan nilai</h2>
-                    <Link :href="depreciationLogs.url(asset.id)" class="text-sm font-medium text-[#2457DA]">
-                        Semua riwayat
-                    </Link>
+                    <h2 class="font-semibold">{{ $t("Riwayat perubahan nilai") }}</h2>
+                    <Link :href="depreciationLogs.url(asset.id)" class="text-sm font-medium text-[#2457DA]"> {{ $t("Semua riwayat") }} </Link>
                 </div>
-                <p v-if="!logs.data.length" class="rounded-xl bg-[#F5F7FA] p-4 text-sm text-[#637083]">
-                    Belum ada perubahan nilai yang diproses.
-                </p>
+                <p v-if="!logs.data.length" class="rounded-xl bg-[#F5F7FA] p-4 text-sm text-[#637083]"> {{ $t("Belum ada perubahan nilai yang diproses.") }} </p>
                 <article
                     v-for="log in logs.data"
                     :key="log.id"
@@ -332,9 +324,7 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
                 type="button"
                 class="h-12 w-full rounded-xl border border-red-300 text-sm font-semibold text-red-700"
                 @click="dispose"
-            >
-                Tandai aset sebagai disposed
-            </button>
+            > {{ $t("Tandai aset sebagai disposed") }} </button>
         </main>
 
         <MobileBottomNav />

@@ -166,7 +166,7 @@ const submitSnooze = (log) => snoozeForm.post(
             <Link :href="remindersIndex.url()" aria-label="Kembali ke daftar pengingat">
                 <ArrowLeft :size="22" class="text-[#2457DA]" />
             </Link>
-            <h1 class="max-w-[65%] truncate text-lg font-semibold">Detail pengingat</h1>
+            <h1 class="max-w-[65%] truncate text-lg font-semibold">{{ $t("Reminder details") }}</h1>
             <ButtonPrimary
                 v-if="reminder.status !== 'ended' && reminder.purpose === 'transaction'"
                 type="button"
@@ -205,51 +205,51 @@ const submitSnooze = (log) => snoozeForm.post(
 
                 <div class="grid grid-cols-2 gap-3 border-t border-slate-200 pt-4">
                     <div>
-                        <p class="text-xs text-[#637083]">Perkiraan nominal</p>
+                        <p class="text-xs text-[#637083]">{{ $t("Estimated amount") }}</p>
                         <p class="mt-1 font-semibold">
                             {{ amount(reminder.amount, reminder.account?.currency || 'IDR') }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-xs text-[#637083]">Status</p>
+                        <p class="text-xs text-[#637083]">{{ $t("Status") }}</p>
                         <p class="mt-1 font-semibold">{{ statusLabel(reminder.status) }}</p>
                     </div>
                 </div>
             </section>
 
             <section class="space-y-4 rounded-2xl border border-slate-200 p-4">
-                <h2 class="font-semibold">Informasi pengingat</h2>
+                <h2 class="font-semibold">{{ $t("Informasi pengingat") }}</h2>
                 <dl class="space-y-4">
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Jadwal berikutnya</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Next schedule") }}</dt>
                         <dd class="text-right text-sm font-semibold">
                             {{ reminder.next_reminder_at || 'Tidak ada jadwal' }}
                         </dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Akun bawaan</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Akun bawaan") }}</dt>
                         <dd class="text-right text-sm font-semibold">
                             {{ reminder.account?.name || 'Pilih saat mencatat' }}
                         </dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Kategori</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Category") }}</dt>
                         <dd class="text-right text-sm font-semibold">
                             {{ reminder.category?.name || 'Tanpa kategori' }}
                         </dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Mulai</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Mulai") }}</dt>
                         <dd class="text-right text-sm font-semibold">{{ reminder.starts_at }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4">
-                        <dt class="text-sm text-[#637083]">Batas akhir</dt>
+                        <dt class="text-sm text-[#637083]">{{ $t("Batas akhir") }}</dt>
                         <dd class="text-right text-sm font-semibold">
                             {{ reminder.ends_at || 'Tidak dibatasi' }}
                         </dd>
                     </div>
                     <div v-if="reminder.notes" class="space-y-1 border-t border-slate-100 pt-3">
-                        <dt class="text-xs text-[#637083]">Catatan</dt>
+                        <dt class="text-xs text-[#637083]">{{ $t("Note") }}</dt>
                         <dd class="whitespace-pre-wrap text-sm">{{ reminder.notes }}</dd>
                     </div>
                 </dl>
@@ -266,8 +266,7 @@ const submitSnooze = (log) => snoozeForm.post(
                     class="!flex !min-h-0 items-center gap-1.5 !rounded-lg !px-3 !py-2 !text-sm"
                     @click="runReminderAction(pauseReminder)"
                 >
-                    <Pause :size="15" /> Jeda
-                </ButtonPrimary>
+                    <Pause :size="15" /> {{ $t("Jeda") }} </ButtonPrimary>
                 <ButtonPrimary
                     v-else-if="reminder.status === 'paused'"
                     type="button"
@@ -275,23 +274,18 @@ const submitSnooze = (log) => snoozeForm.post(
                     class="!flex !min-h-0 items-center gap-1.5 !rounded-lg !px-3 !py-2 !text-sm"
                     @click="runReminderAction(resumeReminder)"
                 >
-                    <Play :size="15" /> Lanjutkan
-                </ButtonPrimary>
+                    <Play :size="15" /> {{ $t("Continue") }} </ButtonPrimary>
                 <ButtonPrimary
                     type="button"
                     variant="secondary"
                     class="!min-h-0 !rounded-lg !border-[#F1C9C2] !px-3 !py-2 !text-sm !text-[#A63C2C]"
                     @click="runReminderAction(endReminder)"
-                >
-                    Hentikan
-                </ButtonPrimary>
+                > {{ $t("Hentikan") }} </ButtonPrimary>
             </section>
 
             <section class="space-y-3 rounded-2xl border border-slate-200 p-4">
-                <h2 class="font-semibold">Riwayat pengingat</h2>
-                <p v-if="!reminder.logs.length" class="text-sm text-[#8792A2]">
-                    Belum ada periode jatuh tempo.
-                </p>
+                <h2 class="font-semibold">{{ $t("Reminder history") }}</h2>
+                <p v-if="!reminder.logs.length" class="text-sm text-[#8792A2]"> {{ $t("Belum ada periode jatuh tempo.") }} </p>
                 <article
                     v-for="log in reminder.logs"
                     :key="log.id"
@@ -303,8 +297,7 @@ const submitSnooze = (log) => snoozeForm.post(
                                 {{ log.scheduled_at }}
                                 <span class="font-normal text-[#637083]">· {{ statusLabel(log.status) }}</span>
                             </p>
-                            <p v-if="log.snoozed_until" class="mt-1 text-xs text-[#637083]">
-                                Diingatkan lagi {{ log.snoozed_until }}
+                            <p v-if="log.snoozed_until" class="mt-1 text-xs text-[#637083]"> {{ $t("Diingatkan lagi") }} {{ log.snoozed_until }}
                             </p>
                         </div>
                         <div
@@ -323,16 +316,13 @@ const submitSnooze = (log) => snoozeForm.post(
                                 class="!flex !min-h-0 items-center !rounded-lg !px-3 !py-2 !text-xs"
                                 @click="startSnooze(log)"
                             >
-                                <Clock3 :size="14" class="mr-1" /> Ingatkan nanti
-                            </ButtonPrimary>
+                                <Clock3 :size="14" class="mr-1" /> {{ $t("Ingatkan nanti") }} </ButtonPrimary>
                             <ButtonPrimary
                                 type="button"
                                 variant="secondary"
                                 class="!min-h-0 !rounded-lg !px-3 !py-2 !text-xs"
                                 @click="runLogAction(skipLog, log)"
-                            >
-                                Lewati
-                            </ButtonPrimary>
+                            > {{ $t("Lewati") }} </ButtonPrimary>
                         </div>
                     </div>
 
@@ -341,9 +331,7 @@ const submitSnooze = (log) => snoozeForm.post(
                         class="flex flex-wrap items-end gap-2"
                         @submit.prevent="submitSnooze(log)"
                     >
-                        <label class="text-xs text-[#637083]">
-                            Ingatkan pada
-                            <input
+                        <label class="text-xs text-[#637083]"> {{ $t("Ingatkan pada") }} <input
                                 v-model="snoozeForm.snoozed_until"
                                 type="datetime-local"
                                 required
@@ -354,17 +342,13 @@ const submitSnooze = (log) => snoozeForm.post(
                             type="submit"
                             :disabled="snoozeForm.processing"
                             class="!min-h-0 !rounded-lg !px-3 !py-2 !text-xs"
-                        >
-                            Simpan
-                        </ButtonPrimary>
+                        > {{ $t("Save") }} </ButtonPrimary>
                         <ButtonPrimary
                             type="button"
                             variant="secondary"
                             class="!min-h-0 !rounded-lg !px-3 !py-2 !text-xs"
                             @click="snoozingLog = null"
-                        >
-                            Batal
-                        </ButtonPrimary>
+                        > {{ $t("Cancel") }} </ButtonPrimary>
                         <p v-if="snoozeForm.errors.snoozed_until" class="w-full text-xs text-[#B34735]">
                             {{ snoozeForm.errors.snoozed_until }}
                         </p>

@@ -164,9 +164,7 @@ const updatePassword = () => {
                     <p
                         v-if="form.recentlySuccessful"
                         class="text-sm text-green-600"
-                    >
-                        Saved.
-                    </p>
+                    > {{ $t("Saved.") }} </p>
                 </Transition>
             </div>
         </form>

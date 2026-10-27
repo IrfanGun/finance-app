@@ -37,7 +37,7 @@ const recordExpense = () => {
     <div class="mx-auto min-h-screen w-full max-w-lg bg-[#F7F8FA] pb-28 text-[#152338]">
         <header class="flex items-center justify-between bg-white px-6 py-5">
             <Link :href="mealsIndex.url()" aria-label="Kembali ke Meal Record"><ArrowLeft :size="22" class="text-[#2457DA]" /></Link>
-            <h1 class="text-lg font-semibold">Detail makanan</h1>
+            <h1 class="text-lg font-semibold">{{ $t("Detail makanan") }}</h1>
             <span class="w-6" />
         </header>
         <main class="space-y-4 px-5 pt-5">
@@ -63,14 +63,14 @@ const recordExpense = () => {
             </section>
 
             <section v-if="mealRecord.type === 'buy'" class="space-y-3 rounded-2xl bg-white p-5">
-                <h3 class="font-semibold">Jadwal buka</h3>
-                <p v-if="!mealRecord.opening_hours.length" class="text-sm text-[#637083]">Jam buka belum diketahui.</p>
+                <h3 class="font-semibold">{{ $t("Jadwal buka") }}</h3>
+                <p v-if="!mealRecord.opening_hours.length" class="text-sm text-[#637083]">{{ $t("Jam buka belum diketahui.") }}</p>
                 <div v-for="day in weekdays" :key="day" class="border-b border-[#EEF1F5] pb-2 last:border-0">
                     <p class="text-sm font-medium">{{ day }}</p>
                     <div v-for="session in mealRecord.opening_hours.filter((item) => item.day_of_week === weekdays.indexOf(day) + 1)" :key="session.id" class="text-sm text-[#637083]">
-                        {{ session.opens_at.slice(0, 5) }}–{{ session.closes_at.slice(0, 5) }}<span v-if="session.closes_next_day"> (hari berikutnya)</span>
+                        {{ session.opens_at.slice(0, 5) }}–{{ session.closes_at.slice(0, 5) }}<span v-if="session.closes_next_day"> {{ $t("(hari berikutnya)") }}</span>
                     </div>
-                    <p v-if="!mealRecord.opening_hours.some((item) => item.day_of_week === weekdays.indexOf(day) + 1)" class="text-sm text-[#637083]">Tutup</p>
+                    <p v-if="!mealRecord.opening_hours.some((item) => item.day_of_week === weekdays.indexOf(day) + 1)" class="text-sm text-[#637083]">{{ $t("Close") }}</p>
                 </div>
             </section>
 
@@ -78,17 +78,13 @@ const recordExpense = () => {
                 type="button"
                 class="w-full"
                 @click="recordExpense"
-            >
-                Catat pengeluaran
-            </ButtonPrimary>
+            > {{ $t("Catat pengeluaran") }} </ButtonPrimary>
             <ButtonPrimary
                 type="button"
                 variant="secondary"
                 class="w-full"
                 @click="router.visit(dashboard.url())"
-            >
-                Kembali ke dashboard
-            </ButtonPrimary>
+            > {{ $t("Kembali ke dashboard") }} </ButtonPrimary>
         </main>
         <MobileBottomNav />
     </div>

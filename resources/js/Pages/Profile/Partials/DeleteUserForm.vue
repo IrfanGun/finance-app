@@ -42,32 +42,21 @@ const closeModal = () => {
 <template>
     <section class="space-y-5">
         <header>
-            <h2 class="text-base font-semibold text-red-700">
-                Delete account
-            </h2>
+            <h2 class="text-base font-semibold text-red-700"> {{ $t("Delete account") }} </h2>
 
-            <p class="mt-1 text-sm leading-6 text-red-700/70">
-                This permanently removes your account and all associated data.
-            </p>
+            <p class="mt-1 text-sm leading-6 text-red-700/70"> {{ $t("This permanently removes your account and all associated data.") }} </p>
         </header>
 
         <DangerButton
             class="rounded-xl px-4 py-3 normal-case tracking-normal"
             @click="confirmUserDeletion"
-        >
-            Delete account
-        </DangerButton>
+        > {{ $t("Delete account") }} </DangerButton>
 
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    Delete your account?
-                </h2>
+                <h2 class="text-lg font-semibold text-gray-900"> {{ $t("Delete your account?") }} </h2>
 
-                <p class="mt-1 text-sm leading-6 text-gray-600">
-                    This permanently deletes your account and all related data.
-                    Enter your password to continue.
-                </p>
+                <p class="mt-1 text-sm leading-6 text-gray-600"> {{ $t("This permanently deletes your account and all related data. Enter your password to continue.") }} </p>
 
                 <div class="mt-6">
                     <InputLabel
@@ -93,18 +82,14 @@ const closeModal = () => {
                     <SecondaryButton
                         class="rounded-xl normal-case tracking-normal"
                         @click="closeModal"
-                    >
-                        Cancel
-                    </SecondaryButton>
+                    > {{ $t("Cancel") }} </SecondaryButton>
 
                     <DangerButton
                         class="ms-3 rounded-xl normal-case tracking-normal"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
                         @click="deleteUser"
-                    >
-                        Delete account
-                    </DangerButton>
+                    > {{ $t("Delete account") }} </DangerButton>
                 </div>
             </div>
         </Modal>

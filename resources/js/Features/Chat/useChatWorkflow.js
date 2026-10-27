@@ -1,9 +1,11 @@
 import { computed, ref, watch } from 'vue';
+import { useTranslation } from '@/Composables/useTranslation';
 import { confirm as confirmAiChatTransaction } from '@/actions/App/Http/Controllers/AiChatTransactionController';
 import { cancel as cancelAiWorkflow } from '@/actions/App/Http/Controllers/AiWorkflowController';
 import { chatRequestHeaders } from './chatRequestHeaders';
 
 export function useChatWorkflow(props, appendAssistantMessage) {
+    const { locale, t } = useTranslation();
     const isSavingSetup = ref(false);
     const pendingTransaction = ref(null);
     const pendingTransactions = ref([]);
@@ -242,7 +244,7 @@ export function useChatWorkflow(props, appendAssistantMessage) {
             const payload = await response.json();
 
             if (!response.ok) {
-                throw new Error(payload.message ?? 'Akun atau kategori gagal dibuat.');
+                throw new Error(payload.message ?? t('Unable to create the account or category.'));
             }
 
             const createdTransactions = Array.isArray(payload.transactions)
@@ -250,7 +252,12 @@ export function useChatWorkflow(props, appendAssistantMessage) {
                 : [payload.transaction];
             const successMessage = createdTransactions
                 .map((transaction) => (
-                    `Berhasil dicatat: ${transaction.title} sebesar Rp ${new Intl.NumberFormat('id-ID').format(Number(transaction.amount))}.`
+                    t('Recorded: {title} amount {amount}.', {
+                        title: transaction.title,
+                        amount: new Intl.NumberFormat(
+                            locale.value === 'id' ? 'id-ID' : 'en-US',
+                        ).format(Number(transaction.amount)),
+                    })
                 ))
                 .join(' ');
 
@@ -260,7 +267,7 @@ export function useChatWorkflow(props, appendAssistantMessage) {
             await appendAssistantMessage(
                 error instanceof Error
                     ? error.message
-                    : 'Akun atau kategori gagal dibuat. Silakan coba lagi.',
+                    : t('Unable to create the account or category. Please try again.'),
                 2,
             );
         } finally {

@@ -35,13 +35,12 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
             <Link :href="show.url(asset.id)" aria-label="Back to asset">
                 <ArrowLeft :size="22" class="text-[#2457DA]" />
             </Link>
-            <h1 class="text-lg font-semibold">Riwayat perubahan nilai</h1>
+            <h1 class="text-lg font-semibold">{{ $t("Riwayat perubahan nilai") }}</h1>
             <span class="w-[22px]" />
         </header>
 
         <main class="space-y-3 px-6 pt-5">
-            <p v-if="!logs.data.length" class="rounded-2xl bg-[#F5F7FA] px-5 py-10 text-center text-sm text-[#637083]">
-                Belum ada riwayat perubahan nilai untuk {{ asset.name }}.
+            <p v-if="!logs.data.length" class="rounded-2xl bg-[#F5F7FA] px-5 py-10 text-center text-sm text-[#637083]"> {{ $t("Belum ada riwayat perubahan nilai untuk") }} {{ asset.name }}.
             </p>
 
             <article v-for="log in logs.data" :key="log.id" class="rounded-xl bg-[#F5F7FA] p-4">

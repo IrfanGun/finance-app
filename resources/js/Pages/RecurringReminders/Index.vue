@@ -216,10 +216,10 @@ onMounted(() => {
             <div class="flex items-center justify-between gap-3">
                 <Link :href="dashboard.url()" class="text-[#2457DA]" aria-label="Kembali ke beranda"><ArrowLeft :size="21" /></Link>
                 <div class="min-w-0 flex-1">
-                    <h1 class="text-xl font-semibold">Pengingat berulang</h1>
+                    <h1 class="text-xl font-semibold">{{ $t("Recurring reminders") }}</h1>
                 </div>
                 <ButtonPrimary type="button" class="!flex h-11 items-center gap-2 !rounded-xl !px-4 !text-sm" @click="openCreate">
-                    <Plus :size="18" /> <span class="hidden sm:inline">Tambah</span>
+                    <Plus :size="18" /> <span class="hidden sm:inline">{{ $t("Tambah") }}</span>
                 </ButtonPrimary>
             </div>
             <div class="flex gap-2" role="group" aria-label="Filter jenis pengingat">
@@ -241,7 +241,7 @@ onMounted(() => {
             <section v-if="notifications.length" class="rounded-xl bg-white p-4">
                 <div class="mb-3 flex items-center gap-2">
                     <Bell :size="17" class="text-[#2457DA]" />
-                    <h2 class="text-sm font-semibold">Notifikasi terbaru</h2>
+                    <h2 class="text-sm font-semibold">{{ $t("Notifikasi terbaru") }}</h2>
                 </div>
                 <div class="space-y-2">
                     <Link
@@ -283,9 +283,7 @@ onMounted(() => {
                     type="button"
                     class="mt-5 !min-h-0 !rounded-xl !px-4 !py-2.5 !text-sm"
                     @click="openCreate"
-                >
-                    Buat pengingat
-                </ButtonPrimary>
+                > {{ $t("Create a reminder") }} </ButtonPrimary>
             </section>
 
             <Link
@@ -321,13 +319,13 @@ onMounted(() => {
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <div>
-                        <p class="text-xs text-[#637083]">Perkiraan nominal</p>
+                        <p class="text-xs text-[#637083]">{{ $t("Estimated amount") }}</p>
                         <p class="mt-1 font-semibold">
                             {{ amount(reminder.amount, reminder.account?.currency || 'IDR') }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-xs text-[#637083]">Jadwal berikutnya</p>
+                        <p class="text-xs text-[#637083]">{{ $t("Next schedule") }}</p>
                         <p class="mt-1 font-medium">
                             {{ reminder.next_reminder_at || 'Tidak ada jadwal' }}
                         </p>
@@ -347,14 +345,12 @@ onMounted(() => {
                     <ArrowLeft :size="22" />
                 </ButtonPrimary>
                 <div class="min-w-0 flex-1">
-                    <p class="text-xs font-medium text-[#637083]">Pengingat berulang</p>
+                    <p class="text-xs font-medium text-[#637083]">{{ $t("Recurring reminders") }}</p>
                     <h1 class="text-xl font-semibold">
                         {{ currentStep === 1 ? (editingId ? 'Edit pengingat' : 'Pengingat baru') : 'Atur jadwal' }}
                     </h1>
                 </div>
-                <span class="shrink-0 text-sm font-medium text-[#637083]">
-                    Langkah {{ currentStep }} dari 2
-                </span>
+                <span class="shrink-0 text-sm font-medium text-[#637083]"> {{ $t("Step") }} {{ currentStep }} {{ $t("dari 2") }} </span>
             </header>
 
             <div class="mt-6 flex gap-2" aria-hidden="true">
@@ -376,46 +372,38 @@ onMounted(() => {
             >
                 <div v-if="currentStep === 1" class="space-y-4">
                     <div>
-                        <h2 class="text-lg font-semibold">Detail pengingat</h2>
-                        <p class="mt-1 text-sm leading-5 text-[#637083]">
-                            Tentukan transaksi yang ingin Anda ingat.
-                        </p>
+                        <h2 class="text-lg font-semibold">{{ $t("Reminder details") }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-[#637083]"> {{ $t("Tentukan transaksi yang ingin Anda ingat.") }} </p>
                     </div>
 
-                    <label class="block text-sm font-medium">
-                        Jenis transaksi
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Jenis transaksi") }} <select
                             v-model="form.type"
                             required
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
                         >
-                            <option value="expense">Pengeluaran</option>
-                            <option value="income">Pemasukan</option>
+                            <option value="expense">{{ $t("Expenses") }}</option>
+                            <option value="income">{{ $t("Income") }}</option>
                         </select>
                         <p v-if="form.errors.type" class="mt-1 text-xs text-red-600">
                             {{ form.errors.type }}
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Prioritas
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Priority") }} <select
                             v-model="form.priority"
                             required
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
                         >
-                            <option value="low">Rendah</option>
-                            <option value="medium">Sedang</option>
-                            <option value="high">Tinggi</option>
+                            <option value="low">{{ $t("Rendah") }}</option>
+                            <option value="medium">{{ $t("Sedang") }}</option>
+                            <option value="high">{{ $t("Tinggi") }}</option>
                         </select>
                         <p v-if="form.errors.priority" class="mt-1 text-xs text-red-600">
                             {{ form.errors.priority }}
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Judul
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Title") }} <input
                             v-model="form.title"
                             required
                             maxlength="255"
@@ -427,13 +415,8 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Nominal perkiraan
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Nominal perkiraan") }} <AmountInput
                             v-model="form.amount"
-                            type="number"
-                            min="0"
-                            step="0.01"
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
                         />
                         <p v-if="form.errors.amount" class="mt-1 text-xs text-red-600">
@@ -441,13 +424,11 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Akun bawaan
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Akun bawaan") }} <select
                             v-model="form.financial_account_id"
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
                         >
-                            <option value="">Pilih saat mencatat</option>
+                            <option value="">{{ $t("Pilih saat mencatat") }}</option>
                             <option
                                 v-for="account in accounts"
                                 :key="account.id"
@@ -461,13 +442,11 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Kategori bawaan
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Kategori bawaan") }} <select
                             v-model="form.category_id"
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
                         >
-                            <option value="">Tanpa kategori</option>
+                            <option value="">{{ $t("Uncategorized") }}</option>
                             <option
                                 v-for="category in availableCategories"
                                 :key="category.id"
@@ -481,9 +460,7 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Catatan
-                        <textarea
+                    <label class="block text-sm font-medium"> {{ $t("Note") }} <textarea
                             v-model="form.notes"
                             rows="2"
                             maxlength="1000"
@@ -498,32 +475,26 @@ onMounted(() => {
 
                 <div v-if="currentStep === 2" class="space-y-4">
                     <div>
-                        <h2 class="text-lg font-semibold">Jadwal berulang</h2>
-                        <p class="mt-1 text-sm leading-5 text-[#637083]">
-                            Pilih kapan pengingat mulai dan seberapa sering diulang.
-                        </p>
+                        <h2 class="text-lg font-semibold">{{ $t("Jadwal berulang") }}</h2>
+                        <p class="mt-1 text-sm leading-5 text-[#637083]"> {{ $t("Pilih kapan pengingat mulai dan seberapa sering diulang.") }} </p>
                     </div>
 
-                    <label class="block text-sm font-medium">
-                        Frekuensi
-                        <select
+                    <label class="block text-sm font-medium"> {{ $t("Frequency") }} <select
                             v-model="form.frequency"
                             required
                             class="mt-2 h-11 w-full rounded-lg border border-slate-300 bg-white px-4"
                         >
-                            <option value="daily">Harian</option>
-                            <option value="weekly">Mingguan</option>
-                            <option value="monthly">Bulanan</option>
-                            <option value="yearly">Tahunan</option>
+                            <option value="daily">{{ $t("Daily") }}</option>
+                            <option value="weekly">{{ $t("Weekly") }}</option>
+                            <option value="monthly">{{ $t("Monthly") }}</option>
+                            <option value="yearly">{{ $t("Yearly") }}</option>
                         </select>
                         <p v-if="form.errors.frequency" class="mt-1 text-xs text-red-600">
                             {{ form.errors.frequency }}
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Ulang setiap
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Ulang setiap") }} <input
                             v-model.number="form.interval"
                             type="number"
                             min="1"
@@ -535,9 +506,7 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Jadwal pertama
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Jadwal pertama") }} <input
                             v-model="form.starts_at"
                             type="datetime-local"
                             required
@@ -548,9 +517,7 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <label class="block text-sm font-medium">
-                        Batas akhir (opsional)
-                        <input
+                    <label class="block text-sm font-medium"> {{ $t("Batas akhir (opsional)") }} <input
                             v-model="form.ends_at"
                             type="datetime-local"
                             :min="form.starts_at"
@@ -561,9 +528,7 @@ onMounted(() => {
                         </p>
                     </label>
 
-                    <p v-if="editingId" class="rounded-xl bg-[#FFF7E8] p-3 text-xs text-[#765723]">
-                        Perubahan jadwal akan berlaku pada periode pengingat yang belum selesai.
-                    </p>
+                    <p v-if="editingId" class="rounded-xl bg-[#FFF7E8] p-3 text-xs text-[#765723]"> {{ $t("Perubahan jadwal akan berlaku pada periode pengingat yang belum selesai.") }} </p>
                 </div>
 
                 <div v-if="unhandledErrors.length" class="space-y-1 text-sm text-[#B34735]">
@@ -586,8 +551,7 @@ onMounted(() => {
                         type="button"
                         class="!flex items-center gap-2 !rounded-xl !px-5 !py-2.5 !text-sm"
                         @click="continueToSchedule"
-                    >
-                        Lanjut <ArrowLeft class="rotate-180" :size="16" />
+                    > {{ $t("Lanjut") }} <ArrowLeft class="rotate-180" :size="16" />
                     </ButtonPrimary>
                     <ButtonPrimary
                         v-else

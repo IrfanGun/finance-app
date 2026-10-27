@@ -160,8 +160,7 @@ onUnmounted(() => chart?.destroy());
                 <span class="min-w-0 truncate text-[#637083]">
                     {{ category.name }} · {{ category.count }}x
                 </span>
-                <strong class="shrink-0 font-semibold text-[#314158]">
-                    Rp {{ formatCurrency(category.amount) }}
+                <strong class="shrink-0 font-semibold text-[#314158]"> {{ $t("Rp") }} {{ formatCurrency(category.amount) }}
                 </strong>
             </li>
         </ul>

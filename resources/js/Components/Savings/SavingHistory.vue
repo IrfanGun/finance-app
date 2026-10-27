@@ -33,7 +33,7 @@ const resetFilters = () => {
     <div class="contents">
         <section class="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm sm:p-5">
             <div class="flex items-center justify-between gap-3">
-                <h2 class="font-semibold">Riwayat alokasi</h2>
+                <h2 class="font-semibold">{{ $t("Allocation history") }}</h2>
                 <ButtonPrimary
                     type="button"
                     variant="secondary"
@@ -41,16 +41,13 @@ const resetFilters = () => {
                     aria-label="Buka filter riwayat alokasi"
                     @click="emit('update:isOpen', true)"
                 >
-                    <Filter :size="16" />
-                    Filter
-                    <span v-if="activeFilterCount" class="rounded-full bg-[#2457DA] px-2 py-0.5 text-xs text-white">
+                    <Filter :size="16" /> {{ $t("Filters") }} <span v-if="activeFilterCount" class="rounded-full bg-[#2457DA] px-2 py-0.5 text-xs text-white">
                         {{ activeFilterCount }}
                     </span>
                 </ButtonPrimary>
             </div>
             <p v-if="activeFilterCount" class="text-xs text-[#637083]">
-                {{ activeFilterCount }} filter diterapkan
-            </p>
+                {{ activeFilterCount }} {{ $t("filter diterapkan") }} </p>
             <div class="max-h-48 overflow-y-auto">
                 <p
                     v-for="log in saving.logs"
@@ -58,14 +55,14 @@ const resetFilters = () => {
                     class="flex items-center justify-between gap-2 border-t border-[#F1F3F7] py-2 text-sm"
                 >
                     <span>{{ log.reason }} · {{ log.occurred_at }}</span>
-                    <span>{{ log.type === 'allocation' ? '+' : '-' }} Rp {{ formatMoney(log.amount) }}</span>
+                    <span>{{ log.type === 'allocation' ? '+' : '-' }} {{ $t("Rp") }} {{ formatMoney(log.amount) }}</span>
                     <ButtonPrimary
                         v-if="['direct_allocation', 'goal_contribution'].includes(log.reason) && !log.reversal"
                         type="button"
                         variant="secondary"
                         class="!min-h-0 !px-2 !py-1 !text-xs"
                         @click="emit('reverse', log)"
-                    >Balik</ButtonPrimary>
+                    >{{ $t("Balik") }}</ButtonPrimary>
                 </p>
             </div>
         </section>
@@ -82,7 +79,7 @@ const resetFilters = () => {
         >
             <section class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
                 <div class="mb-4 flex items-center justify-between gap-3">
-                    <h2 id="history-filter-title" class="font-semibold">Filter riwayat alokasi</h2>
+                    <h2 id="history-filter-title" class="font-semibold">{{ $t("Filter allocation history") }}</h2>
                     <ButtonPrimary
                         type="button"
                         variant="secondary"
@@ -94,40 +91,37 @@ const resetFilters = () => {
                     </ButtonPrimary>
                 </div>
                 <form class="flex flex-col gap-3" @submit.prevent="emit('apply')">
-                    <label class="text-sm">Sumber transaksi
-                        <select
+                    <label class="text-sm">{{ $t("Sumber transaksi") }} <select
                             :value="sourceFilter"
                             class="field"
                             @change="emit('update:sourceFilter', $event.target.value)"
                         >
-                            <option value="">Semua sumber</option>
-                            <option value="direct_allocation">Alokasi langsung</option>
-                            <option value="goal_contribution">Setoran goal</option>
-                            <option value="budget_claim">Klaim budget</option>
-                            <option value="free_release">Lepas dana</option>
-                            <option value="expense">Belanja</option>
-                            <option value="reversal">Koreksi</option>
+                            <option value="">{{ $t("Semua sumber") }}</option>
+                            <option value="direct_allocation">{{ $t("Alokasi langsung") }}</option>
+                            <option value="goal_contribution">{{ $t("Setoran goal") }}</option>
+                            <option value="budget_claim">{{ $t("Klaim budget") }}</option>
+                            <option value="free_release">{{ $t("Lepas dana") }}</option>
+                            <option value="expense">{{ $t("Belanja") }}</option>
+                            <option value="reversal">{{ $t("Koreksi") }}</option>
                         </select>
                     </label>
-                    <label class="text-sm">Periode
-                        <select
+                    <label class="text-sm">{{ $t("Period") }} <select
                             :value="periodFilter"
                             class="field"
                             @change="emit('update:periodFilter', $event.target.value)"
                         >
-                            <option value="">Semua periode</option>
+                            <option value="">{{ $t("Semua periode") }}</option>
                             <option v-for="period in periodOptions" :key="period.id" :value="period.id">
                                 {{ period.label }}
                             </option>
                         </select>
                     </label>
-                    <label class="text-sm">Akun
-                        <select
+                    <label class="text-sm">{{ $t("Account") }} <select
                             :value="accountFilter"
                             class="field"
                             @change="emit('update:accountFilter', $event.target.value)"
                         >
-                            <option value="">Semua akun</option>
+                            <option value="">{{ $t("All accounts") }}</option>
                             <option v-for="account in accounts" :key="account.id" :value="account.id">
                                 {{ account.name }}
                             </option>
@@ -139,10 +133,8 @@ const resetFilters = () => {
                             variant="secondary"
                             class="flex-1 justify-center"
                             @click="resetFilters"
-                        >Reset</ButtonPrimary>
-                        <ButtonPrimary type="submit" class="flex-1 justify-center">
-                            Terapkan filter
-                        </ButtonPrimary>
+                        >{{ $t("Reset") }}</ButtonPrimary>
+                        <ButtonPrimary type="submit" class="flex-1 justify-center"> {{ $t("Apply filters") }} </ButtonPrimary>
                     </div>
                 </form>
             </section>

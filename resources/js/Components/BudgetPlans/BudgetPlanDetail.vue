@@ -58,51 +58,49 @@ defineEmits([
                             </div>
                         </div>
                     </div>
-                    <strong class="text-sm text-[#2457DA]">
-                        Rp {{ formatMoney(plan.type === 'goal' ? plan.target_amount : plan.amount) }}
+                    <strong class="text-sm text-[#2457DA]"> {{ $t("Rp") }} {{ formatMoney(plan.type === 'goal' ? plan.target_amount : plan.amount) }}
                     </strong>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <ButtonPrimary type="button" variant="secondary" @click="$emit('edit', plan)">Ubah</ButtonPrimary>
+                    <ButtonPrimary type="button" variant="secondary" @click="$emit('edit', plan)">{{ $t("Edit") }}</ButtonPrimary>
                     <ButtonPrimary
                         v-if="plan.status === 'active'"
                         type="button"
                         variant="secondary"
                         @click="$emit('change-status', plan, 'paused')"
-                    >Jeda</ButtonPrimary>
+                    >{{ $t("Jeda") }}</ButtonPrimary>
                     <ButtonPrimary
                         v-if="plan.status === 'paused'"
                         type="button"
                         variant="secondary"
                         @click="$emit('change-status', plan, 'active')"
-                    >Lanjutkan</ButtonPrimary>
+                    >{{ $t("Continue") }}</ButtonPrimary>
                     <ButtonPrimary
                         v-if="['active', 'paused'].includes(plan.status)"
                         type="button"
                         variant="secondary"
                         @click="$emit('change-status', plan, 'ended')"
-                    >Hentikan</ButtonPrimary>
+                    >{{ $t("Hentikan") }}</ButtonPrimary>
                     <ButtonPrimary
                         v-if="plan.type === 'goal' && plan.status !== 'completed'"
                         type="button"
                         variant="secondary"
                         @click="$emit('change-status', plan, 'completed')"
-                    >Tandai selesai</ButtonPrimary>
+                    >{{ $t("Tandai selesai") }}</ButtonPrimary>
                 </div>
                 <div v-if="plan.type === 'goal'" class="grid grid-cols-2 gap-3 rounded-xl bg-[#F3F6FF] p-4 text-sm">
-                    <p>Dana tersedia<br /><strong>Rp {{ formatMoney(plan.goal_available) }}</strong></p>
-                    <p>Biaya dibayar<br /><strong>Rp {{ formatMoney(plan.goal_paid) }}</strong></p>
-                    <p>Kebutuhan didanai<br /><strong>Rp {{ formatMoney(plan.goal_funded) }}</strong></p>
-                    <p>Kekurangan<br /><strong>Rp {{ formatMoney(plan.goal_shortfall) }}</strong></p>
-                    <p class="col-span-2 text-xs text-[#637083]">
-                        Target {{ plan.target_date }} · Savings {{ plan.pocket?.name }}
+                    <p>{{ $t("Dana tersedia") }}<br /><strong>{{ $t("Rp") }} {{ formatMoney(plan.goal_available) }}</strong></p>
+                    <p>{{ $t("Biaya dibayar") }}<br /><strong>{{ $t("Rp") }} {{ formatMoney(plan.goal_paid) }}</strong></p>
+                    <p>{{ $t("Kebutuhan didanai") }}<br /><strong>{{ $t("Rp") }} {{ formatMoney(plan.goal_funded) }}</strong></p>
+                    <p>{{ $t("Kekurangan") }}<br /><strong>{{ $t("Rp") }} {{ formatMoney(plan.goal_shortfall) }}</strong></p>
+                    <p class="col-span-2 text-xs text-[#637083]"> {{ $t("Target") }} {{ plan.target_date }} · Savings {{ plan.pocket?.name }}
                     </p>
                 </div>
                 <div v-if="plan.items?.length" class="text-sm">
-                    <p class="font-semibold">Rincian kebutuhan</p>
+                    <p class="font-semibold">{{ $t("Rincian kebutuhan") }}</p>
                     <p v-for="item in plan.items" :key="item.id" class="flex justify-between">
                         <span>{{ item.name }}</span>
-                        <span>Rp {{ formatMoney(item.amount) }}</span>
+                        <span>{{ $t("Rp") }} {{ formatMoney(item.amount) }}</span>
                     </p>
                 </div>
                 <div
@@ -124,7 +122,7 @@ defineEmits([
 
                     <div v-if="plan.type === 'spending'" class="mt-4 rounded-xl bg-white p-3">
                         <div class="flex items-center justify-between gap-3">
-                            <p class="text-xs font-medium text-[#637083]">Penggunaan cadangan</p>
+                            <p class="text-xs font-medium text-[#637083]">{{ $t("Penggunaan cadangan") }}</p>
                             <strong class="text-xs" :class="periodUsagePercentage(period) >= 100 ? 'text-[#B34735]' : 'text-[#17243A]'">
                                 {{ Math.round(periodUsagePercentage(period)) }}%
                             </strong>
@@ -145,25 +143,23 @@ defineEmits([
                         </div>
                         <div class="mt-3 grid grid-cols-3 gap-2">
                             <div>
-                                <p class="text-[10px] text-[#637083]">Dialokasikan</p>
-                                <p class="mt-0.5 text-xs font-semibold">Rp {{ formatMoney(period.allocated_amount) }}</p>
+                                <p class="text-[10px] text-[#637083]">{{ $t("Dialokasikan") }}</p>
+                                <p class="mt-0.5 text-xs font-semibold">{{ $t("Rp") }} {{ formatMoney(period.allocated_amount) }}</p>
                             </div>
                             <div>
-                                <p class="text-[10px] text-[#637083]">Terpakai</p>
-                                <p class="mt-0.5 text-xs font-semibold">Rp {{ formatMoney(period.spent) }}</p>
+                                <p class="text-[10px] text-[#637083]">{{ $t("Terpakai") }}</p>
+                                <p class="mt-0.5 text-xs font-semibold">{{ $t("Rp") }} {{ formatMoney(period.spent) }}</p>
                             </div>
                             <div>
-                                <p class="text-[10px] text-[#637083]">Sisa</p>
-                                <p class="mt-0.5 text-xs font-semibold">Rp {{ formatMoney(period.remaining) }}</p>
+                                <p class="text-[10px] text-[#637083]">{{ $t("Sisa") }}</p>
+                                <p class="mt-0.5 text-xs font-semibold">{{ $t("Rp") }} {{ formatMoney(period.remaining) }}</p>
                             </div>
                         </div>
-                        <p class="mt-2 text-[10px] text-[#637083]">
-                            Rencana Rp {{ formatMoney(period.planned_amount) }} ·
+                        <p class="mt-2 text-[10px] text-[#637083]"> {{ $t("Rencana Rp") }} {{ formatMoney(period.planned_amount) }} ·
                             Dilepas Rp {{ formatMoney(period.released_amount) }}
                         </p>
                     </div>
-                    <div v-else class="mt-4 rounded-xl bg-white p-3 text-xs text-[#637083]">
-                        Rencana Rp {{ formatMoney(period.planned_amount) }} ·
+                    <div v-else class="mt-4 rounded-xl bg-white p-3 text-xs text-[#637083]"> {{ $t("Rencana Rp") }} {{ formatMoney(period.planned_amount) }} ·
                         Setoran Rp {{ formatMoney(period.contributed) }}
                     </div>
 
@@ -179,7 +175,7 @@ defineEmits([
                                 variant="secondary"
                                 class="!min-h-0 !px-2 !py-1 !text-xs"
                                 @click="$emit('period-action', reverseClaim, claim)"
-                            >Balik klaim</ButtonPrimary>
+                            >{{ $t("Balik klaim") }}</ButtonPrimary>
                         </div>
                     </div>
                     <div v-if="period.status !== 'closed'" class="mt-1 flex flex-wrap gap-2">
@@ -187,52 +183,48 @@ defineEmits([
                             v-if="plan.type === 'spending' && period.status === 'awaiting_funding'"
                             type="button"
                             @click="$emit('period-action', fundPeriod, period)"
-                        >Danai</ButtonPrimary>
+                        >{{ $t("Danai") }}</ButtonPrimary>
                         <ButtonPrimary
                             v-if="plan.type === 'spending' && period.status === 'open'"
                             type="button"
                             @click="$emit('open-transaction', plan, period)"
-                        >Catat belanja</ButtonPrimary>
+                        >{{ $t("Catat belanja") }}</ButtonPrimary>
                         <ButtonPrimary
                             v-if="plan.type === 'spending' && Number(period.remaining) > 0"
                             type="button"
                             @click="$emit('open-claim', period)"
-                        >Klaim sisa</ButtonPrimary>
+                        >{{ $t("Klaim sisa") }}</ButtonPrimary>
                         <Link
                             v-if="plan.type === 'goal'"
                             :href="savingsIndex({ query: { saving: plan.saving_id, period: period.id } }).url"
                             class="text-sm font-semibold text-[#2457DA]"
-                        >Sisihkan Dana</Link>
+                        >{{ $t("Sisihkan Dana") }}</Link>
                         <ButtonPrimary
                             v-if="plan.type === 'spending' && Number(period.remaining) === 0"
                             type="button"
                             variant="secondary"
                             @click="$emit('period-action', closePeriod, period)"
-                        >Tutup periode</ButtonPrimary>
+                        >{{ $t("Tutup periode") }}</ButtonPrimary>
                     </div>
                     <div v-if="activeClaim === period.id" class="mt-1 flex flex-col gap-2 rounded-xl bg-[#F7F9FC] p-3">
-                        <p class="font-semibold">Bagi sisa ke savings</p>
+                        <p class="font-semibold">{{ $t("Bagi sisa ke savings") }}</p>
                         <div v-for="(part, index) in claimParts" :key="index" class="flex gap-2">
                             <select v-model="part.saving_id" class="field" required>
-                                <option value="">Tujuan</option>
+                                <option value="">{{ $t("Tujuan") }}</option>
                                 <option v-for="saving in savings.filter((item) => item.currency === period.currency)" :key="saving.id" :value="saving.id">{{ saving.name }}</option>
                             </select>
-                            <input v-model="part.amount" class="field" type="number" min="0.01" step="0.01" />
+                            <AmountInput v-model="part.amount" class="field" />
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <ButtonPrimary type="button" variant="secondary" @click="claimParts.push({ saving_id: '', amount: '' })">Tambah tujuan</ButtonPrimary>
-                            <ButtonPrimary type="button" @click="$emit('submit-claim')">Simpan klaim</ButtonPrimary>
+                            <ButtonPrimary type="button" variant="secondary" @click="claimParts.push({ saving_id: '', amount: '' })">{{ $t("Tambah tujuan") }}</ButtonPrimary>
+                            <ButtonPrimary type="button" @click="$emit('submit-claim')">{{ $t("Simpan klaim") }}</ButtonPrimary>
                         </div>
-                        <p class="text-xs text-[#637083]">
-                            Total klaim Rp {{ formatMoney(claimTotal) }} dari sisa Rp {{ formatMoney(period.remaining) }}
+                        <p class="text-xs text-[#637083]"> {{ $t("Total klaim Rp") }} {{ formatMoney(claimTotal) }} {{ $t("dari sisa Rp") }} {{ formatMoney(period.remaining) }}
                         </p>
-                        <label class="text-xs">Atau lepas ke uang bebas
-                            <input :value="releaseAmount"
+                        <label class="text-xs">{{ $t("Atau lepas ke uang bebas") }} <input :value="releaseAmount"
                                 @input="$emit('update:releaseAmount', $event.target.value)" class="field" type="number" min="0.01" step="0.01" />
                         </label>
-                        <ButtonPrimary type="button" variant="secondary" @click="$emit('period-action', releasePeriod, period, { amount: releaseAmount })">
-                            Lepas sisa
-                        </ButtonPrimary>
+                        <ButtonPrimary type="button" variant="secondary" @click="$emit('period-action', releasePeriod, period, { amount: releaseAmount })"> {{ $t("Lepas sisa") }} </ButtonPrimary>
                     </div>
                 </div>
             </article>

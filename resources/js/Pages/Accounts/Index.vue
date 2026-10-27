@@ -152,7 +152,7 @@ const formatAmount = (value, account) => {
                 <Home :size="22" class="text-[#2457DA]" />
             </Link>
 
-            <h1 class="text-lg font-semibold">Accounts</h1>
+            <h1 class="text-lg font-semibold">{{ $t("Accounts") }}</h1>
 
             <button
                 class="rounded-full bg-app-primary p-2 text-white"
@@ -166,9 +166,7 @@ const formatAmount = (value, account) => {
             <p
                 v-if="!accounts.length"
                 class="py-10 text-center text-sm text-[#637083]"
-            >
-                No assets yet.
-            </p>
+            > {{ $t("No assets yet.") }} </p>
 
             <article
                 v-for="account in accounts"
@@ -186,8 +184,7 @@ const formatAmount = (value, account) => {
                             <span v-else-if="account.type === 'cash' || account.type === 'bank'">
                                 · {{ account.currency || 'IDR' }}
                             </span>
-                            · {{ account.transactions_count }} transactions
-                        </p>
+                            · {{ account.transactions_count }} {{ $t("transaksi") }} </p>
                     </div>
 
                     <div class="flex gap-2">
@@ -212,7 +209,7 @@ const formatAmount = (value, account) => {
                         {{ formatAmount(account.current_balance, account) }}
                     </template>
                 </p>
-                <p class="mt-1 text-xs text-[#637083]">Current balance</p>
+                <p class="mt-1 text-xs text-[#637083]">{{ $t("Current balance") }}</p>
             </article>
         </main>
 
@@ -235,9 +232,7 @@ const formatAmount = (value, account) => {
                     </button>
                 </div>
 
-                <label class="block text-sm">
-                    Account name
-                    <input
+                <label class="block text-sm"> {{ $t("Account name") }} <input
                         v-model="form.name"
                         required
                         class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
@@ -245,15 +240,13 @@ const formatAmount = (value, account) => {
                     />
                 </label>
 
-                <label class="block text-sm">
-                    Type
-                    <select
+                <label class="block text-sm"> {{ $t("Type") }} <select
                         v-model="form.type"
                         class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
                     >
-                        <option value="cash">Cash</option>
-                        <option value="bank">Bank</option>
-                        <option value="other">Other</option>
+                        <option value="cash">{{ $t("Cash") }}</option>
+                        <option value="bank">{{ $t("Bank") }}</option>
+                        <option value="other">{{ $t("Other") }}</option>
                     </select>
                 </label>
 
@@ -261,7 +254,7 @@ const formatAmount = (value, account) => {
                     v-if="form.type === 'cash' || form.type === 'bank'"
                     class="relative block text-sm font-medium"
                 >
-                    <span>Currency</span>
+                    <span>{{ $t("Currency") }}</span>
                     <button
                         type="button"
                         class="mt-2 flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 text-left font-normal outline-none transition hover:border-slate-300 focus:border-[#2457DA] focus:bg-white focus:ring-4 focus:ring-blue-100"
@@ -273,7 +266,7 @@ const formatAmount = (value, account) => {
                             <span class="font-semibold">{{ selectedCurrency.code }}</span>
                             <span class="ml-2 text-slate-500">{{ selectedCurrency.name }}</span>
                         </span>
-                        <span v-else class="text-slate-400">Choose a currency</span>
+                        <span v-else class="text-slate-400">{{ $t("Choose a currency") }}</span>
                         <ChevronDown :size="18" class="shrink-0 text-slate-500" />
                     </button>
 
@@ -317,16 +310,12 @@ const formatAmount = (value, account) => {
                                 <span
                                     v-if="form.currency === currency.code"
                                     class="ml-2 shrink-0 text-sm font-semibold"
-                                >
-                                    Selected
-                                </span>
+                                > {{ $t("Selected") }} </span>
                             </button>
                             <p
                                 v-if="!filteredCurrencies.length"
                                 class="px-3 py-6 text-center text-sm text-slate-500"
-                            >
-                                No currencies found.
-                            </p>
+                            > {{ $t("No currencies found.") }} </p>
                         </div>
                     </div>
                     <p v-if="form.errors.currency" class="mt-1 text-xs text-red-600">
@@ -334,13 +323,8 @@ const formatAmount = (value, account) => {
                     </p>
                 </div>
 
-                <label class="block text-sm">
-                    Opening balance
-                    <input
+                <label class="block text-sm"> {{ $t("Opening balance") }} <AmountInput
                         v-model="form.opening_balance"
-                        type="number"
-                        min="0"
-                        step="0.01"
                         required
                         class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-4"
                     />
@@ -360,29 +344,21 @@ const formatAmount = (value, account) => {
             class="fixed inset-0 z-40 flex items-end bg-black/30"
         >
             <div class="mx-auto w-full max-w-lg rounded-t-[28px] bg-white px-6 pb-8 pt-6">
-                <h2 class="text-xl font-semibold">Delete {{ deleting.name }}?</h2>
-                <p class="mt-2 text-sm text-[#637083]">
-                        Choose what to do with its transactions.
-                </p>
+                <h2 class="text-xl font-semibold">{{ $t("Delete") }} {{ deleting.name }}?</h2>
+                <p class="mt-2 text-sm text-[#637083]"> {{ $t("Choose what to do with its transactions.") }} </p>
                 <div class="mt-5 grid gap-3">
                     <button
                         class="rounded-xl bg-red-600 py-3 font-semibold text-white"
                         @click="confirmDelete(true)"
-                    >
-                        Delete account and transactions
-                    </button>
+                    > {{ $t("Delete account and transactions") }} </button>
                     <button
                         class="rounded-xl border border-[#2457DA] py-3 font-semibold text-[#2457DA]"
                         @click="confirmDelete(false)"
-                    >
-                        Delete account only
-                    </button>
+                    > {{ $t("Delete account only") }} </button>
                     <button
                         class="py-2 text-sm text-[#637083]"
                         @click="deleting = null"
-                    >
-                        Cancel
-                    </button>
+                    > {{ $t("Cancel") }} </button>
                 </div>
             </div>
         </div>

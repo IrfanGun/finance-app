@@ -59,25 +59,19 @@ function handleImageError() {
                             v-if="$page.props.auth.user"
                             :href="route('dashboard')"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                        >
-                            Dashboard
-                        </Link>
+                        > {{ $t("Dashboard") }} </Link>
 
                         <template v-else>
                             <Link
                                 :href="route('login')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                            >
-                                Log in
-                            </Link>
+                            > {{ $t("Log in") }} </Link>
 
                             <Link
                                 v-if="canRegister"
                                 :href="route('register')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                            >
-                                Register
-                            </Link>
+                            > {{ $t("Register") }} </Link>
                         </template>
                     </nav>
                 </header>
@@ -139,9 +133,7 @@ function handleImageError() {
                                     <div class="pt-3 sm:pt-5 lg:pt-0">
                                         <h2
                                             class="text-xl font-semibold text-black dark:text-white"
-                                        >
-                                            Documentation
-                                        </h2>
+                                        > {{ $t("Documentation") }} </h2>
 
                                         <p class="mt-4 text-sm/relaxed">
                                             Laravel has wonderful documentation
@@ -342,7 +334,7 @@ function handleImageError() {
                                     <a
                                         href="https://laravel.com/docs/billing"
                                         class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
-                                        >Cashier</a
+                                        >{{ $t("Cashier") }}</a
                                     >,
                                     <a
                                         href="https://laravel.com/docs/dusk"

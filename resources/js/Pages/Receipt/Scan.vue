@@ -488,8 +488,8 @@ onUnmounted(() => {
                 </Link>
 
                 <div>
-                    <p class="text-sm text-slate-500">Expense capture</p>
-                    <h1 class="text-2xl font-semibold">Scan receipt</h1>
+                    <p class="text-sm text-slate-500">{{ $t("Expense capture") }}</p>
+                    <h1 class="text-2xl font-semibold">{{ $t("Scan receipt") }}</h1>
                 </div>
             </div>
 
@@ -521,9 +521,7 @@ onUnmounted(() => {
                             <span class="absolute -bottom-0.5 -left-0.5 h-8 w-8 rounded-bl-lg border-b-4 border-l-4 border-blue-400" />
                             <span class="absolute -bottom-0.5 -right-0.5 h-8 w-8 rounded-br-lg border-b-4 border-r-4 border-blue-400" />
 
-                            <p class="absolute -bottom-9 left-1/2 w-max -translate-x-1/2 rounded-full bg-black/65 px-3 py-1 text-xs font-medium text-white">
-                                Sejajarkan seluruh struk di dalam kotak
-                            </p>
+                            <p class="absolute -bottom-9 left-1/2 w-max -translate-x-1/2 rounded-full bg-black/65 px-3 py-1 text-xs font-medium text-white"> {{ $t("Sejajarkan seluruh struk di dalam kotak") }} </p>
                         </div>
                     </div>
                 </div>
@@ -543,10 +541,8 @@ onUnmounted(() => {
                         <span class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white">
                             <Camera :size="26" />
                         </span>
-                        <span class="font-medium text-slate-800">Scan receipt</span>
-                        <span class="text-sm text-slate-500">
-                            Foto akan diproses oleh server
-                        </span>
+                        <span class="font-medium text-slate-800">{{ $t("Scan receipt") }}</span>
+                        <span class="text-sm text-slate-500"> {{ $t("Foto akan diproses oleh server") }} </span>
                     </template>
                 </div>
 
@@ -555,9 +551,7 @@ onUnmounted(() => {
                         type="button"
                         class="h-12 rounded-xl border border-slate-300 text-slate-700"
                         @click="stopCamera"
-                    >
-                        Batal
-                    </button>
+                    > {{ $t("Cancel") }} </button>
 
                     <button
                         type="button"
@@ -565,9 +559,7 @@ onUnmounted(() => {
                         :disabled="isProcessing"
                         @click="captureReceipt"
                     >
-                        <Camera :size="19" />
-                        Ambil foto
-                    </button>
+                        <Camera :size="19" /> {{ $t("Ambil foto") }} </button>
                 </div>
 
                 <div v-else class="mt-3 grid grid-cols-2 gap-3">
@@ -575,17 +567,13 @@ onUnmounted(() => {
                         type="button"
                         class="h-11 rounded-xl bg-blue-600 font-medium text-white"
                         @click="openCamera"
-                    >
-                        Kamera
-                    </button>
+                    > {{ $t("Kamera") }} </button>
 
                     <button
                         type="button"
                         class="h-11 rounded-xl border border-blue-200 font-medium text-blue-600"
                         @click="openPicker"
-                    >
-                        Galeri
-                    </button>
+                    > {{ $t("Galeri") }} </button>
                 </div>
 
                 <button
@@ -621,23 +609,17 @@ onUnmounted(() => {
             <div v-if="isProcessing" class="flex flex-col items-center gap-4 py-8 text-center">
                 <LoaderCircle :size="44" class="animate-spin text-blue-600" />
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Processing...</h2>
-                    <p class="mt-1 text-sm text-slate-500">
-                        Server sedang mendeteksi struk dan membaca total.
-                    </p>
+                    <h2 class="text-lg font-semibold text-slate-900">{{ $t("Processing...") }}</h2>
+                    <p class="mt-1 text-sm text-slate-500"> {{ $t("Server sedang mendeteksi struk dan membaca total.") }} </p>
                 </div>
             </div>
 
             <div v-else>
-                <h2 class="text-lg font-semibold text-slate-900">Total transaksi</h2>
-                <p class="mt-1 text-sm text-slate-500">
-                    Periksa atau koreksi nominal sebelum melanjutkan.
-                </p>
+                <h2 class="text-lg font-semibold text-slate-900">{{ $t("Total transactions") }}</h2>
+                <p class="mt-1 text-sm text-slate-500"> {{ $t("Periksa atau koreksi nominal sebelum melanjutkan.") }} </p>
 
                 <section class="mt-5">
-                    <h3 class="text-sm font-bold uppercase text-slate-700">
-                        Detail Transaksi
-                    </h3>
+                    <h3 class="text-sm font-bold uppercase text-slate-700"> {{ $t("Detail Transaksi") }} </h3>
 
                     <div v-if="receiptItems.length" class="mt-3 flex flex-col gap-2 text-sm text-slate-700">
                         <div
@@ -658,9 +640,7 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <p v-else class="mt-3 text-sm text-slate-500">
-                        Detail item tidak berhasil dibaca dari struk.
-                    </p>
+                    <p v-else class="mt-3 text-sm text-slate-500"> {{ $t("Detail item tidak berhasil dibaca dari struk.") }} </p>
                 </section>
 
                 <label class="mt-5 block rounded-xl border border-blue-200 bg-blue-50 p-4">
@@ -673,9 +653,7 @@ onUnmounted(() => {
                     />
                 </label>
 
-                <label class="mt-4 block text-sm font-medium text-slate-700">
-                    Title
-                    <input
+                <label class="mt-4 block text-sm font-medium text-slate-700"> {{ $t("Title") }} <input
                         v-model="transactionTitle"
                         type="text"
                         placeholder="Pengeluaran"
@@ -683,9 +661,7 @@ onUnmounted(() => {
                     />
                 </label>
 
-                <label class="mt-4 block text-sm font-medium text-slate-700">
-                    Category
-                    <select
+                <label class="mt-4 block text-sm font-medium text-slate-700"> {{ $t("Category") }} <select
                         v-model="transactionCategory"
                         class="mt-2 h-11 w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
@@ -699,9 +675,7 @@ onUnmounted(() => {
                     </select>
                 </label>
 
-                <label class="mt-4 block text-sm font-medium text-slate-700">
-                    Account
-                    <select
+                <label class="mt-4 block text-sm font-medium text-slate-700"> {{ $t("Account") }} <select
                         v-model="transactionForm.account_id"
                         class="mt-2 h-11 w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
@@ -720,18 +694,14 @@ onUnmounted(() => {
                         type="button"
                         class="h-12 rounded-xl border border-slate-300 font-medium text-slate-700 hover:bg-slate-50"
                         @click="showScanModal = false"
-                    >
-                        Cancel
-                    </button>
+                    > {{ $t("Cancel") }} </button>
 
                     <button
                         type="button"
                         class="h-12 rounded-xl bg-blue-600 font-medium text-white hover:bg-blue-700"
                         :disabled="transactionForm.processing"
                         @click="confirmTransaction"
-                    >
-                        Confirm
-                    </button>
+                    > {{ $t("Confirm") }} </button>
                 </div>
             </div>
         </div>
