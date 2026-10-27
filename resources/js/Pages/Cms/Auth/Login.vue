@@ -44,10 +44,15 @@ const submit = () => form.post('/cms/login', {
         />
 
         <header class="cms-login-header relative z-10 mx-auto flex w-full max-w-[1440px] shrink-0 items-center justify-between px-6 py-3 sm:px-10 sm:py-4 lg:px-14">
-            <Link href="/cms/login" class="flex items-center gap-3" aria-label="Clarity home">
-                <span class="flex h-11 w-11 items-center justify-center rounded-full bg-[#2457DA] text-2xl font-semibold text-white shadow-lg shadow-black/20">c</span>
+            <Link href="/cms/login" class="flex items-center gap-3" aria-label="Spendsee home">
+                <span class="inline-flex shrink-0 rounded-xl bg-white px-2 py-1">
+                    <img
+                        :src="'/images/logo.png'"
+                        alt=""
+                        class="h-12 w-36 object-contain"
+                    />
+                </span>
                 <span>
-                    <span class="block text-2xl font-medium tracking-tight">Clarity</span>
                     <span class="mt-0.5 block text-[9px] font-medium uppercase tracking-[0.25em] text-white/75">Finance · Focus · Freedom</span>
                 </span>
             </Link>

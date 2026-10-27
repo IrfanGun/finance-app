@@ -17,9 +17,12 @@ const submit = () => form.post(login.url(), { onFinish: () => form.reset('passwo
     <main class="min-h-screen bg-app px-6 py-8 text-app-heading">
         <div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[342px] flex-col">
             <div class="flex flex-1 flex-col">
-                <Link href="/" class="mt-24 flex items-center gap-2 self-center" aria-label="Clarity home">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-2xl font-bold text-white">c</span>
-                    <span class="text-[26px] font-semibold tracking-tight text-slate-800">clarity</span>
+                <Link href="/" class="mt-24 flex items-center self-center" aria-label="Spendsee home">
+                    <img
+                        :src="'/images/logo.png'"
+                        alt=""
+                        class="h-20 w-[240px] object-contain"
+                    />
                 </Link>
                 <div v-if="status" class="mt-6 text-sm font-medium text-green-600">{{ status }}</div>
                 <form class="mt-9 flex flex-col gap-6" @submit.prevent="submit">

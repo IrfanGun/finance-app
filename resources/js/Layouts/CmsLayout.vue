@@ -67,11 +67,17 @@ const navigation = [
                     href="/cms/dashboard"
                     class="flex items-center gap-3 px-2"
                     :class="isSidebarCollapsed ? 'lg:justify-center lg:px-0' : ''"
-                    :aria-label="isSidebarCollapsed ? 'Clarity home' : undefined"
-                    :title="isSidebarCollapsed ? 'Clarity' : undefined"
+                    :aria-label="isSidebarCollapsed ? 'Spendsee home' : undefined"
+                    :title="isSidebarCollapsed ? 'Spendsee' : undefined"
                 >
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2457DA] text-xl font-bold text-white">c</span>
-                    <span v-if="!isSidebarCollapsed" class="text-2xl font-semibold tracking-tight">clarity</span>
+                    <img
+                        :src="'/images/logo.png'"
+                        :alt="isSidebarCollapsed ? '' : 'Spendsee'"
+                        class="block shrink-0 object-left"
+                        :class="isSidebarCollapsed
+                            ? 'h-10 w-10 object-cover'
+                            : 'h-16 w-full max-w-[220px] object-contain'"
+                    />
                 </Link>
                 <button
                     type="button"
