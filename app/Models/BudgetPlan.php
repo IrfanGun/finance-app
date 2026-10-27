@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'user_id',
     'name',
     'type',
+    'icon',
+    'color',
     'amount',
     'target_amount',
     'target_date',
@@ -31,6 +33,46 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class BudgetPlan extends Model
 {
+    public const ICONS = [
+        'shopping-bag' => 'Belanja',
+        'target' => 'Target',
+        'wallet' => 'Dompet',
+        'house' => 'Rumah',
+        'car-front' => 'Kendaraan',
+        'plane' => 'Perjalanan',
+        'footprints' => 'Sepatu',
+        'heart-pulse' => 'Kesehatan',
+        'graduation-cap' => 'Pendidikan',
+        'gift' => 'Hadiah',
+        'coffee' => 'Kopi',
+        'briefcase-business' => 'Pekerjaan',
+        'music' => 'Hobi',
+        'paw-print' => 'Hewan peliharaan',
+        'shopping-cart' => 'Keranjang belanja',
+        'bus' => 'Bus',
+        'bike' => 'Sepeda',
+        'building-2' => 'Gedung',
+        'camera' => 'Kamera',
+        'circle-dollar-sign' => 'Keuangan',
+        'clapperboard' => 'Film',
+        'dumbbell' => 'Olahraga',
+        'gamepad-2' => 'Permainan',
+        'laptop' => 'Laptop',
+        'lightbulb' => 'Ide',
+        'piggy-bank' => 'Tabungan',
+        'shirt' => 'Pakaian',
+        'smartphone' => 'Ponsel',
+    ];
+
+    public const COLORS = [
+        'blue' => 'Biru',
+        'red' => 'Merah',
+        'green' => 'Hijau',
+        'orange' => 'Oranye',
+        'purple' => 'Ungu',
+        'teal' => 'Toska',
+    ];
+
     protected function casts(): array
     {
         return [

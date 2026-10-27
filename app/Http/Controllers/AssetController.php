@@ -44,6 +44,8 @@ class AssetController extends Controller
             return to_route('cms.assets.index');
         }
 
+        Inertia::flash('asset_success', 'created');
+
         return to_route('assets.show', $asset);
     }
 
@@ -81,6 +83,7 @@ class AssetController extends Controller
         Gate::authorize('update', $asset);
 
         $assets->update($asset, $request->validated());
+        Inertia::flash('asset_success', 'updated');
 
         return to_route('assets.show', $asset);
     }

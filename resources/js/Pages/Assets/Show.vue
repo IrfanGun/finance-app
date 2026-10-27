@@ -1,5 +1,6 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     ArrowDownUp,
     ArrowLeft,
@@ -9,6 +10,7 @@ import {
     Trash2,
 } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import SuccessModal from '@/Components/SuccessModal.vue';
 import { destroy, edit as assetEdit, index, status as assetStatus } from '@/routes/assets';
 import { logs as depreciationLogs, status as depreciationStatus } from '@/routes/assets/depreciation';
 
@@ -16,6 +18,16 @@ const props = defineProps({
     asset: { type: Object, required: true },
     logs: { type: Object, default: () => ({ data: [], links: [] }) },
 });
+
+const page = usePage();
+const showSuccess = ref(Boolean(page.flash.asset_success));
+const successMessage = computed(() => page.flash.asset_success === 'created'
+    ? 'Aset baru berhasil dibuat.'
+    : 'Perubahan aset berhasil disimpan.');
+
+const closeSuccess = () => {
+    showSuccess.value = false;
+};
 
 const depreciationForm = useForm({
     status: props.asset.depreciation?.status === 'paused' ? 'active' : 'paused',
@@ -97,6 +109,12 @@ const valueChangeClass = (amount) => Number(amount ?? 0) > 0
     <Head :title="asset.name" />
 
     <div class="mx-auto min-h-screen w-full max-w-lg bg-white pb-28 text-app-heading">
+        <SuccessModal
+            :show="showSuccess"
+            :message="successMessage"
+            @close="closeSuccess"
+        />
+
         <header class="flex items-center justify-between px-6 py-5">
             <Link :href="index.url()" aria-label="Kembali ke daftar aset">
                 <ArrowLeft :size="22" class="text-[#2457DA]" />

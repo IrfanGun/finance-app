@@ -352,7 +352,7 @@ const shortcuts = [
 
     <Transition name="mini-header">
         <div v-if="isScrolled"
-            class="fixed inset-x-0 top-0 z-20 mx-auto flex h-16 w-full max-w-lg items-center justify-between bg-budget-header px-6 text-white shadow-md">
+            class="fixed inset-x-0 top-0 z-20 mx-auto flex h-16 w-full max-w-lg items-center justify-between bg-budget-header px-6 text-white">
             <div>
                 <p class="text-xs text-blue-100">{{ t('Good morning,') }}</p>
                 <h1 class="text-lg font-semibold">{{ userName }}</h1>
@@ -374,14 +374,14 @@ const shortcuts = [
             </div>
             <div class="flex items-center gap-2">
                 <LanguageSwitcher :floating="false" />
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-budget-primary shadow-[0_8px_24px_rgba(41,82,160,0.08)]">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xs font-semibold text-budget-primary">
                     {{ userName.slice(0, 2).toUpperCase() }}
                 </div>
             </div>
         </div>
 
         <header
-            class="relative mx-5 mt-5 overflow-hidden rounded-[28px] bg-budget-header px-6 py-7 text-white shadow-[0_18px_42px_rgba(36,87,218,0.22)]">
+            class="relative mx-5 mt-5 overflow-hidden rounded-[28px] bg-budget-header px-6 py-7 text-white">
             <div
                 ref="wealthChartElement"
                 class="wealth-chart pointer-events-none absolute right-3 top-4 h-16 w-40"
@@ -501,13 +501,13 @@ const shortcuts = [
                         Date().toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { month: 'short', year: 'numeric' }) }}</span>
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    <div class="rounded-[20px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                    <div class="rounded-[20px] border border-budget-border bg-budget-surface p-4">
                         <p class="flex items-center gap-1 text-sm text-income">
                             <ArrowDown :size="15" />{{ t('Income') }}
                         </p>
                         <p class="mt-2 text-lg font-semibold">Rp {{ formatCurrency(summary.income) }}</p>
                     </div>
-                    <div class="rounded-[20px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                    <div class="rounded-[20px] border border-budget-border bg-budget-surface p-4">
                         <p class="flex items-center gap-1 text-sm text-expense">
                             <ArrowUp :size="15" />{{ t('Expense') }}
                         </p>
@@ -524,7 +524,7 @@ const shortcuts = [
                         class="!min-h-0 !border-0 !bg-transparent !px-2 !py-1 !text-sm !text-budget-link !shadow-none"
                     >{{ t('Details') }}</ButtonPrimary>
                 </div>
-                <div class="mt-4 rounded-[24px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                <div class="mt-4 rounded-[24px] border border-budget-border bg-budget-surface p-4">
                     <SpendingCategoryChart :days="weeklySpending" />
                 </div>
             </section>
@@ -533,7 +533,7 @@ const shortcuts = [
                     <h2 class="text-lg font-semibold">{{ t('Recent transactions') }}</h2>
                     <Link :href="transactionsIndex.url()" class="text-sm font-semibold text-budget-link">{{ t('See all') }}</Link>
                 </div>
-                <div v-if="transactions.length" class="mt-4 rounded-[24px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]">
+                <div v-if="transactions.length" class="mt-4 rounded-[24px] border border-budget-border bg-budget-surface p-4">
                     <div v-for="transaction in transactions" :key="transaction.id" class="flex items-center gap-4 border-b border-budget-border py-3 first:pt-0 last:border-0 last:pb-0"><span
                             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-budget-icon-surface"
                             :class="transaction.type === 'income' ? 'text-income' : 'text-expense'">
@@ -563,7 +563,7 @@ const shortcuts = [
                 <article
                     v-for="(account, index) in accounts"
                     :key="account.id"
-                    class="account-card relative isolate flex h-40 w-[280px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[24px] bg-budget-header p-5 text-white shadow-[0_16px_32px_rgba(36,87,218,0.16)]"
+                    class="account-card relative isolate flex h-40 w-[280px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[24px] bg-budget-header p-5 text-white"
                     :class="`account-card--${index % 4}`"
                 >
                     <div class="relative z-10 flex items-start justify-between gap-3">
@@ -598,7 +598,7 @@ const shortcuts = [
                     v-for="asset in assets"
                     :key="asset.id"
                     :href="assetShow.url(asset.id)"
-                    class="flex items-center justify-between rounded-[20px] bg-budget-surface p-4 shadow-[0_8px_28px_rgba(41,82,160,0.05)]"
+                    class="flex items-center justify-between rounded-[20px] border border-budget-border bg-budget-surface p-4"
                 >
                     <span class="font-medium">{{ asset.name }}</span>
                     <span class="text-sm font-semibold">{{ asset.currency }} {{ formatCurrency(asset.current_value) }}</span>

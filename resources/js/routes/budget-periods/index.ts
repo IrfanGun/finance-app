@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\BudgetPlanController::fund
- * @see app/Http/Controllers/BudgetPlanController.php:171
+ * @see app/Http/Controllers/BudgetPlanController.php:175
  * @route '/budget-periods/{period}/fund'
  */
 export const fund = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ fund.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::fund
- * @see app/Http/Controllers/BudgetPlanController.php:171
+ * @see app/Http/Controllers/BudgetPlanController.php:175
  * @route '/budget-periods/{period}/fund'
  */
 fund.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -44,7 +44,7 @@ fund.url = (args: { period: string | number } | [period: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::fund
- * @see app/Http/Controllers/BudgetPlanController.php:171
+ * @see app/Http/Controllers/BudgetPlanController.php:175
  * @route '/budget-periods/{period}/fund'
  */
 fund.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -54,7 +54,7 @@ fund.post = (args: { period: string | number } | [period: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::claim
- * @see app/Http/Controllers/BudgetPlanController.php:180
+ * @see app/Http/Controllers/BudgetPlanController.php:184
  * @route '/budget-periods/{period}/claim'
  */
 export const claim = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -69,7 +69,7 @@ claim.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::claim
- * @see app/Http/Controllers/BudgetPlanController.php:180
+ * @see app/Http/Controllers/BudgetPlanController.php:184
  * @route '/budget-periods/{period}/claim'
  */
 claim.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -97,7 +97,7 @@ claim.url = (args: { period: string | number } | [period: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::claim
- * @see app/Http/Controllers/BudgetPlanController.php:180
+ * @see app/Http/Controllers/BudgetPlanController.php:184
  * @route '/budget-periods/{period}/claim'
  */
 claim.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -107,7 +107,7 @@ claim.post = (args: { period: string | number } | [period: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::release
- * @see app/Http/Controllers/BudgetPlanController.php:199
+ * @see app/Http/Controllers/BudgetPlanController.php:203
  * @route '/budget-periods/{period}/release'
  */
 export const release = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -122,7 +122,7 @@ release.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::release
- * @see app/Http/Controllers/BudgetPlanController.php:199
+ * @see app/Http/Controllers/BudgetPlanController.php:203
  * @route '/budget-periods/{period}/release'
  */
 release.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -150,7 +150,7 @@ release.url = (args: { period: string | number } | [period: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::release
- * @see app/Http/Controllers/BudgetPlanController.php:199
+ * @see app/Http/Controllers/BudgetPlanController.php:203
  * @route '/budget-periods/{period}/release'
  */
 release.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -160,7 +160,7 @@ release.post = (args: { period: string | number } | [period: string | number ] |
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::close
- * @see app/Http/Controllers/BudgetPlanController.php:234
+ * @see app/Http/Controllers/BudgetPlanController.php:238
  * @route '/budget-periods/{period}/close'
  */
 export const close = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -175,7 +175,7 @@ close.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::close
- * @see app/Http/Controllers/BudgetPlanController.php:234
+ * @see app/Http/Controllers/BudgetPlanController.php:238
  * @route '/budget-periods/{period}/close'
  */
 close.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -203,7 +203,7 @@ close.url = (args: { period: string | number } | [period: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::close
- * @see app/Http/Controllers/BudgetPlanController.php:234
+ * @see app/Http/Controllers/BudgetPlanController.php:238
  * @route '/budget-periods/{period}/close'
  */
 close.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

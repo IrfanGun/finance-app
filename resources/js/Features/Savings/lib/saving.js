@@ -8,9 +8,16 @@ export const getActiveHistoryFilterCount = (filters) => [
     filters.account,
 ].filter(Boolean).length;
 
-export const getSavingCurrencies = (accounts) => [
-    ...new Set(accounts.map((account) => account.currency)),
-];
+export const getSavingCurrencies = (accounts) => {
+    const currencies = [
+        ...new Set(accounts
+            .map((account) => account.currency
+                || (account.type === 'investment' ? null : 'IDR'))
+            .filter(Boolean)),
+    ];
+
+    return currencies.length > 0 ? currencies : ['IDR'];
+};
 
 export const createSavingFormDefaults = (currency = 'IDR') => ({
     name: '',

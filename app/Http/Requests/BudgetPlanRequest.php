@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\BudgetPlan;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,6 +20,8 @@ class BudgetPlanRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::in(['spending', 'goal'])],
+            'icon' => ['required', Rule::in(array_keys(BudgetPlan::ICONS))],
+            'color' => ['required', Rule::in(array_keys(BudgetPlan::COLORS))],
             'amount' => [$goal ? 'nullable' : 'required', 'numeric', 'gt:0', 'decimal:0,2'],
             'target_amount' => [$goal ? 'required' : 'nullable', 'numeric', 'gt:0', 'decimal:0,2'],
             'target_date' => [$goal ? 'required' : 'nullable', 'date', 'after_or_equal:starts_on'],

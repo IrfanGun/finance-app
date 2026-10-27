@@ -100,6 +100,10 @@ class BudgetPlanController extends Controller
         return Inertia::render('BudgetPlans/Index', [
             'createMode' => $createMode,
             'selectedPlanId' => $selectedPlanId,
+            'appearanceOptions' => [
+                'icons' => BudgetPlan::ICONS,
+                'colors' => BudgetPlan::COLORS,
+            ],
             'plans' => $plans,
             'legacyBudgets' => $user->budgets()
                 ->with('category')
