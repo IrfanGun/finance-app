@@ -71,19 +71,27 @@ const spentForPlan = (plan) => plan.type === 'goal'
     ? Number(plan.goal_paid ?? 0)
     : Number(props.periodForSelectedMonth(plan)?.spent ?? 0);
 
-const usageForPlan = (plan) => props.periodUsagePercentage(
-    props.periodForSelectedMonth(plan) ?? {
-        allocated_amount: plan.target_amount,
-        spent: plan.goal_funded,
-    },
-);
+const usageForPlan = (plan) => {
+    const period = props.periodForSelectedMonth(plan);
+
+    if (period) {
+        return props.periodUsagePercentage(period);
+    }
+
+    return props.periodUsagePercentage({
+        allocated_amount: plan.type === 'goal' ? plan.target_amount : plan.amount,
+        spent: plan.type === 'goal' ? plan.goal_funded : 0,
+    });
+};
 
 const remainingForPlan = (plan) => {
     if (plan.type === 'goal') {
         return Number(plan.goal_shortfall ?? 0);
     }
 
-    return Number(props.periodForSelectedMonth(plan)?.remaining ?? 0);
+    const period = props.periodForSelectedMonth(plan);
+
+    return Number(period?.remaining ?? (period ? 0 : plan.amount ?? 0));
 };
 
 const allocationLabel = (plan) => {

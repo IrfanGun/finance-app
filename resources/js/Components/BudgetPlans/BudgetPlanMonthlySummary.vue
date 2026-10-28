@@ -10,9 +10,9 @@ const props = defineProps({
     formatCurrency: { type: Function, required: true },
 });
 
-const monthlyTotals = computed(() => props.monthlyPlans.reduce((totals, { period }) => ({
-    allocated: totals.allocated + Number(period.allocated_amount ?? 0),
-    spent: totals.spent + Number(period.spent ?? 0),
+const monthlyTotals = computed(() => props.monthlyPlans.reduce((totals, { plan, period }) => ({
+    allocated: totals.allocated + Number(period?.allocated_amount ?? plan.amount ?? 0),
+    spent: totals.spent + Number(period?.spent ?? 0),
 }), { allocated: 0, spent: 0 }));
 
 const monthlyUsagePercentage = computed(() => monthlyTotals.value.allocated > 0
@@ -57,9 +57,9 @@ const chartDotColor = (index) => [
             <div v-for="({ plan, period }, index) in monthlyPlans" :key="plan.id" class="flex items-center gap-2 text-xs">
                 <span class="h-2.5 w-2.5 shrink-0 rounded-full" :style="{ backgroundColor: chartDotColor(index) }" />
                 <span class="min-w-0 flex-1 truncate text-[#52627E]">{{ plan.name }}</span>
-                <span class="shrink-0 text-[#52627E]">{{ formatCurrency(period.spent, selectedCurrency) }}</span>
+                <span class="shrink-0 text-[#52627E]">{{ formatCurrency(period?.spent ?? 0, selectedCurrency) }}</span>
                 <span class="w-10 shrink-0 text-right text-[#8796AF]">
-                    {{ Math.round(period.allocated_amount > 0 ? Number(period.spent) / Number(period.allocated_amount) * 100 : 0) }}%
+                    {{ Math.round((period?.allocated_amount ?? plan.amount) > 0 ? Number(period?.spent ?? 0) / Number(period?.allocated_amount ?? plan.amount) * 100 : 0) }}%
                 </span>
             </div>
             <p v-if="!monthlyPlans.length" class="text-xs text-[#8796AF]">

@@ -119,12 +119,11 @@ const monthlyPlans = computed(() => props.plans
     .map((plan) => ({
         plan,
         period: periodForSelectedMonth(plan),
-    }))
-    .filter(({ period }) => period));
+    })));
 
-const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { period }) => ({
-    allocated: totals.allocated + Number(period.allocated_amount ?? 0),
-    spent: totals.spent + Number(period.spent ?? 0),
+const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { plan, period }) => ({
+    allocated: totals.allocated + Number(period?.allocated_amount ?? plan.amount ?? 0),
+    spent: totals.spent + Number(period?.spent ?? 0),
 }), { allocated: 0, spent: 0 }));
 </script>
 
