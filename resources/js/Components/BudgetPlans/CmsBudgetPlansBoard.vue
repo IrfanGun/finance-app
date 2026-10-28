@@ -70,21 +70,59 @@ const periodForSelectedMonth = (plan) => {
         ?? null;
 };
 
+const isPlanScheduledForSelectedMonth = (plan) => {
+    if (plan.type !== 'spending') {
+        return true;
+    }
+
+    const selectedMonthKey = `${selectedYear.value}-${String(selectedMonth.value + 1).padStart(2, '0')}`;
+    const planStartMonthKey = plan.starts_on?.slice(0, 7);
+
+    if (!plan.is_recurring) {
+        return planStartMonthKey === selectedMonthKey;
+    }
+
+    if (plan.status !== 'active' && !periodForSelectedMonth(plan)) {
+        return false;
+    }
+
+    const [startYear, startMonth, startDay] = plan.starts_on.split('-').map(Number);
+    const monthsSinceStart = (selectedYear.value - startYear) * 12
+        + selectedMonth.value
+        - (startMonth - 1);
+    const interval = Math.max(Number(plan.interval ?? 1), 1);
+
+    if (monthsSinceStart < 0 || monthsSinceStart % interval !== 0) {
+        return false;
+    }
+
+    const lastDayOfSelectedMonth = new Date(Date.UTC(
+        selectedYear.value,
+        selectedMonth.value + 1,
+        0,
+    )).getUTCDate();
+    const occurrenceDate = `${selectedMonthKey}-${String(Math.min(startDay, lastDayOfSelectedMonth)).padStart(2, '0')}`;
+
+    return !plan.ends_on || occurrenceDate <= plan.ends_on;
+};
+
 const plansAwaitingFunding = computed(() => props.plans.filter((plan) =>
     plan.type === 'spending'
+        && isPlanScheduledForSelectedMonth(plan)
         && periodForSelectedMonth(plan)?.status === 'awaiting_funding',
 ));
 
 const monthlyPlans = computed(() => props.plans
     .filter((plan) => plan.type === 'spending'
-        && plan.currency === props.selectedCurrency)
+        && plan.currency === props.selectedCurrency
+        && isPlanScheduledForSelectedMonth(plan))
     .map((plan) => ({
         plan,
         period: periodForSelectedMonth(plan),
     }))
     .filter(({ period }) => period));
 
-const monthlyTotals = computed(() => monthlyPlans.value.reduce((totals, { period }) => ({
+const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { period }) => ({
     allocated: totals.allocated + Number(period.allocated_amount ?? 0),
     spent: totals.spent + Number(period.spent ?? 0),
 }), { allocated: 0, spent: 0 }));
@@ -203,9 +241,11 @@ const monthlyTotals = computed(() => monthlyPlans.value.reduce((totals, { period
                 <div class="min-w-0">
                     <p class="text-sm font-medium text-[#52627E]">{{ $t('Dana teralokasikan') }}</p>
                     <p class="mt-1 truncate text-2xl font-bold tracking-tight text-[#111B39] sm:text-3xl">
-                        {{ formatCurrency(monthlyTotals.allocated, selectedCurrency) }}
+                        {{ formatCurrency(selectedMonthTotals.allocated, selectedCurrency) }}
                     </p>
-                    <p class="mt-1 text-xs text-[#8796AF]">{{ $t('Alokasi bulan terpilih') }}</p>
+                    <p class="mt-1 text-xs text-[#8796AF]">
+                        {{ $t('Alokasi bulan terpilih') }} · {{ selectedMonthLabel }}
+                    </p>
                 </div>
             </article>
 
@@ -216,9 +256,11 @@ const monthlyTotals = computed(() => monthlyPlans.value.reduce((totals, { period
                 <div class="min-w-0">
                     <p class="text-sm font-medium text-[#52627E]">{{ $t('Dana terealisasikan') }}</p>
                     <p class="mt-1 truncate text-2xl font-bold tracking-tight text-[#111B39] sm:text-3xl">
-                        {{ formatCurrency(monthlyTotals.spent, selectedCurrency) }}
+                        {{ formatCurrency(selectedMonthTotals.spent, selectedCurrency) }}
                     </p>
-                    <p class="mt-1 text-xs text-[#8796AF]">{{ $t('Pengeluaran budget bulan terpilih') }}</p>
+                    <p class="mt-1 text-xs text-[#8796AF]">
+                        {{ $t('Pengeluaran budget bulan terpilih') }} · {{ selectedMonthLabel }}
+                    </p>
                 </div>
             </article>
         </section>
@@ -239,6 +281,7 @@ const monthlyTotals = computed(() => monthlyPlans.value.reduce((totals, { period
                 :create-plan-url="createPlanUrl"
                 :show-plan-url="showPlanUrl"
                 :period-for-selected-month="periodForSelectedMonth"
+                :is-plan-scheduled-for-selected-month="isPlanScheduledForSelectedMonth"
                 :period-usage-percentage="periodUsagePercentage"
                 :format-currency="formatCurrency"
                 :plan-status-label="planStatusLabel"

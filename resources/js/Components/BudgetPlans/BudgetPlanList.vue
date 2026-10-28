@@ -16,6 +16,7 @@ const props = defineProps({
     createPlanUrl: { type: String, required: true },
     showPlanUrl: { type: Function, required: true },
     periodForSelectedMonth: { type: Function, required: true },
+    isPlanScheduledForSelectedMonth: { type: Function, required: true },
     periodUsagePercentage: { type: Function, required: true },
     formatCurrency: { type: Function, required: true },
     planStatusLabel: { type: Function, required: true },
@@ -31,13 +32,17 @@ const planTypeFilter = ref('all');
 const filtersOpen = ref(false);
 const openMenuPlanId = ref(null);
 
+const scheduledPlans = computed(() => props.plans.filter((plan) =>
+    props.isPlanScheduledForSelectedMonth(plan),
+));
+
 const filterCounts = computed(() => ({
-    all: props.plans.length,
-    active: props.plans.filter((plan) => plan.status === 'active').length,
-    completed: props.plans.filter((plan) => ['completed', 'ended'].includes(plan.status)).length,
+    all: scheduledPlans.value.length,
+    active: scheduledPlans.value.filter((plan) => plan.status === 'active').length,
+    completed: scheduledPlans.value.filter((plan) => ['completed', 'ended'].includes(plan.status)).length,
 }));
 
-const visiblePlans = computed(() => props.plans.filter((plan) => {
+const visiblePlans = computed(() => scheduledPlans.value.filter((plan) => {
     const matchesStatus = selectedFilter.value === 'all'
         || (selectedFilter.value === 'active' && plan.status === 'active')
         || (selectedFilter.value === 'completed' && ['completed', 'ended'].includes(plan.status));
@@ -47,7 +52,9 @@ const visiblePlans = computed(() => props.plans.filter((plan) => {
             .toLowerCase()
             .includes(searchTerm.value.toLowerCase());
 
-    return matchesStatus && matchesType && matchesSearch;
+    return matchesStatus
+        && matchesType
+        && matchesSearch;
 }));
 
 const amountForPeriod = (plan) => {
