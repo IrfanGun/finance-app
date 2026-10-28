@@ -26,6 +26,7 @@ import {
     create as createPlanPage,
     show as showPlanPage,
 } from '@/routes/budget-plans';
+import { destroy as destroyBudgetPlan } from '@/routes/cms/budget-plans';
 import {
     claim as claimPeriod,
     close as closePeriod,
@@ -109,6 +110,23 @@ const claimTotal = computed(() => claimParts.value.reduce(
 ));
 const releaseAmount = ref('');
 const actionError = ref('');
+
+const deletePlan = (plan) => {
+    if (!window.confirm(
+        `Hapus budget plan "${plan.name}"? Riwayat transaksi tetap disimpan dan pengingat terkait dihentikan.`,
+    )) {
+        return;
+    }
+
+    actionError.value = '';
+
+    router.delete(destroyBudgetPlan.url(plan.id), {
+        preserveScroll: true,
+        onError: (errors) => {
+            actionError.value = Object.values(errors)[0] ?? 'Budget plan gagal dihapus.';
+        },
+    });
+};
 const showTransactionModal = ref(false);
 const transactionForm = useForm({
     type: 'expense',
@@ -395,19 +413,22 @@ const actOnPeriod = (route, period, data = {}) => {
             :available-currencies="availableCurrencies"
             v-model:selected-currency="selectedCurrency"
             :secondary-currency="secondaryCurrency"
-            :month-label="monthLabel"
             :active-plan-count="activePlanCount"
             :create-plan-url="createPlanUrl"
             :show-plan-url="showPlanUrl"
-            :current-period-for-plan="currentPeriodForPlan"
             :period-usage-percentage="periodUsagePercentage"
             :format-currency="formatCurrency"
             :plan-status-label="planStatusLabel"
             :plan-icon="planIcon"
             :plan-icon-style="planIconStyle"
             @edit="editPlan"
+            @delete="deletePlan"
         />
-        <template v-else>
+        <p
+            v-if="cmsMode && actionError"
+            class="mx-auto max-w-7xl px-6 py-3 text-sm text-red-600"
+        >{{ actionError }}</p>
+        <template v-if="!cmsMode || showCreate || isDetailPage">
         <header
             v-if="!showCreate && !isDetailPage"
             class="grid grid-cols-[52px_1fr_104px] items-center gap-3 px-5 pb-2 pt-6"

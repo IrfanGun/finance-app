@@ -1,5 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
 import loginDf2c2a from './login'
+import budgetPlans from './budget-plans'
+import savings from './savings'
 import transactions from './transactions'
 import recurring from './recurring'
 import categories from './categories'
@@ -8,7 +10,7 @@ import assets from './assets'
 import receipt from './receipt'
 import profile from './profile'
 /**
- * @see routes/web/cms.php:26
+ * @see routes/web/cms.php:28
  * @route '/cms'
  */
 export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -22,7 +24,7 @@ home.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:26
+ * @see routes/web/cms.php:28
  * @route '/cms'
  */
 home.url = (options?: RouteQueryOptions) => {
@@ -30,7 +32,7 @@ home.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web/cms.php:26
+ * @see routes/web/cms.php:28
  * @route '/cms'
  */
 home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -38,7 +40,7 @@ home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:26
+ * @see routes/web/cms.php:28
  * @route '/cms'
  */
 home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -124,7 +126,7 @@ login.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web/cms.php:42
+ * @see routes/web/cms.php:44
  * @route '/cms/dashboard'
  */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -138,7 +140,7 @@ dashboard.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:42
+ * @see routes/web/cms.php:44
  * @route '/cms/dashboard'
  */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -146,7 +148,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web/cms.php:42
+ * @see routes/web/cms.php:44
  * @route '/cms/dashboard'
  */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -154,7 +156,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:42
+ * @see routes/web/cms.php:44
  * @route '/cms/dashboard'
  */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -163,7 +165,7 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web/cms.php:117
+ * @see routes/web/cms.php:147
  * @route '/cms/chat'
  */
 export const chat = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -177,7 +179,7 @@ chat.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:117
+ * @see routes/web/cms.php:147
  * @route '/cms/chat'
  */
 chat.url = (options?: RouteQueryOptions) => {
@@ -185,7 +187,7 @@ chat.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web/cms.php:117
+ * @see routes/web/cms.php:147
  * @route '/cms/chat'
  */
 chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -193,7 +195,7 @@ chat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:117
+ * @see routes/web/cms.php:147
  * @route '/cms/chat'
  */
 chat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -205,6 +207,8 @@ const cms = {
 logout: Object.assign(logout, logout),
 login: Object.assign(login, loginDf2c2a),
 dashboard: Object.assign(dashboard, dashboard),
+budgetPlans: Object.assign(budgetPlans, budgetPlans),
+savings: Object.assign(savings, savings),
 transactions: Object.assign(transactions, transactions),
 recurring: Object.assign(recurring, recurring),
 categories: Object.assign(categories, categories),

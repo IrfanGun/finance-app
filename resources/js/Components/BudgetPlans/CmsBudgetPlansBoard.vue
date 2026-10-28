@@ -23,11 +23,9 @@ const props = defineProps({
     availableCurrencies: { type: Array, default: () => [] },
     selectedCurrency: { type: String, required: true },
     secondaryCurrency: { type: String, default: null },
-    monthLabel: { type: String, required: true },
     activePlanCount: { type: Number, default: 0 },
     createPlanUrl: { type: String, required: true },
     showPlanUrl: { type: Function, required: true },
-    currentPeriodForPlan: { type: Function, required: true },
     periodUsagePercentage: { type: Function, required: true },
     formatCurrency: { type: Function, required: true },
     planStatusLabel: { type: Function, required: true },
@@ -35,13 +33,53 @@ const props = defineProps({
     planIconStyle: { type: Function, required: true },
 });
 
-const emit = defineEmits(['edit', 'update:selectedCurrency']);
+const emit = defineEmits(['edit', 'delete', 'update:selectedCurrency']);
 const selectedFilter = ref('all');
 const viewMode = ref('table');
 const searchTerm = ref('');
 const planTypeFilter = ref('all');
 const filtersOpen = ref(false);
 const openMenuPlanId = ref(null);
+const monthPickerOpen = ref(false);
+const currentCalendarParts = new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'numeric',
+    timeZone: 'Asia/Jakarta',
+}).formatToParts(new Date());
+const currentYear = Number(currentCalendarParts.find((part) => part.type === 'year')?.value);
+const selectedYear = ref(currentYear);
+const selectedMonth = ref(Number(currentCalendarParts.find((part) => part.type === 'month')?.value) - 1);
+
+const monthNames = Array.from({ length: 12 }, (_, month) => new Intl.DateTimeFormat('id-ID', {
+    month: 'long',
+    timeZone: 'UTC',
+}).format(new Date(Date.UTC(2020, month, 1))));
+
+const availableYears = computed(() => {
+    const planYears = props.plans.flatMap((plan) => (plan.periods ?? [])
+        .map((period) => Number(period.starts_on?.slice(0, 4)))
+        .filter((year) => Number.isFinite(year)));
+    const nearbyYears = Array.from({ length: 11 }, (_, index) => currentYear - 5 + index);
+
+    return [...new Set([...planYears, ...nearbyYears])]
+        .sort((firstYear, secondYear) => secondYear - firstYear);
+});
+
+const selectedMonthLabel = computed(() => new Intl.DateTimeFormat('id-ID', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+}).format(new Date(Date.UTC(selectedYear.value, selectedMonth.value, 1))));
+
+const periodForSelectedMonth = (plan) => {
+    const monthStart = `${selectedYear.value}-${String(selectedMonth.value + 1).padStart(2, '0')}-01`;
+    const monthEnd = new Date(Date.UTC(selectedYear.value, selectedMonth.value + 1, 0))
+        .toISOString()
+        .slice(0, 10);
+
+    return plan.periods?.find((period) => period.starts_on <= monthEnd && period.ends_on >= monthStart)
+        ?? null;
+};
 
 const filterCounts = computed(() => ({
     all: props.plans.length,
@@ -64,18 +102,17 @@ const visiblePlans = computed(() => props.plans.filter((plan) => {
 
 const plansAwaitingFunding = computed(() => props.plans.filter((plan) =>
     plan.type === 'spending'
-        && props.currentPeriodForPlan(plan)?.status === 'awaiting_funding',
+        && periodForSelectedMonth(plan)?.status === 'awaiting_funding',
 ));
 
 const monthlyPlans = computed(() => props.plans
     .filter((plan) => plan.type === 'spending'
-        && plan.currency === props.selectedCurrency
-        && ['active', 'paused'].includes(plan.status))
+        && plan.currency === props.selectedCurrency)
     .map((plan) => ({
         plan,
-        period: props.currentPeriodForPlan(plan),
+        period: periodForSelectedMonth(plan),
     }))
-    .filter(({ period }) => period && ['open', 'awaiting_funding'].includes(period.status)));
+    .filter(({ period }) => period));
 
 const monthlyTotals = computed(() => monthlyPlans.value.reduce((totals, { period }) => ({
     allocated: totals.allocated + Number(period.allocated_amount ?? 0),
@@ -94,7 +131,7 @@ const chartDotColor = (index) => [
 ][Math.min(index, 3)];
 
 const amountForPeriod = (plan) => {
-    const period = props.currentPeriodForPlan(plan);
+    const period = periodForSelectedMonth(plan);
 
     if (period) {
         return Number(period.allocated_amount ?? 0);
@@ -105,10 +142,10 @@ const amountForPeriod = (plan) => {
 
 const spentForPlan = (plan) => plan.type === 'goal'
     ? Number(plan.goal_paid ?? 0)
-    : Number(props.currentPeriodForPlan(plan)?.spent ?? 0);
+    : Number(periodForSelectedMonth(plan)?.spent ?? 0);
 
 const usageForPlan = (plan) => props.periodUsagePercentage(
-    props.currentPeriodForPlan(plan) ?? {
+    periodForSelectedMonth(plan) ?? {
         allocated_amount: plan.target_amount,
         spent: plan.goal_funded,
     },
@@ -119,11 +156,11 @@ const remainingForPlan = (plan) => {
         return Number(plan.goal_shortfall ?? 0);
     }
 
-    return Number(props.currentPeriodForPlan(plan)?.remaining ?? 0);
+    return Number(periodForSelectedMonth(plan)?.remaining ?? 0);
 };
 
 const allocationLabel = (plan) => {
-    const period = props.currentPeriodForPlan(plan);
+    const period = periodForSelectedMonth(plan);
 
     if (period?.status === 'awaiting_funding') {
         return 'Belum dialokasikan';
@@ -136,12 +173,12 @@ const amountSummaryForPlan = (plan) => plan.type === 'goal'
     ? `${props.formatCurrency(plan.goal_funded, plan.currency)} / ${props.formatCurrency(plan.target_amount, plan.currency)}`
     : `${props.formatCurrency(spentForPlan(plan), plan.currency)} / ${allocationLabel(plan)}`;
 
-const statusLabel = (plan) => props.currentPeriodForPlan(plan)?.status === 'awaiting_funding'
+const statusLabel = (plan) => periodForSelectedMonth(plan)?.status === 'awaiting_funding'
     ? 'Perlu dana'
     : props.planStatusLabel(plan.status);
 
 const statusClass = (plan) => {
-    if (props.currentPeriodForPlan(plan)?.status === 'awaiting_funding') {
+    if (periodForSelectedMonth(plan)?.status === 'awaiting_funding') {
         return 'bg-[#FFF2D8] text-[#B96B17]';
     }
 
@@ -171,15 +208,51 @@ const closeMenu = () => {
                 </p>
             </div>
             <div class="flex w-full items-center gap-3 sm:w-auto">
-                <ButtonPrimary
-                    type="button"
-                    variant="secondary"
-                    class="!inline-flex !h-11 !min-h-11 !flex-1 !items-center !justify-center !gap-2 !rounded-xl !px-4 !text-sm sm:!flex-none"
+                <div
+                    class="relative min-w-0 flex-1 sm:flex-none"
+                    @keydown.esc.stop="monthPickerOpen = false"
                 >
-                    <CalendarDays :size="17" />
-                    <span class="capitalize">{{ monthLabel }}</span>
-                    <ChevronDown :size="16" class="text-[#687A9B]" />
-                </ButtonPrimary>
+                    <ButtonPrimary
+                        type="button"
+                        variant="secondary"
+                        class="!inline-flex !h-11 !min-h-11 !w-full !items-center !justify-center !gap-2 !rounded-xl !px-4 !text-sm sm:!w-auto"
+                        aria-haspopup="dialog"
+                        :aria-expanded="monthPickerOpen"
+                        @click="monthPickerOpen = !monthPickerOpen"
+                    >
+                        <CalendarDays :size="17" />
+                        <span class="capitalize">{{ selectedMonthLabel }}</span>
+                        <ChevronDown :size="16" class="text-[#687A9B]" />
+                    </ButtonPrimary>
+                    <div
+                        v-if="monthPickerOpen"
+                        class="absolute right-0 top-12 z-20 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-[#E4EAF4] bg-white p-4 shadow-xl"
+                        role="dialog"
+                        :aria-label="$t('Pilih bulan dan tahun')"
+                    >
+                        <label class="mb-3 flex items-center justify-between gap-3 text-sm font-semibold text-[#344563]">
+                            <span>{{ $t('Tahun') }}</span>
+                            <select
+                                v-model.number="selectedYear"
+                                class="h-10 rounded-lg border border-[#DCE4F0] bg-white px-3 text-sm font-semibold text-[#17243A] focus:border-[#2457DA] focus:ring-[#2457DA]"
+                            >
+                                <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                            </select>
+                        </label>
+                        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-[#687A9B]">{{ $t('Bulan') }}</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <ButtonPrimary
+                                v-for="(monthName, monthIndex) in monthNames"
+                                :key="monthName"
+                                type="button"
+                                :variant="selectedMonth === monthIndex ? 'primary' : 'secondary'"
+                                class="!min-h-9 !rounded-lg !px-2 !py-1.5 !text-xs capitalize"
+                                :aria-pressed="selectedMonth === monthIndex"
+                                @click="selectedMonth = monthIndex; monthPickerOpen = false"
+                            >{{ monthName }}</ButtonPrimary>
+                        </div>
+                    </div>
+                </div>
                 <div
                     v-if="availableCurrencies.length > 1"
                     class="flex h-11 min-w-28 flex-1 items-center justify-center gap-1 rounded-xl border border-[#DCE4F0] bg-white p-1 sm:flex-none"
@@ -240,7 +313,7 @@ const closeMenu = () => {
                     <p class="mt-1 truncate text-2xl font-bold tracking-tight text-[#111B39] sm:text-3xl">
                         {{ formatCurrency(monthlyTotals.allocated, selectedCurrency) }}
                     </p>
-                    <p class="mt-1 text-xs text-[#8796AF]">{{ $t('Alokasi bulan ini') }}</p>
+                    <p class="mt-1 text-xs text-[#8796AF]">{{ $t('Alokasi bulan terpilih') }}</p>
                 </div>
             </article>
 
@@ -253,7 +326,7 @@ const closeMenu = () => {
                     <p class="mt-1 truncate text-2xl font-bold tracking-tight text-[#111B39] sm:text-3xl">
                         {{ formatCurrency(monthlyTotals.spent, selectedCurrency) }}
                     </p>
-                    <p class="mt-1 text-xs text-[#8796AF]">{{ $t('Pengeluaran budget bulan ini') }}</p>
+                    <p class="mt-1 text-xs text-[#8796AF]">{{ $t('Pengeluaran budget bulan terpilih') }}</p>
                 </div>
             </article>
         </section>
@@ -400,9 +473,9 @@ const closeMenu = () => {
                                 <td class="px-3 py-3">
                                     <span
                                         class="block text-sm font-medium"
-                                        :class="props.currentPeriodForPlan(plan)?.status === 'awaiting_funding' ? 'text-[#A64F0A]' : 'text-[#26354C]'"
+                                        :class="periodForSelectedMonth(plan)?.status === 'awaiting_funding' ? 'text-[#A64F0A]' : 'text-[#26354C]'"
                                     >{{ allocationLabel(plan) }}</span>
-                                    <span v-if="props.currentPeriodForPlan(plan)?.status === 'awaiting_funding'" class="mt-0.5 block text-xs text-[#8796AF]">
+                                    <span v-if="periodForSelectedMonth(plan)?.status === 'awaiting_funding'" class="mt-0.5 block text-xs text-[#8796AF]">
                                         {{ $t('Setel alokasi') }}
                                     </span>
                                 </td>
@@ -414,11 +487,11 @@ const closeMenu = () => {
                                         <div class="h-2 min-w-20 flex-1 overflow-hidden rounded-full bg-[#E5EBF4]">
                                             <div
                                                 class="h-full rounded-full bg-gradient-to-r from-[#1680F8] to-[#2457DA]"
-                                                :style="{ width: `${periodUsagePercentage(props.currentPeriodForPlan(plan) ?? { allocated_amount: plan.target_amount, spent: plan.goal_funded })}%` }"
+                                                :style="{ width: `${periodUsagePercentage(periodForSelectedMonth(plan) ?? { allocated_amount: plan.target_amount, spent: plan.goal_funded })}%` }"
                                             />
                                         </div>
                                         <span class="w-8 text-right text-xs text-[#687A9B]">
-                                            {{ Math.round(periodUsagePercentage(props.currentPeriodForPlan(plan) ?? { allocated_amount: plan.target_amount, spent: plan.goal_funded })) }}%
+                                            {{ Math.round(periodUsagePercentage(periodForSelectedMonth(plan) ?? { allocated_amount: plan.target_amount, spent: plan.goal_funded })) }}%
                                         </span>
                                     </div>
                                 </td>
@@ -454,6 +527,12 @@ const closeMenu = () => {
                                             class="!min-h-0 !w-full !rounded-lg !border-0 !px-3 !py-2 !text-left !text-sm !font-normal"
                                             @click="emit('edit', plan); closeMenu()"
                                         >{{ $t('Edit budget') }}</ButtonPrimary>
+                                        <ButtonPrimary
+                                            type="button"
+                                            variant="secondary"
+                                            class="!min-h-0 !w-full !rounded-lg !border-0 !px-3 !py-2 !text-left !text-sm !font-normal !text-red-600"
+                                            @click="emit('delete', plan); closeMenu()"
+                                        >{{ $t('Hapus budget') }}</ButtonPrimary>
                                     </div>
                                 </td>
                             </tr>
@@ -462,52 +541,83 @@ const closeMenu = () => {
                 </div>
 
                 <div v-else class="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
-                    <Link
+                    <div
                         v-for="plan in visiblePlans"
                         :key="`card-${plan.id}`"
-                        :href="showPlanUrl(plan.id)"
-                        class="flex min-h-[190px] flex-col gap-3 rounded-xl border border-[#E4EAF4] bg-white p-4 transition hover:border-[#BBD2F8] hover:bg-[#FCFDFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2457DA]"
+                        class="relative min-h-[190px] rounded-xl border border-[#E4EAF4] bg-white p-4 transition hover:border-[#BBD2F8] hover:bg-[#FCFDFF]"
                     >
-                        <div class="flex items-start gap-3">
-                            <div class="flex min-w-0 flex-1 items-center gap-3">
-                                <span
-                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white"
-                                    :style="planIconStyle(plan.color)"
-                                >
-                                    <component :is="planIcon(plan.icon)" :size="19" />
-                                </span>
-                                <span class="min-w-0">
-                                    <span class="block truncate text-sm font-semibold text-[#17243A]">{{ plan.name }}</span>
-                                    <span class="mt-0.5 block truncate text-xs text-[#687A9B]">
-                                        {{ plan.items?.map((item) => item.name).join(', ') || (plan.type === 'goal' ? $t('Target tabungan') : $t('Anggaran belanja')) }}
+                        <Link
+                            :href="showPlanUrl(plan.id)"
+                            class="flex min-h-[158px] flex-col gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2457DA]"
+                        >
+                            <div class="flex items-start gap-3 pr-10">
+                                <div class="flex min-w-0 flex-1 items-center gap-3">
+                                    <span
+                                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white"
+                                        :style="planIconStyle(plan.color)"
+                                    >
+                                        <component :is="planIcon(plan.icon)" :size="19" />
                                     </span>
+                                    <span class="min-w-0">
+                                        <span class="block truncate text-sm font-semibold text-[#17243A]">{{ plan.name }}</span>
+                                        <span class="mt-0.5 block truncate text-xs text-[#687A9B]">
+                                            {{ plan.items?.map((item) => item.name).join(', ') || (plan.type === 'goal' ? $t('Target tabungan') : $t('Anggaran belanja')) }}
+                                        </span>
+                                        <span class="mt-2 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold" :class="statusClass(plan)">
+                                            {{ $t(statusLabel(plan)) }}
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <p class="text-base font-semibold tracking-tight text-[#111B39]">
+                                    {{ amountSummaryForPlan(plan) }}
+                                </p>
+                                <div class="mt-2 h-2.5 overflow-hidden rounded-full bg-[#E5EBF4]">
+                                    <div
+                                        class="h-full rounded-full bg-gradient-to-r from-[#1680F8] to-[#2457DA]"
+                                        :style="{ width: `${usageForPlan(plan)}%` }"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3 border-t border-[#EEF1F5] pt-2.5 text-xs">
+                                <span class="text-[#687A9B]">
+                                    {{ $t('Sisa') }}
+                                    <strong class="ml-1 font-semibold text-[#243451]">{{ formatCurrency(remainingForPlan(plan), plan.currency) }}</strong>
                                 </span>
+                                <ArrowRight :size="16" class="text-[#1768EB]" />
                             </div>
-                            <span class="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[11px] font-semibold" :class="statusClass(plan)">
-                                {{ $t(statusLabel(plan)) }}
-                            </span>
+                        </Link>
+                        <ButtonPrimary
+                            type="button"
+                            variant="secondary"
+                            class="!absolute !right-3 !top-3 !flex !h-9 !min-h-9 !w-9 !items-center !justify-center !rounded-lg !border-0 !p-0 !text-[#687A9B]"
+                            :aria-label="`${$t('Aksi untuk')} ${plan.name}`"
+                            :aria-expanded="openMenuPlanId === plan.id"
+                            @click="openMenuPlanId = openMenuPlanId === plan.id ? null : plan.id"
+                        >
+                            <Ellipsis :size="19" />
+                        </ButtonPrimary>
+                        <div
+                            v-if="openMenuPlanId === plan.id"
+                            class="absolute right-3 top-12 z-10 w-44 rounded-xl border border-[#E4EAF4] bg-white p-1.5 text-left shadow-xl"
+                        >
+                            <ButtonPrimary
+                                type="button"
+                                variant="secondary"
+                                class="!min-h-0 !w-full !rounded-lg !border-0 !px-3 !py-2 !text-left !text-sm !font-normal"
+                                @click="emit('edit', plan); closeMenu()"
+                            >{{ $t('Edit budget') }}</ButtonPrimary>
+                            <ButtonPrimary
+                                type="button"
+                                variant="secondary"
+                                class="!min-h-0 !w-full !rounded-lg !border-0 !px-3 !py-2 !text-left !text-sm !font-normal !text-red-600"
+                                @click="emit('delete', plan); closeMenu()"
+                            >{{ $t('Hapus budget') }}</ButtonPrimary>
                         </div>
-
-                        <div class="mt-auto">
-                            <p class="text-base font-semibold tracking-tight text-[#111B39]">
-                                {{ amountSummaryForPlan(plan) }}
-                            </p>
-                            <div class="mt-2 h-2.5 overflow-hidden rounded-full bg-[#E5EBF4]">
-                                <div
-                                    class="h-full rounded-full bg-gradient-to-r from-[#1680F8] to-[#2457DA]"
-                                    :style="{ width: `${usageForPlan(plan)}%` }"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between gap-3 border-t border-[#EEF1F5] pt-2.5 text-xs">
-                            <span class="text-[#687A9B]">
-                                {{ $t('Sisa') }}
-                                <strong class="ml-1 font-semibold text-[#243451]">{{ formatCurrency(remainingForPlan(plan), plan.currency) }}</strong>
-                            </span>
-                            <ArrowRight :size="16" class="text-[#1768EB]" />
-                        </div>
-                    </Link>
+                    </div>
 
                     <Link
                         :href="createPlanUrl"
@@ -531,8 +641,8 @@ const closeMenu = () => {
 
             <aside class="space-y-4 rounded-2xl border border-[#E4EAF4] bg-white p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-xl font-semibold tracking-tight text-[#111B39]">{{ $t('Ringkasan bulan ini') }}</h2>
-                    <span class="rounded-lg bg-[#F4F7FB] px-2.5 py-1 text-xs font-medium capitalize text-[#687A9B]">{{ monthLabel }}</span>
+                    <h2 class="text-xl font-semibold tracking-tight text-[#111B39]">{{ $t('Ringkasan budget') }}</h2>
+                    <span class="rounded-lg bg-[#F4F7FB] px-2.5 py-1 text-xs font-medium capitalize text-[#687A9B]">{{ selectedMonthLabel }}</span>
                 </div>
 
                 <section class="border-b border-[#E9EEF5] pb-4">

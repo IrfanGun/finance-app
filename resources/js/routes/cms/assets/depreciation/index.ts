@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
- * @see routes/web/cms.php:108
+ * @see routes/web/cms.php:138
  * @route '/cms/assets/{asset}/depreciation-logs'
  */
 export const logs = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ logs.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:108
+ * @see routes/web/cms.php:138
  * @route '/cms/assets/{asset}/depreciation-logs'
  */
 logs.url = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -41,7 +41,7 @@ logs.url = (args: { asset: string | number } | [asset: string | number ] | strin
 }
 
 /**
- * @see routes/web/cms.php:108
+ * @see routes/web/cms.php:138
  * @route '/cms/assets/{asset}/depreciation-logs'
  */
 logs.get = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -49,7 +49,7 @@ logs.get = (args: { asset: string | number } | [asset: string | number ] | strin
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:108
+ * @see routes/web/cms.php:138
  * @route '/cms/assets/{asset}/depreciation-logs'
  */
 logs.head = (args: { asset: string | number } | [asset: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

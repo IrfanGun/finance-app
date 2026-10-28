@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
- * @see routes/web/cms.php:58
+ * @see routes/web/cms.php:88
  * @route '/cms/categories'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ index.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:58
+ * @see routes/web/cms.php:88
  * @route '/cms/categories'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ index.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web/cms.php:58
+ * @see routes/web/cms.php:88
  * @route '/cms/categories'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -30,7 +30,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:58
+ * @see routes/web/cms.php:88
  * @route '/cms/categories'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -39,7 +39,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
- * @see routes/web/cms.php:66
+ * @see routes/web/cms.php:96
  * @route '/cms/categories/{category}'
  */
 export const show = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -53,7 +53,7 @@ show.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:66
+ * @see routes/web/cms.php:96
  * @route '/cms/categories/{category}'
  */
 show.url = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -85,7 +85,7 @@ show.url = (args: { category: number | { id: number } } | [category: number | { 
 }
 
 /**
- * @see routes/web/cms.php:66
+ * @see routes/web/cms.php:96
  * @route '/cms/categories/{category}'
  */
 show.get = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -93,7 +93,7 @@ show.get = (args: { category: number | { id: number } } | [category: number | { 
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:66
+ * @see routes/web/cms.php:96
  * @route '/cms/categories/{category}'
  */
 show.head = (args: { category: number | { id: number } } | [category: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\SavingController::reverse
- * @see app/Http/Controllers/SavingController.php:246
+ * @see app/Http/Controllers/SavingController.php:253
  * @route '/saving-logs/{log}/reverse'
  */
 export const reverse = (args: { log: string | number } | [log: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ reverse.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::reverse
- * @see app/Http/Controllers/SavingController.php:246
+ * @see app/Http/Controllers/SavingController.php:253
  * @route '/saving-logs/{log}/reverse'
  */
 reverse.url = (args: { log: string | number } | [log: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -44,7 +44,7 @@ reverse.url = (args: { log: string | number } | [log: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\SavingController::reverse
- * @see app/Http/Controllers/SavingController.php:246
+ * @see app/Http/Controllers/SavingController.php:253
  * @route '/saving-logs/{log}/reverse'
  */
 reverse.post = (args: { log: string | number } | [log: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\BudgetPlanController::reverse
- * @see app/Http/Controllers/BudgetPlanController.php:220
+ * @see app/Http/Controllers/BudgetPlanController.php:233
  * @route '/budget-claims/{claim}/reverse'
  */
 export const reverse = (args: { claim: string | number } | [claim: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ reverse.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::reverse
- * @see app/Http/Controllers/BudgetPlanController.php:220
+ * @see app/Http/Controllers/BudgetPlanController.php:233
  * @route '/budget-claims/{claim}/reverse'
  */
 reverse.url = (args: { claim: string | number } | [claim: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -44,7 +44,7 @@ reverse.url = (args: { claim: string | number } | [claim: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::reverse
- * @see app/Http/Controllers/BudgetPlanController.php:220
+ * @see app/Http/Controllers/BudgetPlanController.php:233
  * @route '/budget-claims/{claim}/reverse'
  */
 reverse.post = (args: { claim: string | number } | [claim: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

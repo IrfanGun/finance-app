@@ -55,6 +55,10 @@ Route::prefix('cms')
             Route::get('budget-plans', [BudgetPlanController::class, 'index'])
                 ->name('budget-plans.index');
 
+            Route::delete('budget-plans/{plan}', [BudgetPlanController::class, 'destroy'])
+                ->whereNumber('plan')
+                ->name('budget-plans.destroy');
+
             Route::get('budget-plans/{plan}', [BudgetPlanController::class, 'show'])
                 ->whereNumber('plan')
                 ->name('budget-plans.show');

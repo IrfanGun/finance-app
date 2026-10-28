@@ -167,6 +167,13 @@ class BudgetPlanController extends Controller
         return back();
     }
 
+    public function destroy(Request $request, int $plan, FundService $funds): RedirectResponse
+    {
+        $funds->deletePlan($request->user(), $plan);
+
+        return redirect()->route('cms.budget-plans.index');
+    }
+
     public function status(Request $request, int $plan, FundService $funds): RedirectResponse
     {
         $data = $request->validate([

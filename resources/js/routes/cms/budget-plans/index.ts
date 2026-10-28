@@ -86,6 +86,59 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
+* @see \App\Http\Controllers\BudgetPlanController::destroy
+ * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @route '/cms/budget-plans/{plan}'
+ */
+export const destroy = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+destroy.definition = {
+    methods: ["delete"],
+    url: '/cms/budget-plans/{plan}',
+} satisfies RouteDefinition<["delete"]>
+
+/**
+* @see \App\Http\Controllers\BudgetPlanController::destroy
+ * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @route '/cms/budget-plans/{plan}'
+ */
+destroy.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { plan: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    plan: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        plan: args.plan,
+                }
+
+    return destroy.definition.url
+            .replace('{plan}', parsedArgs.plan.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\BudgetPlanController::destroy
+ * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @route '/cms/budget-plans/{plan}'
+ */
+destroy.delete = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+/**
 * @see \App\Http\Controllers\BudgetPlanController::show
  * @see app/Http/Controllers/BudgetPlanController.php:139
  * @route '/cms/budget-plans/{plan}'
@@ -149,6 +202,7 @@ show.head = (args: { plan: string | number } | [plan: string | number ] | string
 const budgetPlans = {
     create: Object.assign(create, create),
 index: Object.assign(index, index),
+destroy: Object.assign(destroy, destroy),
 show: Object.assign(show, show),
 }
 

@@ -238,6 +238,46 @@ class FundService
         }, attempts: 3);
     }
 
+    public function deletePlan(User $user, int $planId): void
+    {
+        DB::transaction(function () use ($user, $planId): void {
+            $plan = $user->budgetPlans()
+                ->lockForUpdate()
+                ->findOrFail($planId);
+            $periodIds = $plan->periods()
+                ->lockForUpdate()
+                ->pluck('id');
+
+            DB::table('transactions')
+                ->where('budget_plan_id', $plan->id)
+                ->update([
+                    'budget_plan_id' => null,
+                    'budget_period_id' => null,
+                ]);
+            DB::table('transactions')
+                ->whereIn('budget_period_id', $periodIds)
+                ->update(['budget_period_id' => null]);
+            BudgetSavingsClaim::query()
+                ->whereIn('budget_period_id', $periodIds)
+                ->update(['budget_period_id' => null]);
+            SavingLog::query()
+                ->whereIn('budget_period_id', $periodIds)
+                ->update(['budget_period_id' => null]);
+            RecurringReminderLog::query()
+                ->whereIn('budget_period_id', $periodIds)
+                ->update(['budget_period_id' => null]);
+            $user->recurringReminders()
+                ->where('budget_plan_id', $plan->id)
+                ->update([
+                    'budget_plan_id' => null,
+                    'status' => 'ended',
+                ]);
+
+            $plan->periods()->delete();
+            $plan->delete();
+        }, attempts: 3);
+    }
+
     public function changePlanStatus(User $user, BudgetPlan $plan, string $status): void
     {
         DB::transaction(function () use ($user, $plan, $status): void {
