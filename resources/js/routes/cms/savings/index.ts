@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:42
+ * @see app/Http/Controllers/SavingController.php:43
  * @route '/cms/savings/create'
  */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:42
+ * @see app/Http/Controllers/SavingController.php:43
  * @route '/cms/savings/create'
  */
 create.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:42
+ * @see app/Http/Controllers/SavingController.php:43
  * @route '/cms/savings/create'
  */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:42
+ * @see app/Http/Controllers/SavingController.php:43
  * @route '/cms/savings/create'
  */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:19
+ * @see app/Http/Controllers/SavingController.php:20
  * @route '/cms/savings'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:19
+ * @see app/Http/Controllers/SavingController.php:20
  * @route '/cms/savings'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:19
+ * @see app/Http/Controllers/SavingController.php:20
  * @route '/cms/savings'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -77,7 +77,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:19
+ * @see app/Http/Controllers/SavingController.php:20
  * @route '/cms/savings'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -87,7 +87,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:68
+ * @see app/Http/Controllers/SavingController.php:69
  * @route '/cms/savings/{saving}/manage'
  */
 export const manage = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -102,7 +102,7 @@ manage.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:68
+ * @see app/Http/Controllers/SavingController.php:69
  * @route '/cms/savings/{saving}/manage'
  */
 manage.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ manage.url = (args: { saving: string | number } | [saving: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:68
+ * @see app/Http/Controllers/SavingController.php:69
  * @route '/cms/savings/{saving}/manage'
  */
 manage.get = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -139,7 +139,7 @@ manage.get = (args: { saving: string | number } | [saving: string | number ] | s
 })
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:68
+ * @see app/Http/Controllers/SavingController.php:69
  * @route '/cms/savings/{saving}/manage'
  */
 manage.head = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -149,7 +149,7 @@ manage.head = (args: { saving: string | number } | [saving: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:47
+ * @see app/Http/Controllers/SavingController.php:48
  * @route '/cms/savings/{saving}'
  */
 export const show = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -164,7 +164,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:47
+ * @see app/Http/Controllers/SavingController.php:48
  * @route '/cms/savings/{saving}'
  */
 show.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -192,7 +192,7 @@ show.url = (args: { saving: string | number } | [saving: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:47
+ * @see app/Http/Controllers/SavingController.php:48
  * @route '/cms/savings/{saving}'
  */
 show.get = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -201,7 +201,7 @@ show.get = (args: { saving: string | number } | [saving: string | number ] | str
 })
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:47
+ * @see app/Http/Controllers/SavingController.php:48
  * @route '/cms/savings/{saving}'
  */
 show.head = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

@@ -1,10 +1,15 @@
 <script setup>
 import { getSavingCurrencies } from '@/Features/Savings/lib/saving';
+import {
+    savingColorOptions,
+    savingIconOptions,
+} from '@/Features/Savings/lib/savingAppearance';
 
 const props = defineProps({
     form: { type: Object, required: true },
     accounts: { type: Array, default: () => [] },
     step: { type: Number, required: true },
+    appearanceEnabled: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:step', 'submit']);
@@ -54,6 +59,45 @@ const goToGoalDetails = () => {
                     </option>
                 </select>
             </label>
+            <div v-if="appearanceEnabled" class="flex flex-col gap-2">
+                <span class="text-sm font-medium">Ikon</span>
+                <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Pilih ikon tabungan">
+                    <button
+                        v-for="icon in savingIconOptions"
+                        :key="icon.value"
+                        type="button"
+                        role="radio"
+                        :aria-label="icon.label"
+                        :aria-checked="form.icon === icon.value"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl border transition"
+                        :class="form.icon === icon.value
+                            ? 'border-[#2457DA] bg-[#EDF4FF] text-[#2457DA] ring-2 ring-[#2457DA]/20'
+                            : 'border-[#DCE3EE] bg-white text-[#637083] hover:border-[#A9BCE9]'"
+                        @click="form.icon = icon.value"
+                    >
+                        <component :is="icon.component" :size="19" />
+                    </button>
+                </div>
+            </div>
+            <div v-if="appearanceEnabled" class="flex flex-col gap-2">
+                <span class="text-sm font-medium">Warna</span>
+                <div class="flex flex-wrap gap-3" role="radiogroup" aria-label="Pilih warna tabungan">
+                    <button
+                        v-for="color in savingColorOptions"
+                        :key="color.value"
+                        type="button"
+                        role="radio"
+                        :aria-label="color.label"
+                        :aria-checked="form.color === color.value"
+                        class="flex h-9 w-9 items-center justify-center rounded-full ring-offset-2 transition"
+                        :class="form.color === color.value ? 'ring-2 ring-[#14213A]' : 'hover:scale-105'"
+                        :style="{ backgroundImage: color.gradient }"
+                        @click="form.color = color.value"
+                    >
+                        <span v-if="form.color === color.value" class="sr-only">Dipilih</span>
+                    </button>
+                </div>
+            </div>
             <p v-if="form.errors.name || form.errors.currency" class="text-sm text-red-600">
                 {{ form.errors.name || form.errors.currency }}
             </p>

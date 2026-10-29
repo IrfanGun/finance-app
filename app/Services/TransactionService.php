@@ -6,6 +6,7 @@ use App\Models\BudgetPeriod;
 use App\Models\BudgetPlan;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -132,7 +133,10 @@ class TransactionService
                     'transaction_id' => $transaction->id,
                     'operation_id' => (string) Str::uuid(),
                     'idempotency_key' => 'expense:'.$transaction->id,
-                    'occurred_at' => now('UTC'),
+                    'occurred_at' => CarbonImmutable::parse($transaction->date, 'Asia/Jakarta')
+                        ->startOfDay()
+                        ->utc(),
+                    'notes' => $transaction->note,
                 ]);
             }
 

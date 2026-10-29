@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue';
+import { Eye, EyeOff } from 'lucide-vue-next';
 import InputError from '@/Components/InputError.vue';
 import { store as login } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import { create as forgotPassword } from '@/actions/App/Http/Controllers/Auth/PasswordResetLinkController';
@@ -9,6 +11,7 @@ import { useTranslation } from '@/Composables/useTranslation';
 defineProps({ canResetPassword: { type: Boolean }, status: { type: String } });
 const { t } = useTranslation();
 const form = useForm({ email: '', password: '', remember: false });
+const showPassword = ref(false);
 const submit = () => form.post(login.url(), { onFinish: () => form.reset('password') });
 </script>
 
@@ -27,7 +30,33 @@ const submit = () => form.post(login.url(), { onFinish: () => form.reset('passwo
                 <div v-if="status" class="mt-6 text-sm font-medium text-green-600">{{ status }}</div>
                 <form class="mt-9 flex flex-col gap-6" @submit.prevent="submit">
                     <div class="flex flex-col gap-2"><label for="email" class="text-base text-slate-800">{{ t('Email address') }}</label><input id="email" v-model="form.email" type="email" name="email" placeholder="you@example.com" required autofocus autocomplete="username" class="h-[42px] rounded-lg border border-slate-300 px-4 text-base text-slate-900 outline-none transition placeholder:text-slate-700 focus:border-blue-600 focus:ring-2 focus:ring-blue-100" /><InputError :message="form.errors.email" /></div>
-                    <div class="flex flex-col gap-2"><label for="password" class="text-base text-slate-800">{{ t('Password') }}</label><input id="password" v-model="form.password" type="password" name="password" :placeholder="t('Enter your password')" required autocomplete="current-password" class="h-[42px] rounded-lg border border-slate-300 px-4 text-base text-slate-900 outline-none transition placeholder:text-slate-700 focus:border-blue-600 focus:ring-2 focus:ring-blue-100" /><InputError :message="form.errors.password" /></div>
+                    <div class="flex flex-col gap-2">
+                        <label for="password" class="text-base text-slate-800">{{ t('Password') }}</label>
+                        <div class="relative">
+                            <input
+                                id="password"
+                                v-model="form.password"
+                                :type="showPassword ? 'text' : 'password'"
+                                name="password"
+                                :placeholder="t('Enter your password')"
+                                required
+                                autocomplete="current-password"
+                                class="h-[42px] w-full rounded-lg border border-slate-300 px-4 pr-12 text-base text-slate-900 outline-none transition placeholder:text-slate-700 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                            />
+                            <ButtonPrimary
+                                type="button"
+                                variant="secondary"
+                                class="absolute right-2 top-1/2 !min-h-0 !-translate-y-1/2 !rounded-md !border-0 !bg-transparent !p-2 !text-slate-500 !shadow-none hover:!bg-slate-100 hover:!text-slate-800"
+                                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                :aria-pressed="showPassword"
+                                @click="showPassword = !showPassword"
+                            >
+                                <EyeOff v-if="showPassword" :size="18" />
+                                <Eye v-else :size="18" />
+                            </ButtonPrimary>
+                        </div>
+                        <InputError :message="form.errors.password" />
+                    </div>
                     <label class="-mt-3 flex items-center gap-2 text-sm text-slate-600">
                         <input v-model="form.remember" type="checkbox" name="remember" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
                         {{ t('Remember me') }}

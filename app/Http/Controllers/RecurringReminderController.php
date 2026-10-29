@@ -69,6 +69,10 @@ class RecurringReminderController extends Controller
     ): RedirectResponse {
         $reminders->create($request->user(), $request->validated());
 
+        if ($this->cameFromCms($request)) {
+            return back()->with('success', 'Pengingat tabungan berhasil dibuat.');
+        }
+
         return redirect()->route('recurring-reminders.index')
             ->with('success', 'Pengingat berulang berhasil dibuat.');
     }
@@ -80,6 +84,10 @@ class RecurringReminderController extends Controller
     ): RedirectResponse {
         $record = $request->user()->recurringReminders()->findOrFail($reminder);
         $reminders->update($record, $request->validated());
+
+        if ($this->cameFromCms($request)) {
+            return back()->with('success', 'Pengingat berhasil diperbarui.');
+        }
 
         return redirect()->route('recurring-reminders.index')
             ->with('success', 'Pengingat berhasil diperbarui.');
@@ -249,6 +257,13 @@ class RecurringReminderController extends Controller
         }, attempts: 3);
 
         return back();
+    }
+
+    private function cameFromCms(Request $request): bool
+    {
+        $refererPath = parse_url($request->header('referer', ''), PHP_URL_PATH);
+
+        return is_string($refererPath) && str_starts_with($refererPath, '/cms/');
     }
 
     /**

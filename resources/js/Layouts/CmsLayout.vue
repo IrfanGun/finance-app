@@ -5,6 +5,7 @@ import { index as recurringRemindersIndex } from '@/routes/cms/recurring';
 import { index as budgetPlansIndex } from '@/routes/cms/budget-plans';
 import { index as savingsIndex } from '@/routes/cms/savings';
 import { useTranslation } from '@/Composables/useTranslation';
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import {
     ChartNoAxesCombined,
     Bell,
@@ -26,6 +27,7 @@ const page = usePage();
 const { t } = useTranslation();
 const user = computed(() => page.props.auth?.user);
 const currentPath = computed(() => page.url.split('?')[0]);
+const isSavingsIndex = computed(() => currentPath.value === '/cms/savings');
 const isSidebarCollapsed = ref(false);
 const isMobileSidebarOpen = ref(false);
 
@@ -176,12 +178,18 @@ const navigation = [
                             <PanelLeftOpen v-if="isSidebarCollapsed" :size="20" />
                             <PanelLeftClose v-else :size="20" />
                         </button>
-                        <div>
+                        <div v-if="isSavingsIndex" class="flex items-center gap-2 text-sm">
+                            <span class="text-[#64748B]">Keuangan pribadi</span>
+                            <span class="text-[#AAB4C2]">/</span>
+                            <span class="font-semibold text-[#1764F5]">Tabungan</span>
+                        </div>
+                        <div v-else>
                             <p class="text-xs text-[#98A2B3]">{{ t('Personal finance workspace') }}</p>
                             <p class="mt-1 text-sm font-semibold">{{ user.name }}</p>
                         </div>
                     </div>
-                    <Link href="/cms/profile" class="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF3FF] text-sm font-semibold text-[#2457DA]" :aria-label="`Open ${user.name}'s profile`">
+                    <LanguageSwitcher v-if="isSavingsIndex" :floating="false" />
+                    <Link v-else href="/cms/profile" class="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF3FF] text-sm font-semibold text-[#2457DA]" :aria-label="`Open ${user.name}'s profile`">
                         {{ user.name.slice(0, 2).toUpperCase() }}
                     </Link>
                 </header>

@@ -24,7 +24,12 @@ class FundService
 
     public function createSaving(User $user, array $data): Saving
     {
-        return $user->savings()->create($data + ['status' => 'active']);
+        return $user->savings()->create([
+            'icon' => 'piggy-bank',
+            'color' => 'blue',
+            ...$data,
+            'status' => 'active',
+        ]);
     }
 
     public function createPlan(User $user, array $data): BudgetPlan
@@ -554,8 +559,10 @@ class FundService
         string $key,
         ?BudgetPeriod $period = null,
         ?int $reminderLogId = null,
+        ?CarbonImmutable $occurredAt = null,
+        ?string $notes = null,
     ): void {
-        DB::transaction(function () use ($user, $saving, $account, $amount, $key, $period, $reminderLogId): void {
+        DB::transaction(function () use ($user, $saving, $account, $amount, $key, $period, $reminderLogId, $occurredAt, $notes): void {
             $lockedAccount = $user->financialAccounts()
                 ->whereKey($account->id)
                 ->lockForUpdate()
@@ -598,7 +605,16 @@ class FundService
             $operationId = $this->operation(
                 $user,
                 $key,
-                ['allocate', $saving->id, $account->id, $amount, $period?->id, $reminderLogId],
+                [
+                    'allocate',
+                    $saving->id,
+                    $account->id,
+                    $amount,
+                    $period?->id,
+                    $reminderLogId,
+                    $occurredAt?->toIso8601String(),
+                    $notes,
+                ],
             );
 
             if ($operationId === null) {
@@ -617,7 +633,8 @@ class FundService
                 'budget_period_id' => $lockedPeriod?->id,
                 'operation_id' => $operationId,
                 'idempotency_key' => $key,
-                'occurred_at' => now('UTC'),
+                'occurred_at' => $occurredAt ?? now('UTC'),
+                'notes' => $notes,
             ]);
 
             if ($lockedPeriod !== null) {

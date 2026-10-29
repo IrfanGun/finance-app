@@ -7,6 +7,7 @@ use App\Models\Saving;
 use App\Models\SavingLog;
 use App\Services\FundBalanceService;
 use App\Services\FundService;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -88,7 +89,7 @@ class SavingController extends Controller
             ->with([
                 'goalPlan.periods',
                 'logs' => fn ($query) => $query
-                    ->with('reversal')
+                    ->with(['reversal', 'account'])
                     ->when(
                         isset($filters['source']),
                         fn ($query) => $query->where('reason', $filters['source']),
@@ -124,13 +125,65 @@ class SavingController extends Controller
                 ];
             });
 
+        $reminders = $managedSavingId === null
+            ? collect()
+            : $user->recurringReminders()
+                ->where('purpose', 'saving_allocation')
+                ->where('saving_id', $managedSavingId)
+                ->whereIn('status', ['active', 'paused'])
+                ->latest('updated_at')
+                ->get()
+                ->map(fn ($reminder): array => [
+                    'id' => $reminder->id,
+                    'saving_id' => $reminder->saving_id,
+                    'title' => $reminder->title,
+                    'amount' => $reminder->amount,
+                    'frequency' => $reminder->frequency,
+                    'interval' => $reminder->interval,
+                    'starts_at' => $reminder->starts_at
+                        ->setTimezone($reminder->timezone)
+                        ->format('Y-m-d\\TH:i'),
+                    'next_reminder_at' => $reminder->next_reminder_at?->toIso8601String(),
+                    'timezone' => $reminder->timezone,
+                    'status' => $reminder->status,
+                ])
+                ->values();
+        $managedSaving = $managedSavingId === null
+            ? null
+            : $user->savings()->find($managedSavingId);
+        $accounts = $user->financialAccounts()
+            ->orderBy('name')
+            ->get($managedSaving === null
+                ? ['id', 'name', 'currency']
+                : ['id', 'name', 'currency', 'type', 'opening_balance']);
+
+        if ($managedSaving !== null) {
+            $accounts = $accounts
+                ->map(fn ($account): array => [
+                    'id' => $account->id,
+                    'name' => $account->name,
+                    'currency' => $account->currencyCode(),
+                    'available_balance' => $balances->free($account),
+                    'saving_balance' => $balances->savingBalance($managedSaving, $account->id),
+                ])
+                ->values();
+        }
+
         return Inertia::render('Savings/Index', [
             'cmsMode' => $request->is('cms/*'),
             'createMode' => $createMode,
             'manageMode' => $manageMode,
             'managedSavingId' => $managedSavingId,
             'savings' => $savings,
-            'accounts' => $user->financialAccounts()->orderBy('name')->get(['id', 'name', 'currency']),
+            'reminders' => $reminders,
+            'accounts' => $accounts,
+            'categories' => $managedSavingId === null
+                ? collect()
+                : $user->categories()
+                    ->where('is_active', true)
+                    ->where('type', 'expense')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'type']),
             'totals' => $balances->totalsFor($user),
             'historyFilters' => $filters,
             'periodOptions' => $user->budgetPlans()
@@ -191,6 +244,8 @@ class SavingController extends Controller
         $data = $request->validate([
             'account_id' => ['required', 'integer'],
             'amount' => ['required', 'numeric', 'gt:0', 'decimal:0,2'],
+            'date' => ['nullable', 'date'],
+            'notes' => ['nullable', 'string', 'max:1000'],
             'budget_period_id' => ['nullable', 'integer'],
             'reminder_log_id' => ['nullable', 'integer'],
             'idempotency_key' => ['required', 'uuid'],
@@ -208,6 +263,10 @@ class SavingController extends Controller
             $data['idempotency_key'],
             $period,
             $data['reminder_log_id'] ?? null,
+            isset($data['date'])
+                ? CarbonImmutable::parse($data['date'], 'Asia/Jakarta')->startOfDay()->utc()
+                : null,
+            $data['notes'] ?? null,
         );
 
         return back();

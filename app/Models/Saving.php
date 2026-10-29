@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['user_id', 'name', 'currency', 'target_amount', 'target_date', 'status', 'notes'])]
+#[Fillable(['user_id', 'name', 'currency', 'icon', 'color', 'target_amount', 'target_date', 'status', 'notes'])]
 class Saving extends Model
 {
     protected function casts(): array

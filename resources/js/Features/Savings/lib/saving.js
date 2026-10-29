@@ -22,6 +22,8 @@ export const getSavingCurrencies = (accounts) => {
 export const createSavingFormDefaults = (currency = 'IDR') => ({
     name: '',
     currency,
+    icon: 'piggy-bank',
+    color: 'blue',
     target_amount: '',
     target_date: '',
     notes: '',
