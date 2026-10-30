@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SavingRequest;
 use App\Models\Saving;
 use App\Models\SavingLog;
+use App\Services\DeleteSavingService;
 use App\Services\FundBalanceService;
 use App\Services\FundService;
 use Carbon\CarbonImmutable;
@@ -305,6 +306,31 @@ class SavingController extends Controller
         }
 
         $record->update(['status' => 'archived']);
+
+        return back();
+    }
+
+    public function unarchive(Request $request, int $saving): RedirectResponse
+    {
+        $record = $request->user()->savings()->findOrFail($saving);
+
+        if ($record->status !== 'archived') {
+            throw ValidationException::withMessages([
+                'saving' => 'Hanya tabungan yang diarsipkan yang dapat dipulihkan.',
+            ]);
+        }
+
+        $record->update(['status' => 'active']);
+
+        return back();
+    }
+
+    public function destroy(
+        Request $request,
+        int $saving,
+        DeleteSavingService $deleteSaving,
+    ): RedirectResponse {
+        $deleteSaving->handle($request->user(), $saving);
 
         return back();
     }

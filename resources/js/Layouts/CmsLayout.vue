@@ -51,7 +51,9 @@ const navigation = [
 <template>
     <div
         class="cms-layout min-h-screen text-[#152338]"
-        :class="currentPath.startsWith('/cms/budget-plans') ? 'bg-[#F7FAFF]' : 'bg-[#F5F7FB]'"
+        :class="currentPath.startsWith('/cms/budget-plans') || currentPath.startsWith('/cms/savings')
+            ? 'bg-[#F7FAFF]'
+            : 'bg-[#F5F7FB]'"
     >
         <Head>
             <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -198,7 +200,7 @@ const navigation = [
                     class="cms-content w-full"
                     :class="currentPath === '/cms/chat'
                         ? 'cms-content--chat flex min-h-0 flex-1'
-                        : 'mx-auto max-w-[1440px] px-5 py-7 sm:px-8 lg:px-10 lg:py-9'"
+                        : 'px-5 py-7 sm:px-8 lg:px-10 lg:py-9'"
                 >
                     <slot />
                 </main>

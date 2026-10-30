@@ -69,6 +69,18 @@ Route::prefix('cms')
             Route::get('savings', [SavingController::class, 'index'])
                 ->name('savings.index');
 
+            Route::post('savings/{saving}/archive', [SavingController::class, 'archive'])
+                ->whereNumber('saving')
+                ->name('savings.archive');
+
+            Route::post('savings/{saving}/unarchive', [SavingController::class, 'unarchive'])
+                ->whereNumber('saving')
+                ->name('savings.unarchive');
+
+            Route::delete('savings/{saving}', [SavingController::class, 'destroy'])
+                ->whereNumber('saving')
+                ->name('savings.destroy');
+
             Route::get('savings/{saving}/manage', [SavingController::class, 'manage'])
                 ->whereNumber('saving')
                 ->name('savings.manage');

@@ -3,13 +3,21 @@ import { computed, ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import {
     ArrowRight,
+    Archive,
+    ArchiveRestore,
     CheckCircle2,
     ChevronDown,
     Info,
     MoreVertical,
     Plus,
+    Trash2,
     X,
 } from 'lucide-vue-next';
+import {
+    archive as archiveSaving,
+    destroy as destroySaving,
+    unarchive as unarchiveSaving,
+} from '@/routes/cms/savings';
 import SavingCreateForm from '@/Components/Savings/SavingCreateForm.vue';
 import {
     getSavingGradient,
@@ -33,6 +41,10 @@ const activeTab = ref('active');
 const sortOrder = ref('newest');
 const openMenuId = ref(null);
 const isCreateModalOpen = ref(props.createModalOpen);
+const savingPendingDeletion = ref(null);
+const deletedSavingName = ref('');
+const isDeleteSuccessModalOpen = ref(false);
+const actionError = ref('');
 
 watch(() => props.createModalOpen, (isOpen) => {
     isCreateModalOpen.value = isOpen;
@@ -122,6 +134,60 @@ function closeCreateModal() {
     isCreateModalOpen.value = false;
 }
 
+function archive(saving) {
+    actionError.value = '';
+    openMenuId.value = null;
+
+    router.post(archiveSaving.url(saving.id), {}, {
+        preserveScroll: true,
+        onError: (errors) => {
+            actionError.value = Object.values(errors)[0] ?? 'Tabungan gagal diarsipkan.';
+        },
+    });
+}
+
+function unarchive(saving) {
+    actionError.value = '';
+    openMenuId.value = null;
+
+    router.post(unarchiveSaving.url(saving.id), {}, {
+        preserveScroll: true,
+        onError: (errors) => {
+            actionError.value = Object.values(errors)[0] ?? 'Tabungan gagal dipulihkan.';
+        },
+    });
+}
+
+function remove(saving) {
+    openMenuId.value = null;
+    savingPendingDeletion.value = saving;
+}
+
+function closeDeleteModal() {
+    savingPendingDeletion.value = null;
+}
+
+function confirmRemove() {
+    if (!savingPendingDeletion.value) {
+        return;
+    }
+
+    const saving = savingPendingDeletion.value;
+    savingPendingDeletion.value = null;
+    actionError.value = '';
+
+    router.delete(destroySaving.url(saving.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            deletedSavingName.value = saving.name;
+            isDeleteSuccessModalOpen.value = true;
+        },
+        onError: (errors) => {
+            actionError.value = Object.values(errors)[0] ?? 'Tabungan gagal dihapus.';
+        },
+    });
+}
+
 const savingIcon = (saving) => getSavingIcon(saving.icon);
 </script>
 
@@ -139,6 +205,10 @@ const savingIcon = (saving) => getSavingIcon(saving.icon);
             <Info :size="20" class="shrink-0 text-[#1764F5]" />
             <span>Alokasi tabungan tidak mengubah saldo akun.</span>
         </div>
+
+        <p v-if="actionError" role="alert" class="rounded-xl border border-[#F1C7C2] bg-[#FFF4F2] px-4 py-3 text-sm text-[#A33D31]">
+            {{ actionError }}
+        </p>
 
         <div class="flex flex-col gap-3 border-b border-[#DCE5F2] sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-2" role="tablist" aria-label="Status tabungan">
@@ -230,6 +300,36 @@ const savingIcon = (saving) => getSavingIcon(saving.icon);
                                 class="rounded-lg px-3 py-2 text-sm text-[#314158] hover:bg-[#F3F6FB]"
                                 @click="openMenuId = null"
                             >Pengaturan tabungan</Link>
+                            <ButtonPrimary
+                                v-if="saving.status === 'active'"
+                                type="button"
+                                variant="secondary"
+                                class="!min-h-0 !inline-flex !items-center !justify-start !gap-2 !rounded-lg !border-0 !px-3 !py-2 !text-sm !font-normal !text-[#314158]"
+                                @click="archive(saving)"
+                            >
+                                <Archive :size="16" />
+                                Arsipkan
+                            </ButtonPrimary>
+                            <ButtonPrimary
+                                v-else
+                                type="button"
+                                variant="secondary"
+                                class="!min-h-0 !inline-flex !items-center !justify-start !gap-2 !rounded-lg !border-0 !px-3 !py-2 !text-sm !font-normal !text-[#314158]"
+                                @click="unarchive(saving)"
+                            >
+                                <ArchiveRestore :size="16" />
+                                Pulihkan
+                            </ButtonPrimary>
+                            <div class="my-1 border-t border-[#E7ECF3]" />
+                            <ButtonPrimary
+                                type="button"
+                                variant="secondary"
+                                class="!min-h-0 !inline-flex !items-center !justify-start !gap-2 !rounded-lg !border-0 !px-3 !py-2 !text-sm !font-normal !text-[#B34735]"
+                                @click="remove(saving)"
+                            >
+                                <Trash2 :size="16" />
+                                {{ $t('Delete permanently') }}
+                            </ButtonPrimary>
                         </div>
                     </div>
                 </div>
@@ -285,6 +385,25 @@ const savingIcon = (saving) => getSavingIcon(saving.icon);
                 Buat tabungan
             </ButtonPrimary>
         </div>
+
+        <ConfirmationModal
+            :show="Boolean(savingPendingDeletion)"
+            :title="$t('Permanently delete {name} savings?', { name: savingPendingDeletion?.name ?? '' })"
+            :description="$t('Remaining funds will be released to their source accounts. Saving history will be permanently deleted; account transactions will remain.')"
+            :cancel-text="$t('No, keep it')"
+            :confirm-text="$t('Yes, delete permanently')"
+            intent="danger"
+            @close="closeDeleteModal"
+            @confirm="confirmRemove"
+        />
+
+        <SuccessModal
+            :show="isDeleteSuccessModalOpen"
+            :title="$t('Savings deleted')"
+            :message="$t('The savings {name} was deleted. Remaining funds are available in their source accounts.', { name: deletedSavingName })"
+            :button-label="$t('Done')"
+            @close="isDeleteSuccessModalOpen = false"
+        />
 
         <div
             v-if="isCreateModalOpen"

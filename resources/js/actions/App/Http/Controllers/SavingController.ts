@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/savings/create'
  */
 const create15e04b67b5a38ea222ff0a83ca19ad1b = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ create15e04b67b5a38ea222ff0a83ca19ad1b.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/savings/create'
  */
 create15e04b67b5a38ea222ff0a83ca19ad1b.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ create15e04b67b5a38ea222ff0a83ca19ad1b.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/savings/create'
  */
 create15e04b67b5a38ea222ff0a83ca19ad1b.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ create15e04b67b5a38ea222ff0a83ca19ad1b.get = (options?: RouteQueryOptions): Rout
 })
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/savings/create'
  */
 create15e04b67b5a38ea222ff0a83ca19ad1b.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ create15e04b67b5a38ea222ff0a83ca19ad1b.head = (options?: RouteQueryOptions): Rou
 
     /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/cms/savings/create'
  */
 const create7022779e2e6c3dd081bc056a8b1d42d4 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ create7022779e2e6c3dd081bc056a8b1d42d4.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/cms/savings/create'
  */
 create7022779e2e6c3dd081bc056a8b1d42d4.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ create7022779e2e6c3dd081bc056a8b1d42d4.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/cms/savings/create'
  */
 create7022779e2e6c3dd081bc056a8b1d42d4.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -77,7 +77,7 @@ create7022779e2e6c3dd081bc056a8b1d42d4.get = (options?: RouteQueryOptions): Rout
 })
 /**
 * @see \App\Http\Controllers\SavingController::create
- * @see app/Http/Controllers/SavingController.php:43
+ * @see app/Http/Controllers/SavingController.php:44
  * @route '/cms/savings/create'
  */
 create7022779e2e6c3dd081bc056a8b1d42d4.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -97,7 +97,7 @@ export const create = {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/savings'
  */
 const index27852c12aa3e367b02557fe64fb8f6b5 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -112,7 +112,7 @@ index27852c12aa3e367b02557fe64fb8f6b5.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/savings'
  */
 index27852c12aa3e367b02557fe64fb8f6b5.url = (options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ index27852c12aa3e367b02557fe64fb8f6b5.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/savings'
  */
 index27852c12aa3e367b02557fe64fb8f6b5.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -130,7 +130,7 @@ index27852c12aa3e367b02557fe64fb8f6b5.get = (options?: RouteQueryOptions): Route
 })
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/savings'
  */
 index27852c12aa3e367b02557fe64fb8f6b5.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -140,7 +140,7 @@ index27852c12aa3e367b02557fe64fb8f6b5.head = (options?: RouteQueryOptions): Rout
 
     /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/cms/savings'
  */
 const index1ce3783c1f66c37e801385d88960f7ab = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -155,7 +155,7 @@ index1ce3783c1f66c37e801385d88960f7ab.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/cms/savings'
  */
 index1ce3783c1f66c37e801385d88960f7ab.url = (options?: RouteQueryOptions) => {
@@ -164,7 +164,7 @@ index1ce3783c1f66c37e801385d88960f7ab.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/cms/savings'
  */
 index1ce3783c1f66c37e801385d88960f7ab.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -173,7 +173,7 @@ index1ce3783c1f66c37e801385d88960f7ab.get = (options?: RouteQueryOptions): Route
 })
 /**
 * @see \App\Http\Controllers\SavingController::index
- * @see app/Http/Controllers/SavingController.php:20
+ * @see app/Http/Controllers/SavingController.php:21
  * @route '/cms/savings'
  */
 index1ce3783c1f66c37e801385d88960f7ab.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -193,7 +193,7 @@ export const index = {
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/savings/{saving}/manage'
  */
 const manage2e05f256e306ca8f21b7c1d9bfd7ab06 = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -208,7 +208,7 @@ manage2e05f256e306ca8f21b7c1d9bfd7ab06.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/savings/{saving}/manage'
  */
 manage2e05f256e306ca8f21b7c1d9bfd7ab06.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -236,7 +236,7 @@ manage2e05f256e306ca8f21b7c1d9bfd7ab06.url = (args: { saving: string | number } 
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/savings/{saving}/manage'
  */
 manage2e05f256e306ca8f21b7c1d9bfd7ab06.get = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -245,7 +245,7 @@ manage2e05f256e306ca8f21b7c1d9bfd7ab06.get = (args: { saving: string | number } 
 })
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/savings/{saving}/manage'
  */
 manage2e05f256e306ca8f21b7c1d9bfd7ab06.head = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -255,7 +255,7 @@ manage2e05f256e306ca8f21b7c1d9bfd7ab06.head = (args: { saving: string | number }
 
     /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/cms/savings/{saving}/manage'
  */
 const managec7d4152a851f0ba4e7834e06e059cbb5 = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -270,7 +270,7 @@ managec7d4152a851f0ba4e7834e06e059cbb5.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/cms/savings/{saving}/manage'
  */
 managec7d4152a851f0ba4e7834e06e059cbb5.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -298,7 +298,7 @@ managec7d4152a851f0ba4e7834e06e059cbb5.url = (args: { saving: string | number } 
 
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/cms/savings/{saving}/manage'
  */
 managec7d4152a851f0ba4e7834e06e059cbb5.get = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -307,7 +307,7 @@ managec7d4152a851f0ba4e7834e06e059cbb5.get = (args: { saving: string | number } 
 })
 /**
 * @see \App\Http\Controllers\SavingController::manage
- * @see app/Http/Controllers/SavingController.php:69
+ * @see app/Http/Controllers/SavingController.php:70
  * @route '/cms/savings/{saving}/manage'
  */
 managec7d4152a851f0ba4e7834e06e059cbb5.head = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -327,7 +327,7 @@ export const manage = {
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/savings/{saving}'
  */
 const showd2e0a0d8aa45b4b267294ba1057cde00 = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -342,7 +342,7 @@ showd2e0a0d8aa45b4b267294ba1057cde00.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/savings/{saving}'
  */
 showd2e0a0d8aa45b4b267294ba1057cde00.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -370,7 +370,7 @@ showd2e0a0d8aa45b4b267294ba1057cde00.url = (args: { saving: string | number } | 
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/savings/{saving}'
  */
 showd2e0a0d8aa45b4b267294ba1057cde00.get = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -379,7 +379,7 @@ showd2e0a0d8aa45b4b267294ba1057cde00.get = (args: { saving: string | number } | 
 })
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/savings/{saving}'
  */
 showd2e0a0d8aa45b4b267294ba1057cde00.head = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -389,7 +389,7 @@ showd2e0a0d8aa45b4b267294ba1057cde00.head = (args: { saving: string | number } |
 
     /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/cms/savings/{saving}'
  */
 const show3e2aa1b4197e6f4e6c7da0de8f0e293a = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -404,7 +404,7 @@ show3e2aa1b4197e6f4e6c7da0de8f0e293a.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/cms/savings/{saving}'
  */
 show3e2aa1b4197e6f4e6c7da0de8f0e293a.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -432,7 +432,7 @@ show3e2aa1b4197e6f4e6c7da0de8f0e293a.url = (args: { saving: string | number } | 
 
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/cms/savings/{saving}'
  */
 show3e2aa1b4197e6f4e6c7da0de8f0e293a.get = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -441,7 +441,7 @@ show3e2aa1b4197e6f4e6c7da0de8f0e293a.get = (args: { saving: string | number } | 
 })
 /**
 * @see \App\Http\Controllers\SavingController::show
- * @see app/Http/Controllers/SavingController.php:48
+ * @see app/Http/Controllers/SavingController.php:49
  * @route '/cms/savings/{saving}'
  */
 show3e2aa1b4197e6f4e6c7da0de8f0e293a.head = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -461,7 +461,7 @@ export const show = {
 
 /**
 * @see \App\Http\Controllers\SavingController::store
- * @see app/Http/Controllers/SavingController.php:200
+ * @see app/Http/Controllers/SavingController.php:201
  * @route '/savings'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -476,7 +476,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::store
- * @see app/Http/Controllers/SavingController.php:200
+ * @see app/Http/Controllers/SavingController.php:201
  * @route '/savings'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -485,7 +485,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\SavingController::store
- * @see app/Http/Controllers/SavingController.php:200
+ * @see app/Http/Controllers/SavingController.php:201
  * @route '/savings'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -495,7 +495,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\SavingController::update
- * @see app/Http/Controllers/SavingController.php:212
+ * @see app/Http/Controllers/SavingController.php:213
  * @route '/savings/{saving}'
  */
 export const update = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -510,7 +510,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::update
- * @see app/Http/Controllers/SavingController.php:212
+ * @see app/Http/Controllers/SavingController.php:213
  * @route '/savings/{saving}'
  */
 update.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -538,7 +538,7 @@ update.url = (args: { saving: string | number } | [saving: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\SavingController::update
- * @see app/Http/Controllers/SavingController.php:212
+ * @see app/Http/Controllers/SavingController.php:213
  * @route '/savings/{saving}'
  */
 update.patch = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -548,7 +548,7 @@ update.patch = (args: { saving: string | number } | [saving: string | number ] |
 
 /**
 * @see \App\Http\Controllers\SavingController::allocate
- * @see app/Http/Controllers/SavingController.php:242
+ * @see app/Http/Controllers/SavingController.php:243
  * @route '/savings/{saving}/allocate'
  */
 export const allocate = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -563,7 +563,7 @@ allocate.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::allocate
- * @see app/Http/Controllers/SavingController.php:242
+ * @see app/Http/Controllers/SavingController.php:243
  * @route '/savings/{saving}/allocate'
  */
 allocate.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -591,7 +591,7 @@ allocate.url = (args: { saving: string | number } | [saving: string | number ] |
 
 /**
 * @see \App\Http\Controllers\SavingController::allocate
- * @see app/Http/Controllers/SavingController.php:242
+ * @see app/Http/Controllers/SavingController.php:243
  * @route '/savings/{saving}/allocate'
  */
 allocate.post = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -601,7 +601,7 @@ allocate.post = (args: { saving: string | number } | [saving: string | number ] 
 
 /**
 * @see \App\Http\Controllers\SavingController::release
- * @see app/Http/Controllers/SavingController.php:275
+ * @see app/Http/Controllers/SavingController.php:276
  * @route '/savings/{saving}/release'
  */
 export const release = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -616,7 +616,7 @@ release.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::release
- * @see app/Http/Controllers/SavingController.php:275
+ * @see app/Http/Controllers/SavingController.php:276
  * @route '/savings/{saving}/release'
  */
 release.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -644,7 +644,7 @@ release.url = (args: { saving: string | number } | [saving: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\SavingController::release
- * @see app/Http/Controllers/SavingController.php:275
+ * @see app/Http/Controllers/SavingController.php:276
  * @route '/savings/{saving}/release'
  */
 release.post = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -654,25 +654,25 @@ release.post = (args: { saving: string | number } | [saving: string | number ] |
 
 /**
 * @see \App\Http\Controllers\SavingController::archive
- * @see app/Http/Controllers/SavingController.php:295
+ * @see app/Http/Controllers/SavingController.php:296
  * @route '/savings/{saving}/archive'
  */
-export const archive = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: archive.url(args, options),
+const archive807bdb224c73ec9af3c5c59ee45d2299 = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: archive807bdb224c73ec9af3c5c59ee45d2299.url(args, options),
     method: 'post',
 })
 
-archive.definition = {
+archive807bdb224c73ec9af3c5c59ee45d2299.definition = {
     methods: ["post"],
     url: '/savings/{saving}/archive',
 } satisfies RouteDefinition<["post"]>
 
 /**
 * @see \App\Http\Controllers\SavingController::archive
- * @see app/Http/Controllers/SavingController.php:295
+ * @see app/Http/Controllers/SavingController.php:296
  * @route '/savings/{saving}/archive'
  */
-archive.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
+archive807bdb224c73ec9af3c5c59ee45d2299.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { saving: args }
     }
@@ -690,24 +690,87 @@ archive.url = (args: { saving: string | number } | [saving: string | number ] | 
                         saving: args.saving,
                 }
 
-    return archive.definition.url
+    return archive807bdb224c73ec9af3c5c59ee45d2299.definition.url
             .replace('{saving}', parsedArgs.saving.toString())
             .replace(/\/+$/, '') + queryParams(options)
 }
 
 /**
 * @see \App\Http\Controllers\SavingController::archive
- * @see app/Http/Controllers/SavingController.php:295
+ * @see app/Http/Controllers/SavingController.php:296
  * @route '/savings/{saving}/archive'
  */
-archive.post = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: archive.url(args, options),
+archive807bdb224c73ec9af3c5c59ee45d2299.post = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: archive807bdb224c73ec9af3c5c59ee45d2299.url(args, options),
+    method: 'post',
+})
+
+    /**
+* @see \App\Http\Controllers\SavingController::archive
+ * @see app/Http/Controllers/SavingController.php:296
+ * @route '/cms/savings/{saving}/archive'
+ */
+const archiveaa4d498485ede998e307d3a9b1496373 = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: archiveaa4d498485ede998e307d3a9b1496373.url(args, options),
+    method: 'post',
+})
+
+archiveaa4d498485ede998e307d3a9b1496373.definition = {
+    methods: ["post"],
+    url: '/cms/savings/{saving}/archive',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\SavingController::archive
+ * @see app/Http/Controllers/SavingController.php:296
+ * @route '/cms/savings/{saving}/archive'
+ */
+archiveaa4d498485ede998e307d3a9b1496373.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { saving: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    saving: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        saving: args.saving,
+                }
+
+    return archiveaa4d498485ede998e307d3a9b1496373.definition.url
+            .replace('{saving}', parsedArgs.saving.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\SavingController::archive
+ * @see app/Http/Controllers/SavingController.php:296
+ * @route '/cms/savings/{saving}/archive'
+ */
+archiveaa4d498485ede998e307d3a9b1496373.post = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: archiveaa4d498485ede998e307d3a9b1496373.url(args, options),
     method: 'post',
 })
 
 /**
+* Multiple routes resolve to \App\Http\Controllers\SavingController::archive, so this export is a
+* dictionary keyed by URI rather than a callable. Call a specific route with `archive['<uri>'](...)`,
+* or import the route by name from your generated `routes/` directory.
+*/
+export const archive = {
+    '/savings/{saving}/archive': archive807bdb224c73ec9af3c5c59ee45d2299,
+    '/cms/savings/{saving}/archive': archiveaa4d498485ede998e307d3a9b1496373,
+}
+
+/**
 * @see \App\Http\Controllers\SavingController::reverseAllocation
- * @see app/Http/Controllers/SavingController.php:312
+ * @see app/Http/Controllers/SavingController.php:338
  * @route '/saving-logs/{log}/reverse'
  */
 export const reverseAllocation = (args: { log: string | number } | [log: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -722,7 +785,7 @@ reverseAllocation.definition = {
 
 /**
 * @see \App\Http\Controllers\SavingController::reverseAllocation
- * @see app/Http/Controllers/SavingController.php:312
+ * @see app/Http/Controllers/SavingController.php:338
  * @route '/saving-logs/{log}/reverse'
  */
 reverseAllocation.url = (args: { log: string | number } | [log: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -750,13 +813,119 @@ reverseAllocation.url = (args: { log: string | number } | [log: string | number 
 
 /**
 * @see \App\Http\Controllers\SavingController::reverseAllocation
- * @see app/Http/Controllers/SavingController.php:312
+ * @see app/Http/Controllers/SavingController.php:338
  * @route '/saving-logs/{log}/reverse'
  */
 reverseAllocation.post = (args: { log: string | number } | [log: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: reverseAllocation.url(args, options),
     method: 'post',
 })
-const SavingController = { create, index, manage, show, store, update, allocate, release, archive, reverseAllocation }
+
+/**
+* @see \App\Http\Controllers\SavingController::unarchive
+ * @see app/Http/Controllers/SavingController.php:313
+ * @route '/cms/savings/{saving}/unarchive'
+ */
+export const unarchive = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: unarchive.url(args, options),
+    method: 'post',
+})
+
+unarchive.definition = {
+    methods: ["post"],
+    url: '/cms/savings/{saving}/unarchive',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\SavingController::unarchive
+ * @see app/Http/Controllers/SavingController.php:313
+ * @route '/cms/savings/{saving}/unarchive'
+ */
+unarchive.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { saving: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    saving: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        saving: args.saving,
+                }
+
+    return unarchive.definition.url
+            .replace('{saving}', parsedArgs.saving.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\SavingController::unarchive
+ * @see app/Http/Controllers/SavingController.php:313
+ * @route '/cms/savings/{saving}/unarchive'
+ */
+unarchive.post = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: unarchive.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\SavingController::destroy
+ * @see app/Http/Controllers/SavingController.php:328
+ * @route '/cms/savings/{saving}'
+ */
+export const destroy = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+
+destroy.definition = {
+    methods: ["delete"],
+    url: '/cms/savings/{saving}',
+} satisfies RouteDefinition<["delete"]>
+
+/**
+* @see \App\Http\Controllers\SavingController::destroy
+ * @see app/Http/Controllers/SavingController.php:328
+ * @route '/cms/savings/{saving}'
+ */
+destroy.url = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { saving: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    saving: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        saving: args.saving,
+                }
+
+    return destroy.definition.url
+            .replace('{saving}', parsedArgs.saving.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\SavingController::destroy
+ * @see app/Http/Controllers/SavingController.php:328
+ * @route '/cms/savings/{saving}'
+ */
+destroy.delete = (args: { saving: string | number } | [saving: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: destroy.url(args, options),
+    method: 'delete',
+})
+const SavingController = { create, index, manage, show, store, update, allocate, release, archive, reverseAllocation, unarchive, destroy }
 
 export default SavingController

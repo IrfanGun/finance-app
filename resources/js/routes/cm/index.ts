@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
 /**
- * @see routes/web/cms.php:166
+ * @see routes/web/cms.php:178
  * @route '/cm/recurring'
  */
 export const recurring = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ recurring.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:166
+ * @see routes/web/cms.php:178
  * @route '/cm/recurring'
  */
 recurring.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ recurring.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web/cms.php:166
+ * @see routes/web/cms.php:178
  * @route '/cm/recurring'
  */
 recurring.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -30,7 +30,7 @@ recurring.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:166
+ * @see routes/web/cms.php:178
  * @route '/cm/recurring'
  */
 recurring.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

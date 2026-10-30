@@ -6,6 +6,8 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import type { DefineComponent } from 'vue'
 import ButtonPrimary from './Components/ButtonPrimary.vue'
 import AmountInput from './Components/AmountInput.vue'
+import ConfirmationModal from './Components/ConfirmationModal.vue'
+import SuccessModal from './Components/SuccessModal.vue'
 import { wayfinderRoute } from './wayfinder/route'
 import CmsLayout from './Layouts/CmsLayout.vue'
 import LanguageSwitcher from './Components/LanguageSwitcher.vue'
@@ -41,6 +43,8 @@ createInertiaApp({
         vueApp
             .component('ButtonPrimary', ButtonPrimary)
             .component('AmountInput', AmountInput)
+            .component('ConfirmationModal', ConfirmationModal)
+            .component('SuccessModal', SuccessModal)
             .use(plugin)
             .use(appI18n)
             .mount(el)

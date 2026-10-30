@@ -132,9 +132,6 @@ const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { 
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h1 class="text-3xl font-semibold tracking-tight text-[#111B39] sm:text-4xl">{{ $t('Budget plans') }}</h1>
-                <p class="mt-1 text-sm text-[#687A9B] sm:text-base">
-                    {{ $t('Atur alokasi, pantau pemakaian, dan jaga pengeluaranmu.') }}
-                </p>
             </div>
             <div class="flex w-full items-center gap-3 sm:w-auto">
                 <div

@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 /**
- * @see routes/web/cms.php:159
+ * @see routes/web/cms.php:171
  * @route '/cms/profile'
  */
 export const edit = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ edit.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
- * @see routes/web/cms.php:159
+ * @see routes/web/cms.php:171
  * @route '/cms/profile'
  */
 edit.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ edit.url = (options?: RouteQueryOptions) => {
 }
 
 /**
- * @see routes/web/cms.php:159
+ * @see routes/web/cms.php:171
  * @route '/cms/profile'
  */
 edit.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -30,7 +30,7 @@ edit.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     method: 'get',
 })
 /**
- * @see routes/web/cms.php:159
+ * @see routes/web/cms.php:171
  * @route '/cms/profile'
  */
 edit.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

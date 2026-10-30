@@ -40,7 +40,6 @@ const goToGoalDetails = () => {
             />
         </div>
         <template v-if="step === 1">
-            <p class="text-sm text-[#637083]"> {{ $t("Buat kantong untuk memberi nama pada tujuan dana. Dana belum akan dipindahkan.") }} </p>
             <label class="text-sm">{{ $t("Nama kantong") }} <input
                     v-model="form.name"
                     class="field"

@@ -365,7 +365,7 @@ const applyHistoryFilters = () => {
     <div
         class="min-h-screen w-full text-[#152338]"
         :class="cmsMode
-            ? 'bg-[#F5F8FD] pb-10'
+            ? 'bg-[#F7FAFF] pb-0'
             : 'mx-auto max-w-lg bg-[#F7F9FC] pb-28'"
     >
         <Head :title="showCreateSaving ? 'Buat kantong savings' : 'Savings'" />
@@ -375,11 +375,12 @@ const applyHistoryFilters = () => {
             <Link :href="budgetIndexUrl" class="text-sm font-semibold text-[#2457DA]">{{ $t("Budget") }}</Link>
         </header>
 
-        <main
+        <component
+            :is="cmsMode ? 'div' : 'main'"
             v-if="!cmsMode || !manageMode || !selected || manageSection === 'transactions'"
             class="flex flex-col gap-5"
             :class="cmsMode
-                ? 'mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-8 lg:px-10 lg:py-8'
+                ? 'w-full min-w-0'
                 : 'px-6 pt-6'"
         >
             <header v-if="manageMode && selected" class="flex items-center gap-4">
@@ -477,7 +478,7 @@ const applyHistoryFilters = () => {
                 @apply="applyHistoryFilters"
                 @reverse="reverseLog"
             />
-        </main>
+        </component>
 
         <CmsSavingManage
             v-if="cmsMode && manageMode && selected && manageSection !== 'transactions'"
