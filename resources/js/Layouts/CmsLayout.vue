@@ -28,6 +28,7 @@ const { t } = useTranslation();
 const user = computed(() => page.props.auth?.user);
 const currentPath = computed(() => page.url.split('?')[0]);
 const isSavingsIndex = computed(() => currentPath.value === '/cms/savings');
+const isBudgetPlanDetail = computed(() => /^\/cms\/budget-plans\/\d+$/.test(currentPath.value));
 const isSidebarCollapsed = ref(false);
 const isMobileSidebarOpen = ref(false);
 
@@ -184,6 +185,11 @@ const navigation = [
                             <span class="text-[#64748B]">Keuangan pribadi</span>
                             <span class="text-[#AAB4C2]">/</span>
                             <span class="font-semibold text-[#1764F5]">Tabungan</span>
+                        </div>
+                        <div v-else-if="isBudgetPlanDetail" class="flex items-center gap-2 text-sm">
+                            <span class="text-[#64748B]">{{ t('Budget plans') }}</span>
+                            <span class="text-[#AAB4C2]">/</span>
+                            <span class="font-semibold text-[#17243A]">{{ t('Detail plan') }}</span>
                         </div>
                         <div v-else>
                             <p class="text-xs text-[#98A2B3]">{{ t('Personal finance workspace') }}</p>

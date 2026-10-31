@@ -49,6 +49,21 @@ const planColorGradients = {
 export function useBudgetPlanDisplay(props) {
     const planIcon = (icon) => planIcons[icon] ?? ShoppingBag;
     const planIconStyle = (color) => {
+        const customColor = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color ?? '');
+
+        if (customColor) {
+            const lighterColor = customColor.slice(1)
+                .map((channel) => Math.min(
+                    255,
+                    Math.round(Number.parseInt(channel, 16) * 0.82 + 255 * 0.18),
+                ).toString(16).padStart(2, '0'))
+                .join('');
+
+            return {
+                backgroundImage: `linear-gradient(135deg, ${color}, #${lighterColor})`,
+            };
+        }
+
         const [start, end] = planColorGradients[color] ?? planColorGradients.blue;
 
         return { backgroundImage: `linear-gradient(135deg, ${start}, ${end})` };

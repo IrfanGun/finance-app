@@ -87,7 +87,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::destroy
- * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @see app/Http/Controllers/BudgetPlanController.php:193
  * @route '/cms/budget-plans/{plan}'
  */
 export const destroy = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -102,7 +102,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::destroy
- * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @see app/Http/Controllers/BudgetPlanController.php:193
  * @route '/cms/budget-plans/{plan}'
  */
 destroy.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ destroy.url = (args: { plan: string | number } | [plan: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::destroy
- * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @see app/Http/Controllers/BudgetPlanController.php:193
  * @route '/cms/budget-plans/{plan}'
  */
 destroy.delete = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -140,7 +140,7 @@ destroy.delete = (args: { plan: string | number } | [plan: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 export const show = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -155,7 +155,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 show.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -183,7 +183,7 @@ show.url = (args: { plan: string | number } | [plan: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 show.get = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -192,7 +192,7 @@ show.get = (args: { plan: string | number } | [plan: string | number ] | string 
 })
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 show.head = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

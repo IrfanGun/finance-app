@@ -350,6 +350,10 @@ const submitTransaction = () => {
         onSuccess: () => {
             showTransactionModal.value = false;
             transactionForm.reset();
+
+            if (props.cmsMode) {
+                showOperationSuccess('Belanja berhasil disimpan.');
+            }
         },
     });
 };
@@ -358,6 +362,14 @@ const openClaim = (period) => {
     claimParts.value = [{ saving_id: '', amount: period.remaining }];
     releaseAmount.value = period.remaining;
     actionError.value = '';
+};
+const closeClaim = () => {
+    activeClaim.value = null;
+    actionError.value = '';
+};
+const showOperationSuccess = (message) => {
+    successMessage.value = message;
+    showSuccessModal.value = true;
 };
 const submitClaim = () => {
     actionError.value = '';
@@ -374,6 +386,7 @@ const submitClaim = () => {
             },
             onSuccess: () => {
                 activeClaim.value = null;
+                showOperationSuccess('Sisa anggaran berhasil diklaim.');
             },
         },
     );
@@ -390,6 +403,10 @@ const actOnPeriod = (route, period, data = {}) => {
             },
             onSuccess: () => {
                 activeClaim.value = null;
+
+                if (route.url(period.id) === releasePeriod.url(period.id)) {
+                    showOperationSuccess('Sisa anggaran berhasil dilepas ke saldo bebas.');
+                }
             },
         },
     );
@@ -398,8 +415,8 @@ const actOnPeriod = (route, period, data = {}) => {
 
 <template>
     <div
-        class="mx-auto min-h-screen w-full max-w-lg text-budget-heading"
-        :class="cmsMode ? 'bg-[#F7FAFF] pb-0' : 'bg-budget-page pb-28'"
+        class="mx-auto min-h-screen w-full text-budget-heading"
+        :class="cmsMode ? 'max-w-7xl bg-[#F7FAFF] pb-0' : 'max-w-lg bg-budget-page pb-28'"
     >
         <Head
             :title="showCreate
@@ -447,7 +464,7 @@ const actOnPeriod = (route, period, data = {}) => {
             >
                 <PiggyBank :size="20" /> {{ $t("Savings") }} </Link>
         </header>
-        <header v-else-if="!showCreate" class="flex items-center justify-between bg-white px-6 py-5">
+        <header v-else-if="!showCreate && (!cmsMode || selectedPlan?.type === 'goal')" class="flex items-center justify-between bg-white px-6 py-5">
             <Link :href="budgetPlansIndexUrl" class="text-sm font-semibold text-[#2457DA]">
                 â† Semua plan
             </Link>
@@ -457,7 +474,9 @@ const actOnPeriod = (route, period, data = {}) => {
 
         <main
             class="flex flex-col gap-5 px-5 pt-4"
-            :class="showCreate
+            :class="cmsMode && isDetailPage
+                ? 'gap-5 px-0 pt-0'
+                : showCreate
                 ? 'min-h-[calc(100vh-84px)] flex-1 gap-4 px-4 pb-4 pt-3 sm:px-6'
                 : (!isDetailPage ? 'pb-4' : 'sm:px-6 sm:pt-6')"
         >
@@ -592,6 +611,8 @@ const actOnPeriod = (route, period, data = {}) => {
                 :format-currency="formatCurrency"
                 :format-date="formatDate"
                 :display-account-currency="displayAccountCurrency"
+                :cms-mode="cmsMode"
+                :budget-plans-index-url="budgetPlansIndexUrl"
                 :account-changed="accountChanged"
                 :next-step="nextStep"
                 :back-step="goBackFromForm"
@@ -653,11 +674,17 @@ const actOnPeriod = (route, period, data = {}) => {
                 :close-period="closePeriod"
                 :release-period="releasePeriod"
                 :savings-url="savingsFilterUrl"
+                :savings-index-url="savingsIndexUrl"
+                :budget-plans-index-url="budgetPlansIndexUrl"
+                :format-date="formatDate"
+                :cms-mode="cmsMode"
+                :action-error="actionError"
                 @edit="editPlan"
                 @change-status="changeStatus"
                 @period-action="actOnPeriod"
                 @open-transaction="openTransactionModal"
                 @open-claim="openClaim"
+                @close-claim="closeClaim"
                 @submit-claim="submitClaim"
                 @update:release-amount="releaseAmount = $event"
             />
@@ -684,6 +711,10 @@ const actOnPeriod = (route, period, data = {}) => {
             :selected-plan="selectedPlan"
             :selected-transaction-period="selectedTransactionPeriod"
             :available-categories="availableCategories"
+            :cms-mode="cmsMode"
+            :plan-icon="planIcon"
+            :format-money="formatMoney"
+            :format-date="formatDate"
             @close="closeTransactionModal"
             @submit="submitTransaction"
         />

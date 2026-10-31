@@ -21,7 +21,16 @@ class BudgetPlanRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::in(['spending', 'goal'])],
             'icon' => ['required', Rule::in(array_keys(BudgetPlan::ICONS))],
-            'color' => ['required', Rule::in(array_keys(BudgetPlan::COLORS))],
+            'color' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::when(
+                    in_array($this->input('color'), array_keys(BudgetPlan::COLORS), true),
+                    [Rule::in(array_keys(BudgetPlan::COLORS))],
+                    [Rule::hexColor()],
+                ),
+            ],
             'amount' => [$goal ? 'nullable' : 'required', 'numeric', 'gt:0', 'decimal:0,2'],
             'target_amount' => [$goal ? 'required' : 'nullable', 'numeric', 'gt:0', 'decimal:0,2'],
             'target_date' => [$goal ? 'required' : 'nullable', 'date', 'after_or_equal:starts_on'],

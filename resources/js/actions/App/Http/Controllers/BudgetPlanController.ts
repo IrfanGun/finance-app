@@ -193,7 +193,7 @@ export const index = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::store
- * @see app/Http/Controllers/BudgetPlanController.php:147
+ * @see app/Http/Controllers/BudgetPlanController.php:170
  * @route '/budget-plans'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -208,7 +208,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::store
- * @see app/Http/Controllers/BudgetPlanController.php:147
+ * @see app/Http/Controllers/BudgetPlanController.php:170
  * @route '/budget-plans'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -217,7 +217,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::store
- * @see app/Http/Controllers/BudgetPlanController.php:147
+ * @see app/Http/Controllers/BudgetPlanController.php:170
  * @route '/budget-plans'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -227,7 +227,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::update
- * @see app/Http/Controllers/BudgetPlanController.php:159
+ * @see app/Http/Controllers/BudgetPlanController.php:182
  * @route '/budget-plans/{plan}'
  */
 export const update = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -242,7 +242,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::update
- * @see app/Http/Controllers/BudgetPlanController.php:159
+ * @see app/Http/Controllers/BudgetPlanController.php:182
  * @route '/budget-plans/{plan}'
  */
 update.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -270,7 +270,7 @@ update.url = (args: { plan: string | number } | [plan: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::update
- * @see app/Http/Controllers/BudgetPlanController.php:159
+ * @see app/Http/Controllers/BudgetPlanController.php:182
  * @route '/budget-plans/{plan}'
  */
 update.patch = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -280,7 +280,7 @@ update.patch = (args: { plan: string | number } | [plan: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::status
- * @see app/Http/Controllers/BudgetPlanController.php:177
+ * @see app/Http/Controllers/BudgetPlanController.php:200
  * @route '/budget-plans/{plan}/status'
  */
 export const status = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -295,7 +295,7 @@ status.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::status
- * @see app/Http/Controllers/BudgetPlanController.php:177
+ * @see app/Http/Controllers/BudgetPlanController.php:200
  * @route '/budget-plans/{plan}/status'
  */
 status.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -323,7 +323,7 @@ status.url = (args: { plan: string | number } | [plan: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::status
- * @see app/Http/Controllers/BudgetPlanController.php:177
+ * @see app/Http/Controllers/BudgetPlanController.php:200
  * @route '/budget-plans/{plan}/status'
  */
 status.post = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -333,7 +333,7 @@ status.post = (args: { plan: string | number } | [plan: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/budget-plans/{plan}'
  */
 const show279acf29e76bc124ed6a09be439f7910 = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -348,7 +348,7 @@ show279acf29e76bc124ed6a09be439f7910.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/budget-plans/{plan}'
  */
 show279acf29e76bc124ed6a09be439f7910.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -376,7 +376,7 @@ show279acf29e76bc124ed6a09be439f7910.url = (args: { plan: string | number } | [p
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/budget-plans/{plan}'
  */
 show279acf29e76bc124ed6a09be439f7910.get = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -385,7 +385,7 @@ show279acf29e76bc124ed6a09be439f7910.get = (args: { plan: string | number } | [p
 })
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/budget-plans/{plan}'
  */
 show279acf29e76bc124ed6a09be439f7910.head = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -395,7 +395,7 @@ show279acf29e76bc124ed6a09be439f7910.head = (args: { plan: string | number } | [
 
     /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 const showdbcc2d6ab61e2367983bd87b9a9a9906 = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -410,7 +410,7 @@ showdbcc2d6ab61e2367983bd87b9a9a9906.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 showdbcc2d6ab61e2367983bd87b9a9a9906.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -438,7 +438,7 @@ showdbcc2d6ab61e2367983bd87b9a9a9906.url = (args: { plan: string | number } | [p
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 showdbcc2d6ab61e2367983bd87b9a9a9906.get = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -447,7 +447,7 @@ showdbcc2d6ab61e2367983bd87b9a9a9906.get = (args: { plan: string | number } | [p
 })
 /**
 * @see \App\Http\Controllers\BudgetPlanController::show
- * @see app/Http/Controllers/BudgetPlanController.php:139
+ * @see app/Http/Controllers/BudgetPlanController.php:162
  * @route '/cms/budget-plans/{plan}'
  */
 showdbcc2d6ab61e2367983bd87b9a9a9906.head = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -467,7 +467,7 @@ export const show = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::fund
- * @see app/Http/Controllers/BudgetPlanController.php:188
+ * @see app/Http/Controllers/BudgetPlanController.php:211
  * @route '/budget-periods/{period}/fund'
  */
 export const fund = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -482,7 +482,7 @@ fund.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::fund
- * @see app/Http/Controllers/BudgetPlanController.php:188
+ * @see app/Http/Controllers/BudgetPlanController.php:211
  * @route '/budget-periods/{period}/fund'
  */
 fund.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -510,7 +510,7 @@ fund.url = (args: { period: string | number } | [period: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::fund
- * @see app/Http/Controllers/BudgetPlanController.php:188
+ * @see app/Http/Controllers/BudgetPlanController.php:211
  * @route '/budget-periods/{period}/fund'
  */
 fund.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -520,7 +520,7 @@ fund.post = (args: { period: string | number } | [period: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::claim
- * @see app/Http/Controllers/BudgetPlanController.php:197
+ * @see app/Http/Controllers/BudgetPlanController.php:220
  * @route '/budget-periods/{period}/claim'
  */
 export const claim = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -535,7 +535,7 @@ claim.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::claim
- * @see app/Http/Controllers/BudgetPlanController.php:197
+ * @see app/Http/Controllers/BudgetPlanController.php:220
  * @route '/budget-periods/{period}/claim'
  */
 claim.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -563,7 +563,7 @@ claim.url = (args: { period: string | number } | [period: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::claim
- * @see app/Http/Controllers/BudgetPlanController.php:197
+ * @see app/Http/Controllers/BudgetPlanController.php:220
  * @route '/budget-periods/{period}/claim'
  */
 claim.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -573,7 +573,7 @@ claim.post = (args: { period: string | number } | [period: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::reverseClaim
- * @see app/Http/Controllers/BudgetPlanController.php:233
+ * @see app/Http/Controllers/BudgetPlanController.php:256
  * @route '/budget-claims/{claim}/reverse'
  */
 export const reverseClaim = (args: { claim: string | number } | [claim: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -588,7 +588,7 @@ reverseClaim.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::reverseClaim
- * @see app/Http/Controllers/BudgetPlanController.php:233
+ * @see app/Http/Controllers/BudgetPlanController.php:256
  * @route '/budget-claims/{claim}/reverse'
  */
 reverseClaim.url = (args: { claim: string | number } | [claim: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -616,7 +616,7 @@ reverseClaim.url = (args: { claim: string | number } | [claim: string | number ]
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::reverseClaim
- * @see app/Http/Controllers/BudgetPlanController.php:233
+ * @see app/Http/Controllers/BudgetPlanController.php:256
  * @route '/budget-claims/{claim}/reverse'
  */
 reverseClaim.post = (args: { claim: string | number } | [claim: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -626,7 +626,7 @@ reverseClaim.post = (args: { claim: string | number } | [claim: string | number 
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::release
- * @see app/Http/Controllers/BudgetPlanController.php:216
+ * @see app/Http/Controllers/BudgetPlanController.php:239
  * @route '/budget-periods/{period}/release'
  */
 export const release = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -641,7 +641,7 @@ release.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::release
- * @see app/Http/Controllers/BudgetPlanController.php:216
+ * @see app/Http/Controllers/BudgetPlanController.php:239
  * @route '/budget-periods/{period}/release'
  */
 release.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -669,7 +669,7 @@ release.url = (args: { period: string | number } | [period: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::release
- * @see app/Http/Controllers/BudgetPlanController.php:216
+ * @see app/Http/Controllers/BudgetPlanController.php:239
  * @route '/budget-periods/{period}/release'
  */
 release.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -679,7 +679,7 @@ release.post = (args: { period: string | number } | [period: string | number ] |
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::close
- * @see app/Http/Controllers/BudgetPlanController.php:251
+ * @see app/Http/Controllers/BudgetPlanController.php:274
  * @route '/budget-periods/{period}/close'
  */
 export const close = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -694,7 +694,7 @@ close.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::close
- * @see app/Http/Controllers/BudgetPlanController.php:251
+ * @see app/Http/Controllers/BudgetPlanController.php:274
  * @route '/budget-periods/{period}/close'
  */
 close.url = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -722,7 +722,7 @@ close.url = (args: { period: string | number } | [period: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::close
- * @see app/Http/Controllers/BudgetPlanController.php:251
+ * @see app/Http/Controllers/BudgetPlanController.php:274
  * @route '/budget-periods/{period}/close'
  */
 close.post = (args: { period: string | number } | [period: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -732,7 +732,7 @@ close.post = (args: { period: string | number } | [period: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::destroy
- * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @see app/Http/Controllers/BudgetPlanController.php:193
  * @route '/cms/budget-plans/{plan}'
  */
 export const destroy = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -747,7 +747,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::destroy
- * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @see app/Http/Controllers/BudgetPlanController.php:193
  * @route '/cms/budget-plans/{plan}'
  */
 destroy.url = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -775,7 +775,7 @@ destroy.url = (args: { plan: string | number } | [plan: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\BudgetPlanController::destroy
- * @see app/Http/Controllers/BudgetPlanController.php:170
+ * @see app/Http/Controllers/BudgetPlanController.php:193
  * @route '/cms/budget-plans/{plan}'
  */
 destroy.delete = (args: { plan: string | number } | [plan: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

@@ -34,11 +34,23 @@ class BudgetPlanController extends Controller
         ?int $selectedPlanId = null,
     ): Response {
         $user = $request->user();
+        $cmsMode = $request->is('cms/*');
+        $includeTransactions = $cmsMode && $selectedPlanId !== null;
         $plansQuery = $user->budgetPlans()
             ->with([
                 'pocket',
                 'items',
-                'periods' => fn ($query) => $query->with('claims.pocket')->orderByDesc('starts_on'),
+                'periods' => fn ($query) => $query
+                    ->with([
+                        'claims.pocket',
+                        ...($includeTransactions ? [
+                            'transactions' => fn ($transactions) => $transactions
+                                ->with('category:id,name')
+                                ->where('type', 'expense')
+                                ->orderByDesc('date'),
+                        ] : []),
+                    ])
+                    ->orderByDesc('starts_on'),
             ])
             ->latest();
 
@@ -48,8 +60,8 @@ class BudgetPlanController extends Controller
 
         $plans = $plansQuery
             ->get()
-            ->map(function (BudgetPlan $plan) use ($balances): array {
-                $periods = $plan->periods->map(function (BudgetPeriod $period) use ($balances, $plan): array {
+            ->map(function (BudgetPlan $plan) use ($balances, $includeTransactions): array {
+                $periods = $plan->periods->map(function (BudgetPeriod $period) use ($balances, $plan, $includeTransactions): array {
                     $contributed = $plan->type === 'goal'
                         ? $balances->goalContribution($period)
                         : null;
@@ -65,6 +77,17 @@ class BudgetPlanController extends Controller
                                 ->sum('amount')
                             : null,
                         'contributed' => $contributed,
+                        'transactions' => $includeTransactions && $plan->type === 'spending'
+                            ? $period->transactions
+                                ->map(fn ($transaction): array => [
+                                    'id' => $transaction->id,
+                                    'amount' => $transaction->amount,
+                                    'date' => substr((string) $transaction->date, 0, 10),
+                                    'title' => $transaction->title,
+                                    'category' => $transaction->category?->name,
+                                ])
+                                ->all()
+                            : [],
                     ];
                 });
                 $available = $plan->type === 'goal'
@@ -98,7 +121,7 @@ class BudgetPlanController extends Controller
         abort_if($selectedPlanId !== null && $plans->isEmpty(), 404);
 
         return Inertia::render('BudgetPlans/Index', [
-            'cmsMode' => $request->is('cms/*'),
+            'cmsMode' => $cmsMode,
             'createMode' => $createMode,
             'selectedPlanId' => $selectedPlanId,
             'appearanceOptions' => [

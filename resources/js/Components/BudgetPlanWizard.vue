@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
     ArrowLeft,
     Bell,
@@ -8,6 +8,7 @@ import {
     ChevronRight,
     Info,
     Plus,
+    Palette,
     Repeat,
     ShoppingBag,
     Target,
@@ -19,6 +20,7 @@ const props = defineProps({
     activeStep: { type: Number, required: true },
     steps: { type: Array, required: true },
     editing: { type: Boolean, default: false },
+    cmsMode: { type: Boolean, default: false },
     accounts: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] },
     savings: { type: Array, default: () => [] },
@@ -36,8 +38,21 @@ const props = defineProps({
     changeStep: { type: Function, required: true },
     addItem: { type: Function, required: true },
     savingsUrl: { type: String, required: true },
+    budgetPlansIndexUrl: { type: String, required: true },
 });
 defineEmits(['submit']);
+
+const customColorValue = ref(
+    /^#[\da-f]{6}$/i.test(props.form.color)
+        ? props.form.color
+        : '#2457da',
+);
+
+watch(() => props.form.color, (color) => {
+    if (/^#[\da-f]{6}$/i.test(color)) {
+        customColorValue.value = color;
+    }
+});
 
 const availableCategories = computed(() => props.categories.filter(
     (category) => category.type === 'expense',
@@ -58,8 +73,17 @@ const selectedSaving = computed(() => props.savings.find(
 </script>
 
 <template>
-    <div class="flex flex-1 flex-col gap-4">
-        <header class="flex items-center gap-3 px-1 py-1 sm:px-2">
+    <div :class="cmsMode ? 'mx-auto flex w-full max-w-7xl flex-col gap-5 text-[#152338]' : 'flex flex-1 flex-col gap-4'">
+        <template v-if="cmsMode">
+            <Link :href="budgetPlansIndexUrl" class="inline-flex w-fit items-center gap-2 px-1 pt-1 text-sm font-medium text-[#1764F5]">
+                <ArrowLeft :size="19" />
+                Semua plan
+            </Link>
+            <h1 class="px-1 text-3xl font-bold tracking-tight text-[#111B39] sm:px-2 sm:text-[32px]">
+                {{ editing ? 'Ubah budget plan' : 'Buat budget plan' }}
+            </h1>
+        </template>
+        <header v-else class="flex items-center gap-3 px-1 py-1 sm:px-2">
             <button type="button" class="flex h-10 w-10 shrink-0 items-center justify-center text-[#2457DA]" aria-label="Kembali" @click="backStep">
                 <ArrowLeft :size="22" />
             </button>
@@ -71,14 +95,14 @@ const selectedSaving = computed(() => props.savings.find(
             </div>
             <span class="shrink-0 text-sm font-medium text-[#637083]">{{ $t("Step") }} {{ activeStep }} {{ $t("dari") }} {{ steps.length }}</span>
         </header>
-        <div class="relative grid grid-cols-3 px-1" role="list" aria-label="Progres pembuatan rencana">
+        <div :class="cmsMode ? 'relative mx-auto grid w-full max-w-3xl grid-cols-3 px-1 py-1' : 'relative grid grid-cols-3 px-1'" role="list" aria-label="Progres pembuatan rencana">
             <span
-                class="absolute left-[16.6667%] top-[10px] h-0.5 w-[33.3333%] rounded-full"
+                class="absolute left-[16.6667%] top-[15px] h-0.5 w-[33.3333%] rounded-full"
                 :class="activeStep > 1 ? 'bg-[#16815B]' : 'bg-[#DDE3EC]'"
                 aria-hidden="true"
             />
             <span
-                class="absolute left-1/2 top-[10px] h-0.5 w-[33.3333%] rounded-full"
+                class="absolute left-1/2 top-[15px] h-0.5 w-[33.3333%] rounded-full"
                 :class="activeStep > 2 ? 'bg-[#16815B]' : 'bg-[#DDE3EC]'"
                 aria-hidden="true"
             />
@@ -93,7 +117,7 @@ const selectedSaving = computed(() => props.savings.find(
                 :aria-current="activeStep === index + 1 ? 'step' : undefined"
             >
                 <span
-                    class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-[#F4F7FC] text-[11px]"
+                    class="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border bg-white text-sm"
                     :class="activeStep > index + 1
                         ? 'border-[#16815B] bg-[#16815B] text-white'
                         : (activeStep === index + 1 ? 'border-[#2457DA] text-[#2457DA]' : 'border-[#C9D1DE] text-[#758196]')"
@@ -106,9 +130,12 @@ const selectedSaving = computed(() => props.savings.find(
         </div>
 
         <form
-            class="flex min-h-[calc(100vh-210px)] flex-1 flex-col overflow-hidden rounded-[24px] border border-[#E7EAF0] bg-white px-5 pb-5 pt-5 shadow-[0_8px_24px_rgba(41,82,160,0.06)] sm:px-6"
+            :class="cmsMode
+                ? 'grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.95fr)]'
+                : 'flex min-h-[calc(100vh-210px)] flex-1 flex-col overflow-hidden rounded-[24px] border border-[#E7EAF0] bg-white px-5 pb-5 pt-5 shadow-[0_8px_24px_rgba(41,82,160,0.06)] sm:px-6'"
             @submit.prevent="$emit('submit')"
         >
+            <div :class="cmsMode ? 'flex min-h-[560px] flex-col overflow-hidden rounded-2xl border border-[#E2E8F2] bg-white px-5 pb-5 pt-5 shadow-[0_4px_18px_rgba(41,82,160,0.04)] sm:px-6' : 'contents'">
             <p class="mb-5 text-xs font-medium text-[#637083]"> {{ $t("Step") }} {{ activeStep }} {{ $t("dari") }} {{ steps.length }} · {{ activeStep === 1 ? 'Jenis rencana' : steps[activeStep - 1] }}
             </p>
             <div class="flex-1 overflow-y-auto">
@@ -198,7 +225,7 @@ const selectedSaving = computed(() => props.savings.find(
                     </div>
                 </template>
 
-                <details class="group border-t border-[#E7EAF0] pt-4">
+                <details class="group border-t border-[#E7EAF0] pt-4" :open="cmsMode">
                     <summary class="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-[#637083]">
                         <span class="flex items-center gap-2"><ChevronRight :size="17" class="transition group-open:rotate-90" /> {{ $t("Ikon & warna") }}</span><span class="text-xs">{{ $t("Optional") }}</span>
                     </summary>
@@ -206,13 +233,29 @@ const selectedSaving = computed(() => props.savings.find(
                         <fieldset class="flex flex-col gap-2">
                             <legend class="text-xs font-semibold text-[#637083]">{{ $t("Choose an icon") }}</legend>
                             <div class="grid grid-cols-7 gap-2">
-                                <ButtonPrimary v-for="([icon, label]) in Object.entries(icons)" :key="icon" type="button" variant="secondary" class="!h-10 !min-h-10 !w-full !rounded-xl !p-2" :class="form.icon === icon ? '!border-[#2457DA] !bg-[#EEF3FF] !text-[#2457DA]' : '!border-transparent !bg-[#F5F7FA] !text-[#637083]'" :aria-label="`Pilih ikon ${label}`" :aria-pressed="form.icon === icon" @click="form.icon = icon"><component :is="planIcon(icon)" :size="19" /></ButtonPrimary>
+                                <ButtonPrimary v-for="([icon, label]) in Object.entries(icons)" :key="icon" type="button" variant="secondary" class="!inline-flex !h-10 !min-h-10 !w-full !items-center !justify-center !rounded-xl !p-0" :class="form.icon === icon ? '!border-[#2457DA] !bg-[#EEF3FF] !text-[#2457DA]' : '!border-transparent !bg-[#F5F7FA] !text-[#637083]'" :aria-label="`Pilih ikon ${label}`" :aria-pressed="form.icon === icon" @click="form.icon = icon"><component :is="planIcon(icon)" class="block shrink-0" :size="19" /></ButtonPrimary>
                             </div>
                         </fieldset>
                         <fieldset class="flex flex-col gap-2">
                             <legend class="text-xs font-semibold text-[#637083]">{{ $t("Pilih warna") }}</legend>
-                            <div class="flex gap-2">
-                                <ButtonPrimary v-for="([color, label]) in Object.entries(colors)" :key="color" type="button" variant="secondary" class="!h-10 !min-h-10 !w-10 !rounded-full !p-1" :class="form.color === color ? '!border-[#2457DA]' : '!border-transparent'" :aria-label="`Pilih warna ${label}`" :aria-pressed="form.color === color" @click="form.color = color"><span class="block h-6 w-6 rounded-full" :style="planIconStyle(color)" /></ButtonPrimary>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <ButtonPrimary v-for="([color, label]) in Object.entries(colors)" :key="color" type="button" variant="secondary" class="!inline-flex !h-10 !min-h-10 !w-10 !items-center !justify-center !rounded-full !p-0" :class="form.color === color ? '!border-[#2457DA] !ring-2 !ring-[#2457DA]/20 !ring-offset-1' : '!border-transparent'" :aria-label="`Pilih warna ${label}`" :aria-pressed="form.color === color" @click="form.color = color"><span class="block h-6 w-6 shrink-0 rounded-full" :style="planIconStyle(color)" /></ButtonPrimary>
+                                <label
+                                    class="relative inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border bg-white p-1 transition"
+                                    :class="/^#[\da-f]{6}$/i.test(form.color) ? 'border-[#2457DA] ring-2 ring-[#2457DA]/20 ring-offset-1' : 'border-dashed border-[#C9D1DE] hover:border-[#2457DA]'"
+                                    title="Pilih warna kustom"
+                                >
+                                    <span class="flex h-6 w-6 items-center justify-center rounded-full" :style="planIconStyle(customColorValue)">
+                                        <Palette :size="13" class="text-white drop-shadow" />
+                                    </span>
+                                    <input
+                                        v-model="customColorValue"
+                                        class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                        type="color"
+                                        aria-label="Pilih warna kustom"
+                                        @input="form.color = $event.target.value"
+                                    />
+                                </label>
                             </div>
                         </fieldset>
                     </div>
@@ -317,6 +360,94 @@ const selectedSaving = computed(() => props.savings.find(
                 </ButtonPrimary>
             </div>
         </footer>
+            </div>
+
+            <aside
+                v-if="cmsMode"
+                class="min-h-[420px] rounded-2xl border border-[#E2E8F2] bg-white p-5 shadow-[0_4px_18px_rgba(41,82,160,0.04)] sm:p-6"
+            >
+                <template v-if="activeStep === 1">
+                    <h2 class="text-lg font-bold text-[#152338]">Pratinjau</h2>
+                    <p class="mt-1 text-sm text-[#758196]">Berikut tampilan budget plan kamu.</p>
+                    <div class="relative isolate mt-5 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#F4F8FD_0%,#EDF4FF_100%)] p-5">
+                        <svg
+                            aria-hidden="true"
+                            class="pointer-events-none absolute -right-1 top-0 z-0 h-full w-[58%]"
+                            viewBox="0 0 240 260"
+                            fill="none"
+                            preserveAspectRatio="xMidYMid slice"
+                        >
+                            <path
+                                d="M132 -35C122 27 213 16 226 76C239 132 174 151 192 210C201 239 224 258 250 278"
+                                stroke="#8FB1FF"
+                                stroke-width="30"
+                                stroke-linecap="round"
+                                opacity=".2"
+                            />
+                            <g stroke="#78A2FF" stroke-width="1" opacity=".38">
+                                <circle cx="174" cy="126" r="43" />
+                                <circle cx="174" cy="126" r="51" />
+                                <circle cx="174" cy="126" r="59" />
+                                <circle cx="174" cy="126" r="67" />
+                                <circle cx="174" cy="126" r="75" />
+                                <circle cx="225" cy="248" r="53" />
+                                <circle cx="225" cy="248" r="61" />
+                                <circle cx="225" cy="248" r="69" />
+                                <circle cx="225" cy="248" r="77" />
+                            </g>
+                        </svg>
+                        <div class="relative z-10">
+                        <span class="flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-[0_8px_18px_rgba(36,87,218,0.2)]" :style="planIconStyle(form.color)">
+                            <component :is="planIcon(form.icon)" :size="26" />
+                        </span>
+                        <h3 class="mt-3 truncate text-xl font-bold text-[#152338]">{{ form.name || 'Nama rencana' }}</h3>
+                        <p class="mt-1 text-sm text-[#758196]">{{ form.type === 'goal' ? 'Rencana tujuan' : 'Anggaran belanja' }}</p>
+                        <p class="mt-4 text-3xl font-bold tracking-tight text-[#111B39]">
+                            {{ formatCurrency(form.type === 'goal' ? form.target_amount : form.amount, form.currency) }}
+                        </p>
+                        <p class="mt-1 text-sm text-[#758196]">{{ form.type === 'goal' ? 'target dana' : 'per periode' }}</p>
+                        </div>
+                    </div>
+                    <dl class="mt-5 divide-y divide-[#E8EDF5] border-y border-[#E8EDF5] text-sm">
+                        <div class="flex justify-between gap-4 py-3.5">
+                            <dt class="text-[#758196]">Akun sumber</dt>
+                            <dd class="text-right font-medium text-[#152338]">{{ selectedAccount ? `${selectedAccount.name} · ${displayAccountCurrency(selectedAccount)}` : 'Belum dipilih' }}</dd>
+                        </div>
+                        <div class="flex justify-between gap-4 py-3.5">
+                            <dt class="text-[#758196]">Kategori</dt>
+                            <dd class="text-right font-medium text-[#152338]">{{ selectedCategory?.name || 'Belum dipilih' }}</dd>
+                        </div>
+                    </dl>
+                    <div class="mt-5 flex items-start gap-3 rounded-xl bg-[#F1F5FC] p-4 text-sm text-[#64748B]">
+                        <Info :size="18" class="mt-0.5 shrink-0 text-[#1764F5]" />
+                        <span>Jadwal diatur pada langkah berikutnya.</span>
+                    </div>
+                </template>
+                <template v-else>
+                    <h2 class="text-lg font-bold text-[#152338]">{{ activeStep === 2 ? 'Ringkasan sementara' : 'Ringkasan rencana' }}</h2>
+                    <p class="mt-1 text-sm text-[#758196]">Periksa detail rencana sebelum melanjutkan.</p>
+                    <div class="mt-5 flex items-center gap-4 rounded-2xl bg-[#F4F8FD] p-4">
+                        <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white" :style="planIconStyle(form.color)">
+                            <component :is="planIcon(form.icon)" :size="25" />
+                        </span>
+                        <div class="min-w-0">
+                            <p class="truncate font-bold text-[#152338]">{{ form.name || 'Nama rencana' }}</p>
+                            <p class="text-sm text-[#758196]">{{ formatCurrency(form.type === 'goal' ? form.target_amount : form.amount, form.currency) }} {{ form.type === 'goal' ? 'target' : 'per periode' }}</p>
+                        </div>
+                    </div>
+                    <dl class="mt-5 divide-y divide-[#E8EDF5] border-y border-[#E8EDF5] text-sm">
+                        <div class="flex justify-between gap-4 py-3.5"><dt class="text-[#758196]">Akun sumber</dt><dd class="text-right font-medium">{{ selectedAccount ? `${selectedAccount.name} · ${displayAccountCurrency(selectedAccount)}` : 'Belum dipilih' }}</dd></div>
+                        <div class="flex justify-between gap-4 py-3.5"><dt class="text-[#758196]">Kategori</dt><dd class="text-right font-medium">{{ selectedCategory?.name || 'Belum dipilih' }}</dd></div>
+                        <div class="flex justify-between gap-4 py-3.5"><dt class="text-[#758196]">Mulai</dt><dd class="text-right font-medium">{{ formatDate(form.starts_on) }}</dd></div>
+                        <div class="flex justify-between gap-4 py-3.5"><dt class="text-[#758196]">Pengulangan</dt><dd class="text-right font-medium">{{ form.is_recurring ? `Setiap ${form.interval} bulan` : 'Satu kali' }}</dd></div>
+                        <div class="flex justify-between gap-4 py-3.5"><dt class="text-[#758196]">Pengingat</dt><dd class="text-right font-medium">{{ form.remind ? '1 hari sebelumnya' : 'Tidak ada' }}</dd></div>
+                    </dl>
+                    <div v-if="activeStep === 3" class="mt-5 flex items-start gap-3 rounded-xl bg-[#F1F5FC] p-4 text-sm text-[#64748B]">
+                        <Info :size="18" class="mt-0.5 shrink-0 text-[#1764F5]" />
+                        <span>Membuat rencana tidak mengubah saldo akun.</span>
+                    </div>
+                </template>
+            </aside>
         </form>
     </div>
 </template>
