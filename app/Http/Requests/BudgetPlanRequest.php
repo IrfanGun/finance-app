@@ -28,7 +28,7 @@ class BudgetPlanRequest extends FormRequest
                 Rule::when(
                     in_array($this->input('color'), array_keys(BudgetPlan::COLORS), true),
                     [Rule::in(array_keys(BudgetPlan::COLORS))],
-                    [Rule::hexColor()],
+                    ['hex_color'],
                 ),
             ],
             'amount' => [$goal ? 'nullable' : 'required', 'numeric', 'gt:0', 'decimal:0,2'],
