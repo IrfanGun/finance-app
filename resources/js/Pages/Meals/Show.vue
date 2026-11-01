@@ -4,10 +4,12 @@ import { ArrowLeft, MapPin, Star } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
 import { dashboard } from '@/routes';
 import { index as mealsIndex } from '@/routes/meals';
+import { index as cmsMealsIndex } from '@/routes/cms/meals';
 
 const props = defineProps({
     mealRecord: { type: Object, required: true },
     openingStatus: { type: String, default: 'unknown' },
+    isCms: { type: Boolean, default: false },
 });
 
 const weekdays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -34,9 +36,9 @@ const recordExpense = () => {
 
 <template>
     <Head :title="mealRecord.name" />
-    <div class="mx-auto min-h-screen w-full max-w-lg bg-[#F7F8FA] pb-28 text-[#152338]">
-        <header class="flex items-center justify-between bg-white px-6 py-5">
-            <Link :href="mealsIndex.url()" aria-label="Kembali ke Meal Record"><ArrowLeft :size="22" class="text-[#2457DA]" /></Link>
+    <div :class="isCms ? 'min-h-screen w-full space-y-5 text-[#152338]' : 'mx-auto min-h-screen w-full max-w-lg bg-[#F7F8FA] pb-28 text-[#152338]'">
+        <header class="flex items-center justify-between bg-white px-6 py-5" :class="isCms ? 'rounded-2xl border border-[#E9EDF3]' : ''">
+            <Link :href="(isCms ? cmsMealsIndex : mealsIndex).url()" aria-label="Kembali ke Meal Record"><ArrowLeft :size="22" class="text-[#2457DA]" /></Link>
             <h1 class="text-lg font-semibold">{{ $t("Detail makanan") }}</h1>
             <span class="w-6" />
         </header>
@@ -86,6 +88,6 @@ const recordExpense = () => {
                 @click="router.visit(dashboard.url())"
             > {{ $t("Kembali ke dashboard") }} </ButtonPrimary>
         </main>
-        <MobileBottomNav />
+        <MobileBottomNav v-if="!isCms" />
     </div>
 </template>

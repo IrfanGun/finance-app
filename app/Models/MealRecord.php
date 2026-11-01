@@ -17,9 +17,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'rating',
     'address',
     'impression',
+    'photo_path',
 ])]
 class MealRecord extends Model
 {
+    protected $hidden = [
+        'photo_path',
+    ];
+
     protected function casts(): array
     {
         return [

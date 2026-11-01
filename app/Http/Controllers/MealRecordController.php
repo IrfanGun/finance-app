@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMealRecordRequest;
+use App\Http\Requests\UploadMealRecordPhotoRequest;
 use App\Models\MealRecord;
 use App\Services\MealRecordService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,6 +32,7 @@ class MealRecordController extends Controller
                     ? $mealRecords->openingStatus($mealRecord)
                     : null,
             );
+            $mealRecord->setAttribute('has_photo', $mealRecord->photo_path !== null);
 
             return $mealRecord;
         });
@@ -36,6 +40,7 @@ class MealRecordController extends Controller
         return Inertia::render('Meals/Index', [
             'mealRecords' => $records,
             'filters' => $filters,
+            'isCms' => $request->routeIs('cms.meals.*'),
         ]);
     }
 
@@ -45,7 +50,8 @@ class MealRecordController extends Controller
     ): RedirectResponse {
         $mealRecords->save($request->user(), $request->validated());
 
-        return redirect()->route('meals.index')->with('success', 'Pilihan makanan berhasil disimpan.');
+        return $this->mealIndexRedirect($request)
+            ->with('success', 'Pilihan makanan berhasil disimpan.');
     }
 
     public function show(Request $request, int $meal, MealRecordService $mealRecords): Response
@@ -53,10 +59,12 @@ class MealRecordController extends Controller
         $mealRecord = $request->user()->mealRecords()
             ->with('openingHours')
             ->findOrFail($meal);
+        $mealRecord->setAttribute('has_photo', $mealRecord->photo_path !== null);
 
         return Inertia::render('Meals/Show', [
             'mealRecord' => $mealRecord,
             'openingStatus' => $mealRecords->openingStatus($mealRecord),
+            'isCms' => $request->routeIs('cms.meals.*'),
         ]);
     }
 
@@ -68,7 +76,8 @@ class MealRecordController extends Controller
         $record = $request->user()->mealRecords()->findOrFail($meal);
         $mealRecords->save($request->user(), $request->validated(), $record);
 
-        return redirect()->route('meals.index')->with('success', 'Pilihan makanan berhasil diperbarui.');
+        return $this->mealIndexRedirect($request)
+            ->with('success', 'Pilihan makanan berhasil diperbarui.');
     }
 
     public function destroy(Request $request, int $meal, MealRecordService $mealRecords): RedirectResponse
@@ -76,6 +85,38 @@ class MealRecordController extends Controller
         $record = $request->user()->mealRecords()->findOrFail($meal);
         $mealRecords->delete($record);
 
-        return redirect()->route('meals.index')->with('success', 'Pilihan makanan berhasil dihapus.');
+        return $this->mealIndexRedirect($request)
+            ->with('success', 'Pilihan makanan berhasil dihapus.');
+    }
+
+    public function uploadPhoto(
+        UploadMealRecordPhotoRequest $request,
+        int $meal,
+        MealRecordService $mealRecords,
+    ): RedirectResponse {
+        $record = $request->user()->mealRecords()->findOrFail($meal);
+        $mealRecords->replacePhoto($record, $request->file('photo'));
+
+        return back();
+    }
+
+    public function photo(Request $request, int $meal): HttpResponse
+    {
+        $record = $request->user()->mealRecords()->findOrFail($meal);
+        abort_if($record->photo_path === null, 404);
+
+        $disk = Storage::disk('local');
+        abort_unless($disk->exists($record->photo_path), 404);
+
+        return response($disk->get($record->photo_path), 200, [
+            'Cache-Control' => 'private, max-age=3600',
+            'Content-Type' => $disk->mimeType($record->photo_path) ?? 'application/octet-stream',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    private function mealIndexRedirect(Request $request): RedirectResponse
+    {
+        return to_route($request->routeIs('cms.meals.*') ? 'cms.meals.index' : 'meals.index');
     }
 }

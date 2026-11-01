@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { store as mealStore, update as mealUpdate } from '@/routes/meals';
+import { store as cmsMealStore, update as cmsMealUpdate } from '@/routes/cms/meals';
 import {
     createEmptyMealForm,
     getOpeningHoursForForm,
@@ -9,7 +10,7 @@ import {
     weekdays,
 } from './lib/mealRecord';
 
-export function useMealRecordForm(formElement) {
+export function useMealRecordForm(formElement, isCms = false) {
     const formVisible = ref(false);
     const currentStep = ref(1);
     const hasOpeningHours = ref(false);
@@ -196,12 +197,14 @@ export function useMealRecordForm(formElement) {
         };
 
         if (editingMeal.value) {
-            form.put(mealUpdate.url(editingMeal.value.id), options);
+            const updateRoute = isCms ? cmsMealUpdate : mealUpdate;
+            form.put(updateRoute.url(editingMeal.value.id), options);
 
             return;
         }
 
-        form.post(mealStore.url(), options);
+        const storeRoute = isCms ? cmsMealStore : mealStore;
+        form.post(storeRoute.url(), options);
     };
 
     return {

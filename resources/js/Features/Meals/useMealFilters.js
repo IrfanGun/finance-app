@@ -2,7 +2,7 @@ import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { index as mealsIndex } from '@/routes/meals';
 
-export function useMealFilters(filters = {}) {
+export function useMealFilters(filters = {}, indexRoute = mealsIndex) {
     const isLoading = ref(false);
     const search = ref(filters.search ?? '');
     const typeFilter = ref(filters.type ?? '');
@@ -13,7 +13,7 @@ export function useMealFilters(filters = {}) {
     watch(
         [search, typeFilter, availabilityFilter, priceMinFilter, priceMaxFilter],
         () => {
-            router.get(mealsIndex.url(), {
+            router.get(indexRoute.url(), {
                 search: search.value || undefined,
                 type: typeFilter.value || undefined,
                 availability: availabilityFilter.value || undefined,

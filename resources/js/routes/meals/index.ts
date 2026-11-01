@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:15
+ * @see app/Http/Controllers/MealRecordController.php:18
  * @route '/meals'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:15
+ * @see app/Http/Controllers/MealRecordController.php:18
  * @route '/meals'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:15
+ * @see app/Http/Controllers/MealRecordController.php:18
  * @route '/meals'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:15
+ * @see app/Http/Controllers/MealRecordController.php:18
  * @route '/meals'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:42
+ * @see app/Http/Controllers/MealRecordController.php:47
  * @route '/meals'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:42
+ * @see app/Http/Controllers/MealRecordController.php:47
  * @route '/meals'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:42
+ * @see app/Http/Controllers/MealRecordController.php:47
  * @route '/meals'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -78,7 +78,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:51
+ * @see app/Http/Controllers/MealRecordController.php:57
  * @route '/meals/{meal}'
  */
 export const show = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -93,7 +93,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:51
+ * @see app/Http/Controllers/MealRecordController.php:57
  * @route '/meals/{meal}'
  */
 show.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ show.url = (args: { meal: string | number } | [meal: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:51
+ * @see app/Http/Controllers/MealRecordController.php:57
  * @route '/meals/{meal}'
  */
 show.get = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -130,7 +130,7 @@ show.get = (args: { meal: string | number } | [meal: string | number ] | string 
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:51
+ * @see app/Http/Controllers/MealRecordController.php:57
  * @route '/meals/{meal}'
  */
 show.head = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -140,7 +140,7 @@ show.head = (args: { meal: string | number } | [meal: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:63
+ * @see app/Http/Controllers/MealRecordController.php:71
  * @route '/meals/{meal}'
  */
 export const update = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -155,7 +155,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:63
+ * @see app/Http/Controllers/MealRecordController.php:71
  * @route '/meals/{meal}'
  */
 update.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -183,7 +183,7 @@ update.url = (args: { meal: string | number } | [meal: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:63
+ * @see app/Http/Controllers/MealRecordController.php:71
  * @route '/meals/{meal}'
  */
 update.put = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -192,7 +192,7 @@ update.put = (args: { meal: string | number } | [meal: string | number ] | strin
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:63
+ * @see app/Http/Controllers/MealRecordController.php:71
  * @route '/meals/{meal}'
  */
 update.patch = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -202,7 +202,7 @@ update.patch = (args: { meal: string | number } | [meal: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:74
+ * @see app/Http/Controllers/MealRecordController.php:83
  * @route '/meals/{meal}'
  */
 export const destroy = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -217,7 +217,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:74
+ * @see app/Http/Controllers/MealRecordController.php:83
  * @route '/meals/{meal}'
  */
 destroy.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -245,7 +245,7 @@ destroy.url = (args: { meal: string | number } | [meal: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:74
+ * @see app/Http/Controllers/MealRecordController.php:83
  * @route '/meals/{meal}'
  */
 destroy.delete = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

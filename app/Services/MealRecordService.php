@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Models\MealRecord;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class MealRecordService
 {
@@ -37,7 +40,38 @@ class MealRecordService
 
     public function delete(MealRecord $mealRecord): void
     {
+        $photoPath = $mealRecord->photo_path;
         $mealRecord->delete();
+
+        if ($photoPath !== null) {
+            Storage::disk('local')->delete($photoPath);
+        }
+    }
+
+    public function replacePhoto(MealRecord $mealRecord, UploadedFile $photo): void
+    {
+        $previousPath = $mealRecord->photo_path;
+        $photoPath = $photo->store('meal-records', 'local');
+
+        if (! is_string($photoPath)) {
+            throw new RuntimeException('Foto makanan gagal disimpan.');
+        }
+
+        try {
+            DB::transaction(function () use ($mealRecord, $photoPath): void {
+                $mealRecord->forceFill([
+                    'photo_path' => $photoPath,
+                ])->save();
+            });
+        } catch (\Throwable $exception) {
+            Storage::disk('local')->delete($photoPath);
+
+            throw $exception;
+        }
+
+        if ($previousPath !== null) {
+            Storage::disk('local')->delete($previousPath);
+        }
     }
 
     public function openingStatus(MealRecord $mealRecord, ?Carbon $now = null): string

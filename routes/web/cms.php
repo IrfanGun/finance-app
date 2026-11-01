@@ -8,6 +8,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Cms\AuthenticatedSessionController as CmsAuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinancialAccountController;
+use App\Http\Controllers\MealRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RecurringReminderController;
@@ -155,6 +156,18 @@ Route::prefix('cms')
             ) {
                 return $controller->logs($request, $asset, $assets);
             })->whereNumber('asset')->name('assets.depreciation.logs');
+
+            Route::resource('meals', MealRecordController::class)
+                ->parameters(['meals' => 'meal'])
+                ->only(['index', 'show', 'store', 'update', 'destroy']);
+
+            Route::post('meals/{meal}/photo', [MealRecordController::class, 'uploadPhoto'])
+                ->whereNumber('meal')
+                ->name('meals.photo.store');
+
+            Route::get('meals/{meal}/photo', [MealRecordController::class, 'photo'])
+                ->whereNumber('meal')
+                ->name('meals.photo');
 
             Route::get('chat', function (
                 Request $request,
