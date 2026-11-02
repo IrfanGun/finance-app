@@ -1,11 +1,13 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import {
     ArrowRight,
     CalendarDays,
     ChartNoAxesCombined,
     ChevronDown,
+    ChevronLeft,
+    ChevronRight,
     CircleAlert,
     Wallet,
 } from 'lucide-vue-next';
@@ -56,6 +58,12 @@ const availableYears = computed(() => {
 
 const selectedMonthLabel = computed(() => new Intl.DateTimeFormat('id-ID', {
     month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+}).format(new Date(Date.UTC(selectedYear.value, selectedMonth.value, 1))));
+
+const selectedMonthShortLabel = computed(() => new Intl.DateTimeFormat('id-ID', {
+    month: 'short',
     year: 'numeric',
     timeZone: 'UTC',
 }).format(new Date(Date.UTC(selectedYear.value, selectedMonth.value, 1))));
@@ -112,6 +120,186 @@ const plansAwaitingFunding = computed(() => props.plans.filter((plan) =>
         && periodForSelectedMonth(plan)?.status === 'awaiting_funding',
 ));
 
+const monthlyFundingDetails = computed(() => {
+    const months = new Map();
+    const selectedMonthKey = `${selectedYear.value}-${String(selectedMonth.value + 1).padStart(2, '0')}`;
+
+    props.plans
+        .filter((plan) => plan.type === 'spending' && plan.currency === props.selectedCurrency)
+        .forEach((plan) => {
+            (plan.periods ?? [])
+                .filter((period) => period.starts_on?.slice(0, 7) <= selectedMonthKey)
+                .forEach((period) => {
+                    const remainingAmount = Math.max(Number(period.remaining ?? 0), 0);
+
+                    if (remainingAmount <= 0) {
+                        return;
+                    }
+
+                    const monthKey = period.starts_on.slice(0, 7);
+                    const month = months.get(monthKey) ?? {
+                        key: monthKey,
+                        label: new Intl.DateTimeFormat('id-ID', {
+                            month: 'long',
+                            year: 'numeric',
+                            timeZone: 'UTC',
+                        }).format(new Date(`${monthKey}-01T00:00:00Z`)),
+                        shortLabel: new Intl.DateTimeFormat('id-ID', {
+                            month: 'short',
+                            year: 'numeric',
+                            timeZone: 'UTC',
+                        }).format(new Date(`${monthKey}-01T00:00:00Z`)),
+                        remainingAmount: 0,
+                    };
+
+                    month.remainingAmount += remainingAmount;
+                    months.set(monthKey, month);
+                });
+        });
+
+    return [...months.values()]
+        .sort((first, second) => second.key.localeCompare(first.key));
+});
+
+const fundingThemes = [
+    {
+        card: 'bg-gradient-to-br from-[#0867F2] via-[#1265EC] to-[#2457DA] text-white',
+        text: 'text-white/80',
+        mutedText: 'text-white/75',
+        icon: 'bg-white/15',
+        pill: 'bg-white/15 text-white/90',
+        button: '!border-white/35 !bg-white/15 !text-white hover:!bg-white/25',
+        decoration: 'bg-white/[0.07]',
+        dot: '!bg-[#1768EB]',
+        layer: 'bg-[#DCE8FF]',
+    },
+    {
+        card: 'bg-gradient-to-br from-[#FFF0B8] to-[#F6D46D] text-[#28364D]',
+        text: 'text-[#52627E]',
+        mutedText: 'text-[#52627E]/80',
+        icon: 'bg-white/50',
+        pill: 'bg-white/55 text-[#344563]',
+        button: '!border-[#9C7A24]/40 !bg-white/45 !text-[#344563] hover:!bg-white/70',
+        decoration: 'bg-white/25',
+        dot: '!bg-[#D9A822]',
+        layer: 'bg-[#FFF0B8]',
+    },
+    {
+        card: 'bg-gradient-to-br from-[#D9F8E8] to-[#AEEFCB] text-[#243B34]',
+        text: 'text-[#48675B]',
+        mutedText: 'text-[#48675B]/80',
+        icon: 'bg-white/50',
+        pill: 'bg-white/55 text-[#345448]',
+        button: '!border-[#4D8C70]/35 !bg-white/45 !text-[#345448] hover:!bg-white/70',
+        decoration: 'bg-white/30',
+        dot: '!bg-[#42A87C]',
+        layer: 'bg-[#D9F8E8]',
+    },
+    {
+        card: 'bg-gradient-to-br from-[#FFE8F0] to-[#F8C7D8] text-[#49313D]',
+        text: 'text-[#795363]',
+        mutedText: 'text-[#795363]/80',
+        icon: 'bg-white/50',
+        pill: 'bg-white/55 text-[#614454]',
+        button: '!border-[#A86E87]/35 !bg-white/45 !text-[#614454] hover:!bg-white/70',
+        decoration: 'bg-white/30',
+        dot: '!bg-[#CF7298]',
+        layer: 'bg-[#FFE8F0]',
+    },
+];
+
+const fundingSlides = computed(() => {
+    const availableSlide = {
+        key: 'available',
+        type: 'available',
+        label: selectedMonthLabel.value,
+        shortLabel: selectedMonthShortLabel.value,
+        theme: fundingThemes[0],
+    };
+    const months = monthlyFundingDetails.value;
+    const visibleMonths = months.length <= 9
+        ? months
+        : [
+            ...months.slice(0, 8),
+            {
+                key: 'accumulated',
+                type: 'accumulated',
+                label: 'Akumulasi sisa budget',
+                monthCount: months.length - 8,
+                remainingAmount: months
+                    .slice(8)
+                    .reduce((total, month) => total + month.remainingAmount, 0),
+            },
+        ];
+
+    return [
+        availableSlide,
+        ...visibleMonths.map((month, index) => ({
+            ...month,
+            type: month.type ?? 'month',
+            theme: fundingThemes[(index + 1) % fundingThemes.length],
+        })),
+    ];
+});
+
+const activeFundingSlide = ref(0);
+const fundingTouchStartX = ref(null);
+const pastelLayerThemes = computed(() => {
+    const layerPositions = [
+        'left-7 right-7 top-0',
+        'left-5 right-5 top-2',
+        'left-3 right-3 top-4',
+    ];
+    const layerCount = Math.min(3, fundingSlides.value.length - 1);
+
+    return Array.from({ length: layerCount }, (_, index) => {
+        const positionIndex = 3 - layerCount + index;
+        const slideOffset = layerCount - index;
+        const slideIndex = (activeFundingSlide.value + slideOffset) % fundingSlides.value.length;
+
+        return {
+            ...fundingSlides.value[slideIndex].theme,
+            position: layerPositions[positionIndex],
+        };
+    });
+});
+
+watch(fundingSlides, () => {
+    activeFundingSlide.value = 0;
+});
+
+const changeFundingSlide = (direction) => {
+    if (fundingSlides.value.length < 2) {
+        return;
+    }
+
+    activeFundingSlide.value = (activeFundingSlide.value + direction + fundingSlides.value.length)
+        % fundingSlides.value.length;
+};
+
+const selectFundingSlide = (slideIndex) => {
+    activeFundingSlide.value = slideIndex;
+};
+
+const handleFundingTouchStart = (event) => {
+    fundingTouchStartX.value = event.changedTouches[0]?.clientX ?? null;
+};
+
+const handleFundingTouchEnd = (event) => {
+    if (fundingTouchStartX.value === null) {
+        return;
+    }
+
+    const distance = fundingTouchStartX.value - event.changedTouches[0].clientX;
+    fundingTouchStartX.value = null;
+
+    if (Math.abs(distance) < 40) {
+        return;
+    }
+
+    changeFundingSlide(distance > 0 ? 1 : -1);
+};
+
 const monthlyPlans = computed(() => props.plans
     .filter((plan) => plan.type === 'spending'
         && plan.currency === props.selectedCurrency
@@ -121,10 +309,12 @@ const monthlyPlans = computed(() => props.plans
         period: periodForSelectedMonth(plan),
     })));
 
-const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { plan, period }) => ({
-    allocated: totals.allocated + Number(period?.allocated_amount ?? plan.amount ?? 0),
-    spent: totals.spent + Number(period?.spent ?? 0),
-}), { allocated: 0, spent: 0 }));
+const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { plan, period }) => {
+    return {
+        allocated: totals.allocated + Number(period?.allocated_amount ?? plan.amount ?? 0),
+        spent: totals.spent + Number(period?.spent ?? 0),
+    };
+}, { allocated: 0, spent: 0 }));
 </script>
 
 <template>
@@ -214,21 +404,140 @@ const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { 
         </Link>
 
         <section class="grid gap-4 md:grid-cols-3">
-            <article class="relative isolate overflow-hidden rounded-2xl bg-gradient-to-br from-[#1265EC] to-[#2457DA] p-5 text-white sm:p-6">
-                <span class="pointer-events-none absolute -right-10 -top-8 -z-10 h-40 w-40 rounded-full bg-white/10" />
-                <div class="flex items-center gap-4">
-                    <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                        <Wallet :size="23" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium text-white/85">{{ $t('Dana tersedia') }}</p>
-                        <p class="mt-1 truncate text-2xl font-bold tracking-tight sm:text-3xl">
-                            {{ formatCurrency(totals[selectedCurrency]?.free ?? 0, selectedCurrency) }}
-                        </p>
-                        <p class="mt-1 text-xs text-white/75">{{ $t('Belum dialokasikan') }}</p>
-                    </div>
-                </div>
-            </article>
+            <div class="relative isolate px-1 pt-5">
+                <span
+                    v-for="(layer, layerIndex) in pastelLayerThemes"
+                    :key="layerIndex"
+                    class="pointer-events-none absolute h-10 rounded-[1.5rem] transition-colors duration-500"
+                    :class="[layer.layer, layer.position]"
+                />
+                <Transition name="fund-card" mode="out-in">
+                    <article
+                        :key="fundingSlides[activeFundingSlide]?.key"
+                        class="relative min-h-[9rem] touch-pan-y overflow-hidden rounded-2xl p-3 shadow-[0_12px_26px_rgba(18,101,236,0.16)] sm:min-h-[10rem] sm:p-4"
+                        :class="fundingSlides[activeFundingSlide]?.theme.card"
+                        role="group"
+                        aria-roledescription="slide"
+                        :aria-label="`${activeFundingSlide + 1} / ${fundingSlides.length}`"
+                        @touchstart.passive="handleFundingTouchStart"
+                        @touchend.passive="handleFundingTouchEnd"
+                    >
+                        <span
+                            class="pointer-events-none absolute -right-6 -top-10 h-44 w-44 rounded-full transition-colors duration-500"
+                            :class="fundingSlides[activeFundingSlide]?.theme.decoration"
+                        />
+
+                        <div class="relative flex min-h-[7rem] flex-col justify-between gap-2">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <span
+                                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12"
+                                        :class="fundingSlides[activeFundingSlide]?.theme.icon"
+                                    >
+                                        <Wallet :size="22" />
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p
+                                            class="text-sm font-medium sm:text-base"
+                                            :class="fundingSlides[activeFundingSlide]?.theme.text"
+                                        >
+                                            {{ fundingSlides[activeFundingSlide]?.type === 'available'
+                                                ? $t('Dana tersedia')
+                                                : fundingSlides[activeFundingSlide]?.type === 'accumulated'
+                                                    ? $t(fundingSlides[activeFundingSlide]?.label)
+                                                    : $t('Sisa budget') }}
+                                        </p>
+                                        <p class="mt-1 truncate text-xl font-bold tracking-tight sm:text-2xl">
+                                            {{ formatCurrency(
+                                                fundingSlides[activeFundingSlide]?.type === 'available'
+                                                    ? totals[selectedCurrency]?.free ?? 0
+                                                    : fundingSlides[activeFundingSlide]?.remainingAmount,
+                                                selectedCurrency,
+                                            ) }}
+                                        </p>
+                                        <p
+                                            class="mt-1 text-xs"
+                                            :class="fundingSlides[activeFundingSlide]?.theme.mutedText"
+                                        >
+                                            <template v-if="fundingSlides[activeFundingSlide]?.type === 'available'">
+                                                {{ $t('Belum dialokasikan') }}
+                                            </template>
+                                            <template v-else-if="fundingSlides[activeFundingSlide]?.type === 'accumulated'">
+                                                {{ $t('Gabungan sisa {count} bulan sebelumnya', {
+                                                    count: fundingSlides[activeFundingSlide]?.monthCount,
+                                                }) }}
+                                            </template>
+                                            <template v-else>
+                                                {{ $t('Sisa budget') }}
+                                            </template>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <span
+                                    class="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
+                                    :class="fundingSlides[activeFundingSlide]?.theme.pill"
+                                >
+                                    {{ fundingSlides[activeFundingSlide]?.type === 'accumulated'
+                                        ? $t('{count} bulan', { count: fundingSlides[activeFundingSlide]?.monthCount })
+                                        : fundingSlides[activeFundingSlide]?.shortLabel }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-end justify-between gap-2">
+                                <p class="truncate text-sm font-semibold capitalize">
+                                    {{ fundingSlides[activeFundingSlide]?.type === 'accumulated'
+                                        ? $t(fundingSlides[activeFundingSlide]?.label)
+                                        : fundingSlides[activeFundingSlide]?.label }}
+                                </p>
+                                <div class="flex shrink-0 items-center gap-1">
+                                    <span class="mr-0.5 text-[11px] font-semibold">
+                                        {{ activeFundingSlide + 1 }} / {{ fundingSlides.length }}
+                                    </span>
+                                    <ButtonPrimary
+                                        type="button"
+                                        variant="secondary"
+                                        class="!inline-flex !h-7 !min-h-7 !w-7 !shrink-0 !items-center !justify-center !rounded-full !border !p-0 !leading-none"
+                                        :class="fundingSlides[activeFundingSlide]?.theme.button"
+                                        :aria-label="$t('Sebelumnya')"
+                                        :disabled="fundingSlides.length < 2"
+                                        @click="changeFundingSlide(-1)"
+                                    >
+                                        <ChevronLeft :size="16" />
+                                    </ButtonPrimary>
+                                    <ButtonPrimary
+                                        type="button"
+                                        variant="secondary"
+                                        class="!inline-flex !h-7 !min-h-7 !w-7 !shrink-0 !items-center !justify-center !rounded-full !border !p-0 !leading-none"
+                                        :class="fundingSlides[activeFundingSlide]?.theme.button"
+                                        :aria-label="$t('Berikutnya')"
+                                        :disabled="fundingSlides.length < 2"
+                                        @click="changeFundingSlide(1)"
+                                    >
+                                        <ChevronRight :size="16" />
+                                    </ButtonPrimary>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </Transition>
+
+            <div class="flex justify-center gap-2" role="group" :aria-label="$t('Pilih bulan')">
+                <ButtonPrimary
+                    v-for="(slide, slideIndex) in fundingSlides"
+                    :key="slide.key"
+                    type="button"
+                    variant="secondary"
+                    class="!h-2 !min-h-2 !rounded-full !p-0 transition-all"
+                    :class="activeFundingSlide === slideIndex
+                        ? `!w-8 ${slide.theme.dot}`
+                        : '!w-5 !bg-[#CBD7EA] hover:!bg-[#9FB4D6]'"
+                    :aria-label="slide.type === 'accumulated' ? $t(slide.label) : slide.label"
+                    :aria-pressed="activeFundingSlide === slideIndex"
+                    @click="selectFundingSlide(slideIndex)"
+                />
+            </div>
+            </div>
 
             <article class="flex items-center gap-4 rounded-2xl border border-[#E4EAF4] bg-white p-5 sm:p-6">
                 <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EEF4FF] text-[#1768EB]">
@@ -297,3 +606,22 @@ const selectedMonthTotals = computed(() => monthlyPlans.value.reduce((totals, { 
         </div>
     </div>
 </template>
+
+<style scoped>
+.fund-card-enter-active,
+.fund-card-leave-active {
+    transition:
+        opacity 220ms ease,
+        transform 320ms cubic-bezier(0.2, 0.75, 0.3, 1);
+}
+
+.fund-card-enter-from {
+    opacity: 0.5;
+    transform: translate3d(0, 18px, 0) scale(0.95);
+}
+
+.fund-card-leave-to {
+    opacity: 0;
+    transform: translate3d(24px, -8px, 0) scale(0.96) rotate(1deg);
+}
+</style>
