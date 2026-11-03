@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:92
+ * @see app/Http/Controllers/MealRecordController.php:161
  * @route '/cms/meals/{meal}/photo'
  */
 export const store = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:92
+ * @see app/Http/Controllers/MealRecordController.php:161
  * @route '/cms/meals/{meal}/photo'
  */
 store.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -44,7 +44,7 @@ store.url = (args: { meal: string | number } | [meal: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:92
+ * @see app/Http/Controllers/MealRecordController.php:161
  * @route '/cms/meals/{meal}/photo'
  */
 store.post = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\TransactionController::index
- * @see app/Http/Controllers/TransactionController.php:14
+ * @see app/Http/Controllers/TransactionController.php:15
  * @route '/transactions'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::index
- * @see app/Http/Controllers/TransactionController.php:14
+ * @see app/Http/Controllers/TransactionController.php:15
  * @route '/transactions'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionController::index
- * @see app/Http/Controllers/TransactionController.php:14
+ * @see app/Http/Controllers/TransactionController.php:15
  * @route '/transactions'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\TransactionController::index
- * @see app/Http/Controllers/TransactionController.php:14
+ * @see app/Http/Controllers/TransactionController.php:15
  * @route '/transactions'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::store
- * @see app/Http/Controllers/TransactionController.php:51
+ * @see app/Http/Controllers/TransactionController.php:52
  * @route '/transactions'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::store
- * @see app/Http/Controllers/TransactionController.php:51
+ * @see app/Http/Controllers/TransactionController.php:52
  * @route '/transactions'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\TransactionController::store
- * @see app/Http/Controllers/TransactionController.php:51
+ * @see app/Http/Controllers/TransactionController.php:52
  * @route '/transactions'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -78,7 +78,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\TransactionController::voidMethod
- * @see app/Http/Controllers/TransactionController.php:69
+ * @see app/Http/Controllers/TransactionController.php:85
  * @route '/transactions/{transaction}/void'
  */
 export const voidMethod = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -93,7 +93,7 @@ voidMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\TransactionController::voidMethod
- * @see app/Http/Controllers/TransactionController.php:69
+ * @see app/Http/Controllers/TransactionController.php:85
  * @route '/transactions/{transaction}/void'
  */
 voidMethod.url = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ voidMethod.url = (args: { transaction: string | number } | [transaction: string 
 
 /**
 * @see \App\Http\Controllers\TransactionController::voidMethod
- * @see app/Http/Controllers/TransactionController.php:69
+ * @see app/Http/Controllers/TransactionController.php:85
  * @route '/transactions/{transaction}/void'
  */
 voidMethod.post = (args: { transaction: string | number } | [transaction: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

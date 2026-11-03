@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMealRecordRequest;
 use App\Http\Requests\UploadMealRecordPhotoRequest;
+use App\Models\FinancialAccount;
 use App\Models\MealRecord;
 use App\Services\MealRecordService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,7 +35,8 @@ class MealRecordController extends Controller
                     ? $mealRecords->openingStatus($mealRecord)
                     : null,
             );
-            $mealRecord->setAttribute('has_photo', $mealRecord->photo_path !== null);
+            $mealRecord->setAttribute('photo_count', count($mealRecord->photoPaths()));
+            $mealRecord->setAttribute('has_photo', $mealRecord->photoPaths() !== []);
 
             return $mealRecord;
         });
@@ -40,6 +44,7 @@ class MealRecordController extends Controller
         return Inertia::render('Meals/Index', [
             'mealRecords' => $records,
             'filters' => $filters,
+            ...($request->routeIs('cms.meals.*') ? $this->expenseFormOptions($request) : []),
             'isCms' => $request->routeIs('cms.meals.*'),
         ]);
     }
@@ -48,7 +53,29 @@ class MealRecordController extends Controller
         StoreMealRecordRequest $request,
         MealRecordService $mealRecords,
     ): RedirectResponse {
-        $mealRecords->save($request->user(), $request->validated());
+        $data = $request->validated();
+        $photos = $data['photos'] ?? [];
+        $removePhotoIndexes = $data['remove_photo_indexes'] ?? [];
+        $primaryPhotoIndex = $data['primary_photo_index'] ?? null;
+        unset($data['photos']);
+        unset($data['remove_photo_indexes']);
+        unset($data['primary_photo_index']);
+
+        if ($removePhotoIndexes !== []) {
+            throw ValidationException::withMessages([
+                'remove_photo_indexes' => 'Foto baru belum dapat dihapus sebelum disimpan.',
+            ]);
+        }
+
+        $mealRecord = $mealRecords->save($request->user(), $data);
+
+        if ($photos !== []) {
+            $mealRecords->appendPhotos($mealRecord, $photos);
+        }
+
+        if ($primaryPhotoIndex !== null && $photos !== []) {
+            $mealRecords->setPrimaryPhoto($mealRecord, $primaryPhotoIndex);
+        }
 
         return $this->mealIndexRedirect($request)
             ->with('success', 'Pilihan makanan berhasil disimpan.');
@@ -59,11 +86,13 @@ class MealRecordController extends Controller
         $mealRecord = $request->user()->mealRecords()
             ->with('openingHours')
             ->findOrFail($meal);
-        $mealRecord->setAttribute('has_photo', $mealRecord->photo_path !== null);
+        $mealRecord->setAttribute('photo_count', count($mealRecord->photoPaths()));
+        $mealRecord->setAttribute('has_photo', $mealRecord->photoPaths() !== []);
 
         return Inertia::render('Meals/Show', [
             'mealRecord' => $mealRecord,
             'openingStatus' => $mealRecords->openingStatus($mealRecord),
+            ...($request->routeIs('cms.meals.*') ? $this->expenseFormOptions($request) : []),
             'isCms' => $request->routeIs('cms.meals.*'),
         ]);
     }
@@ -74,7 +103,47 @@ class MealRecordController extends Controller
         MealRecordService $mealRecords,
     ): RedirectResponse {
         $record = $request->user()->mealRecords()->findOrFail($meal);
-        $mealRecords->save($request->user(), $request->validated(), $record);
+        $data = $request->validated();
+        $photos = $data['photos'] ?? [];
+        $removePhotoIndexes = array_values(array_unique($data['remove_photo_indexes'] ?? []));
+        $primaryPhotoIndex = $data['primary_photo_index'] ?? null;
+        unset($data['photos']);
+        unset($data['remove_photo_indexes']);
+        unset($data['primary_photo_index']);
+
+        $existingPhotoPaths = $record->photoPaths();
+
+        foreach ($removePhotoIndexes as $photoIndex) {
+            if (! array_key_exists($photoIndex, $existingPhotoPaths)) {
+                throw ValidationException::withMessages([
+                    'remove_photo_indexes' => 'Foto yang dipilih tidak tersedia. Muat ulang halaman lalu coba lagi.',
+                ]);
+            }
+        }
+
+        if (count($existingPhotoPaths) - count($removePhotoIndexes) + count($photos) > 5) {
+            throw ValidationException::withMessages([
+                'photos' => 'Setiap makanan dapat memiliki maksimal 5 foto.',
+            ]);
+        }
+
+        $record = $mealRecords->save($request->user(), $data, $record);
+
+        if ($removePhotoIndexes !== []) {
+            $mealRecords->removePhotosAtIndexes($record, $removePhotoIndexes);
+        }
+
+        if ($photos !== []) {
+            $mealRecords->appendPhotos($record, $photos);
+        }
+
+        $photoCountAfterChanges = count($existingPhotoPaths)
+            - count($removePhotoIndexes)
+            + count($photos);
+
+        if ($primaryPhotoIndex !== null && $photoCountAfterChanges > 0) {
+            $mealRecords->setPrimaryPhoto($record, $primaryPhotoIndex);
+        }
 
         return $this->mealIndexRedirect($request)
             ->with('success', 'Pilihan makanan berhasil diperbarui.');
@@ -95,7 +164,7 @@ class MealRecordController extends Controller
         MealRecordService $mealRecords,
     ): RedirectResponse {
         $record = $request->user()->mealRecords()->findOrFail($meal);
-        $mealRecords->replacePhoto($record, $request->file('photo'));
+        $mealRecords->appendPhotos($record, [$request->file('photo')]);
 
         return back();
     }
@@ -103,14 +172,19 @@ class MealRecordController extends Controller
     public function photo(Request $request, int $meal): HttpResponse
     {
         $record = $request->user()->mealRecords()->findOrFail($meal);
-        abort_if($record->photo_path === null, 404);
+        $photoIndex = $request->integer('index', 0);
+        $photoPaths = $record->photoPaths();
+        $photoPath = $photoIndex >= 0
+            ? ($photoPaths[$photoIndex] ?? null)
+            : null;
+        abort_if($photoPath === null, 404);
 
         $disk = Storage::disk('local');
-        abort_unless($disk->exists($record->photo_path), 404);
+        abort_unless($disk->exists($photoPath), 404);
 
-        return response($disk->get($record->photo_path), 200, [
+        return response($disk->get($photoPath), 200, [
             'Cache-Control' => 'private, max-age=3600',
-            'Content-Type' => $disk->mimeType($record->photo_path) ?? 'application/octet-stream',
+            'Content-Type' => $disk->mimeType($photoPath) ?? 'application/octet-stream',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }
@@ -118,5 +192,36 @@ class MealRecordController extends Controller
     private function mealIndexRedirect(Request $request): RedirectResponse
     {
         return to_route($request->routeIs('cms.meals.*') ? 'cms.meals.index' : 'meals.index');
+    }
+
+    private function expenseFormOptions(Request $request): array
+    {
+        $user = $request->user();
+
+        return [
+            'mealCurrency' => 'IDR',
+            'expenseCategories' => $user->categories()
+                ->where('type', 'expense')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name']),
+            'accounts' => $user->financialAccounts()
+                ->where(function (Builder $query): void {
+                    $query->whereRaw('UPPER(currency) = ?', ['IDR'])
+                        ->orWhere(function (Builder $legacyAccountQuery): void {
+                            $legacyAccountQuery
+                                ->whereNull('currency')
+                                ->where('type', '!=', 'investment');
+                        });
+                })
+                ->orderBy('name')
+                ->get()
+                ->map(fn (FinancialAccount $account): array => [
+                    'id' => $account->id,
+                    'name' => $account->name,
+                    'currency' => strtoupper($account->currencyCode() ?? 'IDR'),
+                ])
+                ->values(),
+        ];
     }
 }

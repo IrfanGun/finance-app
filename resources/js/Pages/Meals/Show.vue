@@ -1,37 +1,47 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ArrowLeft, MapPin, Star } from 'lucide-vue-next';
 import MobileBottomNav from '@/Components/MobileBottomNav.vue';
+import MealExpenseModal from '@/Components/Meals/MealExpenseModal.vue';
+import { formatMealPrice } from '@/Features/Meals/lib/mealRecord';
 import { dashboard } from '@/routes';
 import { index as mealsIndex } from '@/routes/meals';
 import { index as cmsMealsIndex } from '@/routes/cms/meals';
 
 const props = defineProps({
     mealRecord: { type: Object, required: true },
+    expenseCategories: { type: Array, default: () => [] },
+    accounts: { type: Array, default: () => [] },
+    mealCurrency: { type: String, default: 'IDR' },
     openingStatus: { type: String, default: 'unknown' },
     isCms: { type: Boolean, default: false },
 });
 
-const weekdays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-const money = (amount) => new Intl.NumberFormat('id-ID', {
-    maximumFractionDigits: 2,
-}).format(Number(amount ?? 0));
-const statusLabel = {
-    open: 'Sedang buka',
-    closed: 'Sedang tutup',
-    unknown: 'Jam buka belum diketahui',
-};
-const price = Number(props.mealRecord.price_min) === Number(props.mealRecord.price_max)
-    ? `Rp ${money(props.mealRecord.price_min)}`
-    : `Rp ${money(props.mealRecord.price_min)} – ${money(props.mealRecord.price_max)}`;
+const expenseModalVisible = ref(false);
 
 const recordExpense = () => {
+    if (props.isCms) {
+        expenseModalVisible.value = true;
+
+        return;
+    }
+
     router.visit(dashboard.url({
         query: {
             meal_record_id: props.mealRecord.id,
         },
     }));
 };
+
+const weekdays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const statusLabel = {
+    open: 'Sedang buka',
+    closed: 'Sedang tutup',
+    unknown: 'Jam buka belum diketahui',
+};
+const price = formatMealPrice(props.mealRecord, props.isCms);
+
 </script>
 
 <template>
@@ -88,6 +98,15 @@ const recordExpense = () => {
                 @click="router.visit(dashboard.url())"
             > {{ $t("Kembali ke dashboard") }} </ButtonPrimary>
         </main>
+        <MealExpenseModal
+            v-if="isCms && expenseModalVisible"
+            :meal-record="mealRecord"
+            :currency="mealCurrency"
+            :expense-categories="expenseCategories"
+            :accounts="accounts"
+            @close="expenseModalVisible = false"
+            @saved="expenseModalVisible = false"
+        />
         <MobileBottomNav v-if="!isCms" />
     </div>
 </template>

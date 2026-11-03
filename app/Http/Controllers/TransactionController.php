@@ -6,6 +6,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Services\TransactionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,9 +51,24 @@ class TransactionController extends Controller
 
     public function store(TransactionRequest $request, TransactionService $transactions): RedirectResponse
     {
-        $transaction = $transactions->create($request->user(), $request->validated());
+        $data = $request->validated();
+        $returnToCmsMeals = (bool) ($data['return_to_cms_meals'] ?? false);
+        unset($data['return_to_cms_meals']);
 
-        if ($request->filled('meal_record_id')) {
+        if ($returnToCmsMeals) {
+            $account = $request->user()->financialAccounts()
+                ->findOrFail($data['account_id']);
+
+            if (strtoupper($account->currencyCode() ?? '') !== 'IDR') {
+                throw ValidationException::withMessages([
+                    'account_id' => 'Meal menggunakan IDR. Pilih akun dengan mata uang IDR.',
+                ]);
+            }
+        }
+
+        $transaction = $transactions->create($request->user(), $data);
+
+        if ($request->filled('meal_record_id') && ! $returnToCmsMeals) {
             return redirect()->route('dashboard');
         }
 

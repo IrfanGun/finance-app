@@ -12,22 +12,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'name',
     'place_name',
     'type',
+    'prices',
     'price_min',
     'price_max',
     'rating',
     'address',
     'impression',
     'photo_path',
+    'photo_paths',
 ])]
 class MealRecord extends Model
 {
     protected $hidden = [
         'photo_path',
+        'photo_paths',
     ];
 
     protected function casts(): array
     {
         return [
+            'prices' => 'array',
+            'photo_paths' => 'array',
             'price_min' => 'decimal:2',
             'price_max' => 'decimal:2',
             'rating' => 'integer',
@@ -47,5 +52,21 @@ class MealRecord extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function photoPaths(): array
+    {
+        $photoPaths = $this->photo_paths;
+
+        if (is_array($photoPaths) && $photoPaths !== []) {
+            return $photoPaths;
+        }
+
+        return $this->photo_path !== null
+            ? [$this->photo_path]
+            : [];
     }
 }

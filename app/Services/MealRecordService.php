@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class MealRecordService
@@ -40,37 +41,123 @@ class MealRecordService
 
     public function delete(MealRecord $mealRecord): void
     {
-        $photoPath = $mealRecord->photo_path;
+        $photoPaths = $mealRecord->photoPaths();
         $mealRecord->delete();
 
-        if ($photoPath !== null) {
-            Storage::disk('local')->delete($photoPath);
+        if ($photoPaths !== []) {
+            Storage::disk('local')->delete($photoPaths);
         }
     }
 
-    public function replacePhoto(MealRecord $mealRecord, UploadedFile $photo): void
+    /**
+     * @param  array<int, int>  $indexes
+     */
+    public function removePhotosAtIndexes(MealRecord $mealRecord, array $indexes): void
     {
-        $previousPath = $mealRecord->photo_path;
-        $photoPath = $photo->store('meal-records', 'local');
+        $indexes = array_values(array_unique($indexes));
 
-        if (! is_string($photoPath)) {
-            throw new RuntimeException('Foto makanan gagal disimpan.');
+        if ($indexes === []) {
+            return;
         }
 
+        rsort($indexes);
+        $removedPaths = DB::transaction(function () use ($mealRecord, $indexes): array {
+            $lockedMealRecord = MealRecord::query()
+                ->lockForUpdate()
+                ->findOrFail($mealRecord->getKey());
+            $photoPaths = $lockedMealRecord->photoPaths();
+            $removedPaths = [];
+
+            foreach ($indexes as $index) {
+                if (! array_key_exists($index, $photoPaths)) {
+                    throw ValidationException::withMessages([
+                        'remove_photo_indexes' => 'Foto yang dipilih tidak tersedia. Muat ulang halaman lalu coba lagi.',
+                    ]);
+                }
+
+                $removedPaths[] = $photoPaths[$index];
+                array_splice($photoPaths, $index, 1);
+            }
+
+            $lockedMealRecord->forceFill([
+                'photo_path' => $photoPaths[0] ?? null,
+                'photo_paths' => $photoPaths,
+            ])->save();
+
+            return $removedPaths;
+        });
+
+        Storage::disk('local')->delete($removedPaths);
+    }
+
+    public function setPrimaryPhoto(MealRecord $mealRecord, int $index): void
+    {
+        DB::transaction(function () use ($mealRecord, $index): void {
+            $lockedMealRecord = MealRecord::query()
+                ->lockForUpdate()
+                ->findOrFail($mealRecord->getKey());
+            $photoPaths = $lockedMealRecord->photoPaths();
+
+            if (! array_key_exists($index, $photoPaths)) {
+                throw ValidationException::withMessages([
+                    'primary_photo_index' => 'Foto utama yang dipilih tidak tersedia. Muat ulang halaman lalu coba lagi.',
+                ]);
+            }
+
+            $primaryPhotoPath = $photoPaths[$index];
+            array_splice($photoPaths, $index, 1);
+            array_unshift($photoPaths, $primaryPhotoPath);
+
+            $lockedMealRecord->forceFill([
+                'photo_path' => $primaryPhotoPath,
+                'photo_paths' => $photoPaths,
+            ])->save();
+        });
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $photos
+     */
+    public function appendPhotos(MealRecord $mealRecord, array $photos): void
+    {
+        $newPaths = [];
+
         try {
-            DB::transaction(function () use ($mealRecord, $photoPath): void {
-                $mealRecord->forceFill([
-                    'photo_path' => $photoPath,
+            DB::transaction(function () use ($mealRecord, $photos, &$newPaths): void {
+                $lockedMealRecord = MealRecord::query()
+                    ->lockForUpdate()
+                    ->findOrFail($mealRecord->getKey());
+                $currentPaths = $lockedMealRecord->photoPaths();
+
+                if (count($currentPaths) + count($photos) > 5) {
+                    throw ValidationException::withMessages([
+                        'photos' => 'Setiap makanan dapat memiliki maksimal 5 foto.',
+                    ]);
+                }
+
+                foreach ($photos as $photo) {
+                    $photoPath = $photo->store('meal-records', 'local');
+
+                    if (! is_string($photoPath)) {
+                        throw new RuntimeException('Foto makanan gagal disimpan.');
+                    }
+
+                    $newPaths[] = $photoPath;
+                }
+
+                $allPaths = [...$currentPaths, ...$newPaths];
+
+                $lockedMealRecord->forceFill([
+                    'photo_path' => $allPaths[0] ?? null,
+                    'photo_paths' => $allPaths,
                 ])->save();
             });
         } catch (\Throwable $exception) {
-            Storage::disk('local')->delete($photoPath);
+            if ($newPaths !== []) {
+                Storage::disk('local')->delete($newPaths);
+            }
 
             throw $exception;
-        }
-
-        if ($previousPath !== null) {
-            Storage::disk('local')->delete($previousPath);
         }
     }
 

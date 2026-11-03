@@ -1,4 +1,7 @@
 <script setup>
+import DatePicker from '@/Components/DatePicker.vue';
+import SelectInput from '@/Components/SelectInput.vue';
+
 defineProps({
     show: { type: Boolean, default: false },
     transactionForm: { type: Object, required: true },
@@ -48,15 +51,22 @@ defineEmits(['close', 'submit']);
                     </div>
                 </div>
 
-                <label class="text-sm font-medium text-[#17243A]">
-                    {{ $t('Nominal') }}
+                <div class="text-sm font-medium text-[#17243A]">
+                    <label>{{ $t('Nominal') }}</label>
                     <span class="mt-1 flex h-12 items-center overflow-hidden rounded-lg border border-[#D4DCEB] focus-within:border-[#2463F5]">
                         <span class="border-r border-[#E0E6F0] px-4 font-semibold text-[#344563]">Rp</span>
                         <AmountInput v-model="transactionForm.amount" class="h-full min-w-0 flex-1 px-4 text-sm outline-none" required placeholder="0" />
+                        <ButtonPrimary
+                            type="button"
+                            variant="secondary"
+                            class="!mr-2 !inline-flex !h-8 !min-h-8 !shrink-0 !items-center !justify-center !rounded-lg !border-0 !bg-[#EEF4FF] !px-3 !py-0 !text-xs !font-semibold !text-[#2463F5] hover:!bg-[#E2ECFF]"
+                            :disabled="!selectedTransactionPeriod?.remaining || Number(selectedTransactionPeriod.remaining) <= 0"
+                            @click="transactionForm.amount = String(selectedTransactionPeriod?.remaining ?? '')"
+                        >{{ $t('Select all') }}</ButtonPrimary>
                     </span>
                     <span class="mt-1 block text-xs font-normal text-[#718096]">{{ $t('Maksimal Rp') }} {{ formatMoney(selectedTransactionPeriod?.remaining) }}</span>
                     <span v-if="transactionForm.errors.amount" class="mt-1 block text-xs text-red-600">{{ transactionForm.errors.amount }}</span>
-                </label>
+                </div>
 
                 <label class="text-sm font-medium text-[#17243A]">
                     {{ $t('Nama belanja') }}
@@ -65,19 +75,27 @@ defineEmits(['close', 'submit']);
                 </label>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <label class="text-sm font-medium text-[#17243A]">
+                    <div class="text-sm font-medium text-[#17243A]">
                         {{ $t('Kategori') }}
-                        <select v-model="transactionForm.category_id" class="modal-field">
-                            <option value="">{{ $t('Pilih kategori') }}</option>
-                            <option v-for="category in availableCategories" :key="category.id" :value="category.id">{{ category.name }}</option>
-                        </select>
+                        <SelectInput
+                            v-model="transactionForm.category_id"
+                            :options="availableCategories.map((category) => ({ label: category.name, value: category.id }))"
+                            :placeholder="$t('Pilih kategori')"
+                            searchable
+                        />
                         <span v-if="transactionForm.errors.category_id" class="mt-1 block text-xs text-red-600">{{ transactionForm.errors.category_id }}</span>
-                    </label>
-                    <label class="text-sm font-medium text-[#17243A]">
+                    </div>
+                    <div class="text-sm font-medium text-[#17243A]">
                         {{ $t('Tanggal') }}
-                        <input v-model="transactionForm.date" class="modal-field" type="date" :min="selectedTransactionPeriod?.starts_on" :max="selectedTransactionPeriod?.ends_on" required />
+                        <DatePicker
+                            v-model="transactionForm.date"
+                            :min="selectedTransactionPeriod?.starts_on"
+                            :max="selectedTransactionPeriod?.ends_on"
+                            :placeholder="$t('Select date')"
+                            required
+                        />
                         <span v-if="transactionForm.errors.date" class="mt-1 block text-xs text-red-600">{{ transactionForm.errors.date }}</span>
-                    </label>
+                    </div>
                 </div>
 
                 <label class="text-sm font-medium text-[#17243A]">

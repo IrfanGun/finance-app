@@ -10,8 +10,12 @@ export const weekdays = [
 
 export const createEmptyMealForm = () => ({
     name: '',
+    photos: [],
+    remove_photo_indexes: [],
+    primary_photo_index: 0,
     place_name: '',
     type: 'buy',
+    prices: [''],
     price_min: '',
     price_max: '',
     rating: null,
@@ -24,7 +28,13 @@ export const formatMoney = (amount) => new Intl.NumberFormat('id-ID', {
     maximumFractionDigits: 2,
 }).format(Number(amount ?? 0));
 
-export const formatMealPrice = (meal) => {
+export const formatMealPrice = (meal, showPriceList = false) => {
+    if (showPriceList && Array.isArray(meal.prices) && meal.prices.length) {
+        return meal.prices
+            .map((price) => `Rp ${formatMoney(price)}`)
+            .join(' · ');
+    }
+
     if (Number(meal.price_min) === Number(meal.price_max)) {
         return `Rp ${formatMoney(meal.price_min)}`;
     }
@@ -59,6 +69,7 @@ export const getScheduleMode = (openingHours) => {
 };
 
 export const prepareMealFormData = (data, {
+    isCms,
     hasOpeningHours,
     scheduleMode,
     dailySessions,
@@ -77,8 +88,30 @@ export const prepareMealFormData = (data, {
                 closes_next_day: session.closes_at < session.opens_at,
             }));
 
+    const {
+        prices,
+        photos,
+        remove_photo_indexes,
+        primary_photo_index,
+        ...mealData
+    } = data;
+    const validPrices = (prices ?? [])
+        .filter((price) => price !== '' && Number.isFinite(Number(price)))
+        .map(Number);
+
     return {
-        ...data,
+        ...mealData,
+        ...(isCms ? {
+            prices: validPrices,
+            price_min: validPrices.length ? Math.min(...validPrices) : '',
+            price_max: validPrices.length ? Math.max(...validPrices) : '',
+            photos,
+            remove_photo_indexes,
+            primary_photo_index,
+        } : {
+            prices: null,
+            photos: null,
+        }),
         place_name: data.type === 'buy' ? data.place_name : null,
         address: data.type === 'buy' ? data.address : null,
         impression: data.type === 'buy' ? data.impression : null,

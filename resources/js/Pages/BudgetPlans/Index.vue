@@ -333,7 +333,7 @@ const openTransactionModal = (plan, period) => {
     transactionForm.date = today >= period.starts_on && today <= period.ends_on
         ? today
         : period.starts_on;
-    transactionForm.title = 'Belanja';
+    transactionForm.title = plan.name;
     transactionForm.note = '';
     transactionForm.account_id = period.financial_account_id;
     transactionForm.category_id = plan.category_id ?? '';

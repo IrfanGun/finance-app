@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/meals'
  */
 const index57b3a6105afb17387b56dc33f17ab3eb = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index57b3a6105afb17387b56dc33f17ab3eb.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/meals'
  */
 index57b3a6105afb17387b56dc33f17ab3eb.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index57b3a6105afb17387b56dc33f17ab3eb.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/meals'
  */
 index57b3a6105afb17387b56dc33f17ab3eb.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index57b3a6105afb17387b56dc33f17ab3eb.get = (options?: RouteQueryOptions): Route
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/meals'
  */
 index57b3a6105afb17387b56dc33f17ab3eb.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index57b3a6105afb17387b56dc33f17ab3eb.head = (options?: RouteQueryOptions): Rout
 
     /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/cms/meals'
  */
 const index1f606ac9ceecafec2623bb42df195c37 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ index1f606ac9ceecafec2623bb42df195c37.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/cms/meals'
  */
 index1f606ac9ceecafec2623bb42df195c37.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ index1f606ac9ceecafec2623bb42df195c37.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/cms/meals'
  */
 index1f606ac9ceecafec2623bb42df195c37.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -77,7 +77,7 @@ index1f606ac9ceecafec2623bb42df195c37.get = (options?: RouteQueryOptions): Route
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::index
- * @see app/Http/Controllers/MealRecordController.php:18
+ * @see app/Http/Controllers/MealRecordController.php:21
  * @route '/cms/meals'
  */
 index1f606ac9ceecafec2623bb42df195c37.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -97,7 +97,7 @@ export const index = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:47
+ * @see app/Http/Controllers/MealRecordController.php:52
  * @route '/meals'
  */
 const store57b3a6105afb17387b56dc33f17ab3eb = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -112,7 +112,7 @@ store57b3a6105afb17387b56dc33f17ab3eb.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:47
+ * @see app/Http/Controllers/MealRecordController.php:52
  * @route '/meals'
  */
 store57b3a6105afb17387b56dc33f17ab3eb.url = (options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ store57b3a6105afb17387b56dc33f17ab3eb.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:47
+ * @see app/Http/Controllers/MealRecordController.php:52
  * @route '/meals'
  */
 store57b3a6105afb17387b56dc33f17ab3eb.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -131,7 +131,7 @@ store57b3a6105afb17387b56dc33f17ab3eb.post = (options?: RouteQueryOptions): Rout
 
     /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:47
+ * @see app/Http/Controllers/MealRecordController.php:52
  * @route '/cms/meals'
  */
 const store1f606ac9ceecafec2623bb42df195c37 = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -146,7 +146,7 @@ store1f606ac9ceecafec2623bb42df195c37.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:47
+ * @see app/Http/Controllers/MealRecordController.php:52
  * @route '/cms/meals'
  */
 store1f606ac9ceecafec2623bb42df195c37.url = (options?: RouteQueryOptions) => {
@@ -155,7 +155,7 @@ store1f606ac9ceecafec2623bb42df195c37.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::store
- * @see app/Http/Controllers/MealRecordController.php:47
+ * @see app/Http/Controllers/MealRecordController.php:52
  * @route '/cms/meals'
  */
 store1f606ac9ceecafec2623bb42df195c37.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -175,7 +175,7 @@ export const store = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/meals/{meal}'
  */
 const showa387d77b0dd404ca1ab189685db434ab = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ showa387d77b0dd404ca1ab189685db434ab.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/meals/{meal}'
  */
 showa387d77b0dd404ca1ab189685db434ab.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -218,7 +218,7 @@ showa387d77b0dd404ca1ab189685db434ab.url = (args: { meal: string | number } | [m
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/meals/{meal}'
  */
 showa387d77b0dd404ca1ab189685db434ab.get = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -227,7 +227,7 @@ showa387d77b0dd404ca1ab189685db434ab.get = (args: { meal: string | number } | [m
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/meals/{meal}'
  */
 showa387d77b0dd404ca1ab189685db434ab.head = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -237,7 +237,7 @@ showa387d77b0dd404ca1ab189685db434ab.head = (args: { meal: string | number } | [
 
     /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/cms/meals/{meal}'
  */
 const show0ca51121e0f8e82765ca5c3c75daa5da = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -252,7 +252,7 @@ show0ca51121e0f8e82765ca5c3c75daa5da.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/cms/meals/{meal}'
  */
 show0ca51121e0f8e82765ca5c3c75daa5da.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -280,7 +280,7 @@ show0ca51121e0f8e82765ca5c3c75daa5da.url = (args: { meal: string | number } | [m
 
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/cms/meals/{meal}'
  */
 show0ca51121e0f8e82765ca5c3c75daa5da.get = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -289,7 +289,7 @@ show0ca51121e0f8e82765ca5c3c75daa5da.get = (args: { meal: string | number } | [m
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::show
- * @see app/Http/Controllers/MealRecordController.php:57
+ * @see app/Http/Controllers/MealRecordController.php:84
  * @route '/cms/meals/{meal}'
  */
 show0ca51121e0f8e82765ca5c3c75daa5da.head = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -309,7 +309,7 @@ export const show = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/meals/{meal}'
  */
 const updatea387d77b0dd404ca1ab189685db434ab = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -324,7 +324,7 @@ updatea387d77b0dd404ca1ab189685db434ab.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/meals/{meal}'
  */
 updatea387d77b0dd404ca1ab189685db434ab.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -352,7 +352,7 @@ updatea387d77b0dd404ca1ab189685db434ab.url = (args: { meal: string | number } | 
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/meals/{meal}'
  */
 updatea387d77b0dd404ca1ab189685db434ab.put = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -361,7 +361,7 @@ updatea387d77b0dd404ca1ab189685db434ab.put = (args: { meal: string | number } | 
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/meals/{meal}'
  */
 updatea387d77b0dd404ca1ab189685db434ab.patch = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -371,7 +371,7 @@ updatea387d77b0dd404ca1ab189685db434ab.patch = (args: { meal: string | number } 
 
     /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/cms/meals/{meal}'
  */
 const update0ca51121e0f8e82765ca5c3c75daa5da = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -386,7 +386,7 @@ update0ca51121e0f8e82765ca5c3c75daa5da.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/cms/meals/{meal}'
  */
 update0ca51121e0f8e82765ca5c3c75daa5da.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -414,7 +414,7 @@ update0ca51121e0f8e82765ca5c3c75daa5da.url = (args: { meal: string | number } | 
 
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/cms/meals/{meal}'
  */
 update0ca51121e0f8e82765ca5c3c75daa5da.put = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -423,7 +423,7 @@ update0ca51121e0f8e82765ca5c3c75daa5da.put = (args: { meal: string | number } | 
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::update
- * @see app/Http/Controllers/MealRecordController.php:71
+ * @see app/Http/Controllers/MealRecordController.php:100
  * @route '/cms/meals/{meal}'
  */
 update0ca51121e0f8e82765ca5c3c75daa5da.patch = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -443,7 +443,7 @@ export const update = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:83
+ * @see app/Http/Controllers/MealRecordController.php:152
  * @route '/meals/{meal}'
  */
 const destroya387d77b0dd404ca1ab189685db434ab = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -458,7 +458,7 @@ destroya387d77b0dd404ca1ab189685db434ab.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:83
+ * @see app/Http/Controllers/MealRecordController.php:152
  * @route '/meals/{meal}'
  */
 destroya387d77b0dd404ca1ab189685db434ab.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -486,7 +486,7 @@ destroya387d77b0dd404ca1ab189685db434ab.url = (args: { meal: string | number } |
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:83
+ * @see app/Http/Controllers/MealRecordController.php:152
  * @route '/meals/{meal}'
  */
 destroya387d77b0dd404ca1ab189685db434ab.delete = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -496,7 +496,7 @@ destroya387d77b0dd404ca1ab189685db434ab.delete = (args: { meal: string | number 
 
     /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:83
+ * @see app/Http/Controllers/MealRecordController.php:152
  * @route '/cms/meals/{meal}'
  */
 const destroy0ca51121e0f8e82765ca5c3c75daa5da = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -511,7 +511,7 @@ destroy0ca51121e0f8e82765ca5c3c75daa5da.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:83
+ * @see app/Http/Controllers/MealRecordController.php:152
  * @route '/cms/meals/{meal}'
  */
 destroy0ca51121e0f8e82765ca5c3c75daa5da.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -539,7 +539,7 @@ destroy0ca51121e0f8e82765ca5c3c75daa5da.url = (args: { meal: string | number } |
 
 /**
 * @see \App\Http\Controllers\MealRecordController::destroy
- * @see app/Http/Controllers/MealRecordController.php:83
+ * @see app/Http/Controllers/MealRecordController.php:152
  * @route '/cms/meals/{meal}'
  */
 destroy0ca51121e0f8e82765ca5c3c75daa5da.delete = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -559,7 +559,7 @@ export const destroy = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::uploadPhoto
- * @see app/Http/Controllers/MealRecordController.php:92
+ * @see app/Http/Controllers/MealRecordController.php:161
  * @route '/cms/meals/{meal}/photo'
  */
 export const uploadPhoto = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -574,7 +574,7 @@ uploadPhoto.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::uploadPhoto
- * @see app/Http/Controllers/MealRecordController.php:92
+ * @see app/Http/Controllers/MealRecordController.php:161
  * @route '/cms/meals/{meal}/photo'
  */
 uploadPhoto.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -602,7 +602,7 @@ uploadPhoto.url = (args: { meal: string | number } | [meal: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\MealRecordController::uploadPhoto
- * @see app/Http/Controllers/MealRecordController.php:92
+ * @see app/Http/Controllers/MealRecordController.php:161
  * @route '/cms/meals/{meal}/photo'
  */
 uploadPhoto.post = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -612,7 +612,7 @@ uploadPhoto.post = (args: { meal: string | number } | [meal: string | number ] |
 
 /**
 * @see \App\Http\Controllers\MealRecordController::photo
- * @see app/Http/Controllers/MealRecordController.php:103
+ * @see app/Http/Controllers/MealRecordController.php:172
  * @route '/cms/meals/{meal}/photo'
  */
 export const photo = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -627,7 +627,7 @@ photo.definition = {
 
 /**
 * @see \App\Http\Controllers\MealRecordController::photo
- * @see app/Http/Controllers/MealRecordController.php:103
+ * @see app/Http/Controllers/MealRecordController.php:172
  * @route '/cms/meals/{meal}/photo'
  */
 photo.url = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -655,7 +655,7 @@ photo.url = (args: { meal: string | number } | [meal: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\MealRecordController::photo
- * @see app/Http/Controllers/MealRecordController.php:103
+ * @see app/Http/Controllers/MealRecordController.php:172
  * @route '/cms/meals/{meal}/photo'
  */
 photo.get = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -664,7 +664,7 @@ photo.get = (args: { meal: string | number } | [meal: string | number ] | string
 })
 /**
 * @see \App\Http\Controllers\MealRecordController::photo
- * @see app/Http/Controllers/MealRecordController.php:103
+ * @see app/Http/Controllers/MealRecordController.php:172
  * @route '/cms/meals/{meal}/photo'
  */
 photo.head = (args: { meal: string | number } | [meal: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

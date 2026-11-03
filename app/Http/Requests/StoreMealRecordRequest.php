@@ -9,6 +9,24 @@ class StoreMealRecordRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
+        if ($this->routeIs('cms.meals.*')) {
+            $prices = $this->input('prices');
+
+            if (is_array($prices)) {
+                $numericPrices = array_map(
+                    static fn (mixed $price): float => (float) $price,
+                    array_filter($prices, static fn (mixed $price): bool => is_numeric($price)),
+                );
+
+                if ($numericPrices !== []) {
+                    $this->merge([
+                        'price_min' => min($numericPrices),
+                        'price_max' => max($numericPrices),
+                    ]);
+                }
+            }
+        }
+
         $openingHours = $this->input('opening_hours');
 
         if (! is_array($openingHours)) {
@@ -39,13 +57,30 @@ class StoreMealRecordRequest extends FormRequest
 
     public function rules(): array
     {
+        $priceListRules = $this->routeIs('cms.meals.*')
+            ? ['required', 'array', 'min:1']
+            : ['nullable', 'array'];
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'place_name' => ['nullable', 'string', 'max:255'],
             'type' => ['required', 'in:buy,homemade'],
             'price_min' => ['required', 'numeric', 'min:0', 'max:9999999999999.99'],
             'price_max' => ['required', 'numeric', 'min:0', 'max:9999999999999.99', 'gte:price_min'],
+            'prices' => $priceListRules,
+            'prices.*' => ['required', 'numeric', 'min:0', 'max:9999999999999.99'],
             'rating' => ['nullable', 'integer', 'between:1,5'],
+            'photos' => $this->routeIs('cms.meals.*')
+                ? ['nullable', 'array', 'max:5']
+                : ['prohibited'],
+            'photos.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'remove_photo_indexes' => $this->routeIs('cms.meals.*')
+                ? ['nullable', 'array', 'max:5']
+                : ['prohibited'],
+            'remove_photo_indexes.*' => ['required', 'integer', 'between:0,4'],
+            'primary_photo_index' => $this->routeIs('cms.meals.*')
+                ? ['nullable', 'integer', 'between:0,4']
+                : ['prohibited'],
             'address' => ['nullable', 'string', 'max:10000'],
             'impression' => ['nullable', 'string', 'max:10000'],
             'opening_hours' => ['nullable', 'array', 'max:56'],

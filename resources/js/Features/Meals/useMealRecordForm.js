@@ -55,8 +55,16 @@ export function useMealRecordForm(formElement, isCms = false) {
         dailySessions.value = schedule.dailySessions;
         form.defaults({
             name: meal.name,
+            photos: [],
+            remove_photo_indexes: [],
+            primary_photo_index: 0,
             place_name: meal.place_name ?? '',
             type: meal.type,
+            prices: Array.isArray(meal.prices) && meal.prices.length
+                ? [...meal.prices]
+                : Number(meal.price_min) === Number(meal.price_max)
+                    ? [meal.price_min]
+                    : [meal.price_min, meal.price_max],
             price_min: meal.price_min,
             price_max: meal.price_max,
             rating: meal.rating,
@@ -87,6 +95,16 @@ export function useMealRecordForm(formElement, isCms = false) {
 
     const removeSession = (index) => {
         form.opening_hours.splice(index, 1);
+    };
+
+    const addPrice = () => {
+        form.prices.push('');
+    };
+
+    const removePrice = (index) => {
+        if (form.prices.length > 1) {
+            form.prices.splice(index, 1);
+        }
     };
 
     const addDailySession = () => {
@@ -164,6 +182,7 @@ export function useMealRecordForm(formElement, isCms = false) {
         }
 
         form.transform((data) => prepareMealFormData(data, {
+            isCms,
             hasOpeningHours: hasOpeningHours.value,
             scheduleMode: scheduleMode.value,
             dailySessions: dailySessions.value,
@@ -171,6 +190,7 @@ export function useMealRecordForm(formElement, isCms = false) {
 
         const options = {
             preserveScroll: true,
+            forceFormData: form.photos.length > 0,
             onSuccess: () => {
                 formVisible.value = false;
                 currentStep.value = 1;
@@ -178,7 +198,17 @@ export function useMealRecordForm(formElement, isCms = false) {
             onError: (validationErrors) => {
                 const errorFields = Object.keys(validationErrors);
 
-                if (errorFields.some((field) => ['name', 'type', 'price_min', 'price_max', 'rating'].includes(field))) {
+                if (errorFields.some((field) => [
+                    'name',
+                    'type',
+                    'price_min',
+                    'price_max',
+                    'prices',
+                    'rating',
+                    'photos',
+                    'remove_photo_indexes',
+                    'primary_photo_index',
+                ].includes(field) || field.startsWith('prices.') || field.startsWith('photos.'))) {
                     currentStep.value = 1;
 
                     return;
@@ -208,6 +238,7 @@ export function useMealRecordForm(formElement, isCms = false) {
     };
 
     return {
+        addPrice,
         addDailySession,
         addSession,
         changeScheduleMode,
@@ -224,6 +255,7 @@ export function useMealRecordForm(formElement, isCms = false) {
         openCreate,
         openEdit,
         removeDailySession,
+        removePrice,
         removeSession,
         save,
         scheduleMode,
